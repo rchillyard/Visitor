@@ -13,7 +13,7 @@ import java.io.{BufferedWriter, File, FileWriter}
  *
  * @tparam X the type of elements that can be appended to the `Appendable`
  */
-trait Appendable[X] {
+trait Appendable[X] extends AutoCloseable {
 
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
@@ -26,15 +26,17 @@ trait Appendable[X] {
 }
 
 /**
- * A wrapper around `BufferedWriter` that provides an implementation of the `Appendable`
- * trait for appending `String` content to the underlying writer.
+ * A class for appending string data to a `BufferedWriter`, enabling efficient
+ * writing operations with the capability to append text in a chained manner.
  *
- * `AppendableWriter` enables efficient string appending while maintaining compatibility
- * with the `Appendable` trait to support method chaining and scalability in writing operations.
+ * The `AppendableWriter` is a wrapper around a `BufferedWriter` and an additional
+ * `AutoCloseable` instance. It supports appending string content and ensures proper
+ * management of the underlying resources through the `close` method.
  *
- * @param bufferedWriter the underlying `BufferedWriter` used for appending string data
+ * @param bufferedWriter the `BufferedWriter` instance used for writing data
+ * @param closeable      an additional `AutoCloseable` resource associated with this writer
  */
-case class AppendableWriter(bufferedWriter: BufferedWriter) extends Appendable[String] {
+case class AppendableWriter(bufferedWriter: BufferedWriter)(closeable: AutoCloseable) extends Appendable[String] {
 
   /**
    * Appends the specified string to this `AppendableWriter` instance.
@@ -47,6 +49,19 @@ case class AppendableWriter(bufferedWriter: BufferedWriter) extends Appendable[S
   def append(x: String): Appendable[String] = {
     bufferedWriter.append(x)
     this
+  }
+
+  /**
+   * Closes the underlying `BufferedWriter`.
+   *
+   * This method ensures that any resources associated with the writer are released
+   * and any data still present in the buffer is flushed before closing.
+   *
+   * @return Unit.
+   */
+  def close(): Unit = {
+    bufferedWriter.close()
+    closeable.close()
   }
 }
 
@@ -83,11 +98,11 @@ object AppendableWriter {
   /**
    * Creates an `AppendableWriter` instance using the specified `File`.
    *
-   * This method initializes a `FileWriter` in append mode for the provided file
+   * This method initializes a `FileWriter` in append-mode for the provided file
    * and then uses it to create an `AppendableWriter` instance.
    *
    * @param file the file to which the `AppendableWriter` will append data
-   * @return an instance of `AppendableWriter` that writes to the specified file in append mode
+   * @return an instance of `AppendableWriter` that writes to the specified file in append-mode
    */
   def apply(file: File): AppendableWriter =
     apply(new FileWriter(file, true))
@@ -102,20 +117,5 @@ object AppendableWriter {
    * @return a new `AppendableWriter` instance wrapping the provided `FileWriter`
    */
   def apply(fileWriter: FileWriter): AppendableWriter =
-    apply(new BufferedWriter(fileWriter))
-
-  /**
-   * Creates an `AppendableWriter` instance using the specified `BufferedWriter`.
-   *
-   * This method wraps the provided `BufferedWriter` to create an `AppendableWriter`
-   * instance, enabling appending operations in compliance with the `Appendable`
-   * interface. The returned `AppendableWriter` can be used for appending string
-   * data efficiently while leveraging the buffering functionality of `BufferedWriter`.
-   *
-   * @param bufferedWriter the `BufferedWriter` to wrap, providing the underlying
-   *                       writing mechanism for the `AppendableWriter`
-   * @return an instance of `AppendableWriter` that wraps the given `BufferedWriter`
-   */
-  def apply(bufferedWriter: BufferedWriter): AppendableWriter =
-    new AppendableWriter(bufferedWriter)
+    new AppendableWriter(new BufferedWriter(fileWriter))(fileWriter)
 }

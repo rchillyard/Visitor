@@ -12,7 +12,7 @@ package com.phasmidsoftware.visitor
  *
  * @tparam X the type of the state or context that the visitor operates on.
  */
-trait Visitor[X] {
+trait Visitor[X] extends AutoCloseable {
 
   /**
    * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`..
@@ -29,6 +29,97 @@ trait Visitor[X] {
 }
 
 /**
+ * Represents an abstract implementation of a `Visitor` which interacts with a collection
+ * of `Appendable` objects.
+ *
+ * This trait defines a general structure for a visitor that operates on multiple appendable
+ * entities, providing functionality to close all associated appendables collectively.
+ *
+ * @tparam X the type of element or context that the visitor and its associated appendables handle
+ */
+trait AbstractVisitor[X] extends Visitor[X] {
+  /**
+   * Represents the state of openness for the visitor or associated entities.
+   *
+   * NOTE this is a var!
+   *
+   * This variable indicates whether the visitor or its managed appendable resources
+   * are currently open and operational. Typically, the variable starts as `true`
+   * and is set to `false` when the `close` method is invoked, signaling that the
+   * operations have been finalized and the resources are no longer active.
+   */
+  protected var open: Boolean = true
+
+  /**
+   * Retrieves the collection of `Appendable[X]` instances associated with this `AbstractVisitor`.
+   *
+   * The method provides access to all the appendable entities that the visitor interacts with.
+   * This can be useful for iterating over, modifying, or closing the appendables as a group.
+   *
+   * @return an `Iterable` containing the appendable elements of type `Appendable[X]` associated with this visitor
+   */
+  def appendables: Iterable[Appendable[X]]
+
+  /**
+   * Closes all associated `Appendable` instances and marks this visitor as no longer open.
+   *
+   * This method iterates over each appendable in the collection and invokes their `close` method,
+   * ensuring that necessary cleanup or finalization operations are performed on each appendable.
+   * After all appendables are closed, the `open` flag is set to `false`.
+   *
+   * @return Unit (no specific value is returned)
+   */
+  def close(): Unit = {
+    appendables foreach (_.close())
+    open = false
+  }
+}
+
+/**
+ * A concrete implementation of the `Visitor` trait designed to operate with an `Appendable`
+ * instance and a specific message. This class facilitates state updates based on message matching
+ * and appends values of type `X` to the `Appendable`.
+ *
+ * CONSIDER implementing this in terms of MultiVisitor
+ *
+ * @constructor Creates a new `SimpleVisitor` with the specified `Appendable` and `Message`.
+ * @param appendable an `Appendable` instance representing the current state which can be updated with new values
+ * @param msg        a `Message` instance that this visitor matches against during the `visit` operation
+ * @tparam X the type of elements that the `SimpleVisitor` operates on
+ */
+case class SimpleVisitor[X](appendable: Appendable[X], msg: Message) extends AbstractVisitor[X] {
+
+  /**
+   * Processes a `Message` with a given value of type `X` and returns a new `Visitor`
+   * that reflects the updated state based on the provided message and value.
+   *
+   * If the provided `msg` matches the `msg` of this visitor, a new visitor is created
+   * with the value `x` appended to its `Appendable`. Otherwise, this visitor is returned unchanged.
+   *
+   * @param msg the message to be processed by this visitor
+   * @param x   the value of type `X` to be added to the visitor's state if the message matches
+   * @return a new `Visitor[X]` instance representing the updated state if the message matches,
+   *         or the current visitor if the message does not match
+   */
+  def visit(msg: Message)(x: X): SimpleVisitor[X] =
+    if (open)
+      if (msg == this.msg)
+        copy(appendable = appendable.append(x))
+      else
+        this
+    else
+      throw new UnsupportedOperationException(s"Visitor $this is closed")
+
+  /**
+   * Retrieves a collection of `Appendable` instances associated with this visitor.
+   *
+   * @return an `Iterable` containing the `Appendable` instances, typically representing
+   *         the current state or outputs that can be updated or extended.
+   */
+  def appendables: Iterable[Appendable[X]] = Seq(appendable)
+}
+
+/**
  * Abstract implementation of the `Visitor` trait, designed to work with multiple `Appendable` objects
  * mapped to specific `Message` instances.
  *
@@ -37,10 +128,10 @@ trait Visitor[X] {
  * messages through the visitor pattern.
  *
  * @tparam X the type of the state or context that the visitor operates on.
- * @param appendables a map associating `Message` instances with their corresponding `Appendable` objects.
+ * @param mapAppendables a map associating `Message` instances with their corresponding `Appendable` objects.
  *                    This map defines the initial state of the visitor.
  */
-abstract class AbstractMultiVisitor[X](appendables: Map[Message, Appendable[X]]) extends Visitor[X] {
+abstract class AbstractMultiVisitor[X](mapAppendables: Map[Message, Appendable[X]]) extends AbstractVisitor[X] {
 
   /**
    * Retrieves an optional `Appendable[X]` associated with the specified `Message`.
@@ -52,7 +143,7 @@ abstract class AbstractMultiVisitor[X](appendables: Map[Message, Appendable[X]])
    * @param message the `Message` for which to retrieve the associated `Appendable[X]`
    * @return an `Option[Appendable[X]]` containing the associated `Appendable[X]` if it exists, or `None` if there is no association
    */
-  def appendable(message: Message): Option[Appendable[X]] = appendables.get(message)
+  def appendable(message: Message): Option[Appendable[X]] = mapAppendables.get(message)
 
   /**
    * Adds an `Appendable` associated with a specified `Message` to the `Visitor`.
@@ -65,8 +156,8 @@ abstract class AbstractMultiVisitor[X](appendables: Map[Message, Appendable[X]])
    * @param appendable the `Appendable` instance to associate with the specified message.
    * @return a new `Visitor[X]` instance that includes the updated association between the message and the `Appendable`.
    */
-  def addAppendable(msg: Message, appendable: Appendable[X]): Visitor[X] =
-    unit(appendables + (msg -> appendable))
+  def addAppendable(msg: Message, appendable: Appendable[X]): AbstractMultiVisitor[X] =
+    unit(mapAppendables + (msg -> appendable)).asInstanceOf[AbstractMultiVisitor[X]]
 
   /**
    * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`..
@@ -79,25 +170,37 @@ abstract class AbstractMultiVisitor[X](appendables: Map[Message, Appendable[X]])
    * @param x   the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  def visit(msg: Message)(x: X): Visitor[X] = appendables.get(msg) match {
-    case Some(appendable) =>
+  def visit(msg: Message)(x: X): AbstractMultiVisitor[X] = (open, mapAppendables.get(msg)) match {
+    case (false, _) => throw new UnsupportedOperationException(s"Visitor $this is closed")
+    case (_, Some(appendable)) =>
       val updatedAppendable: Appendable[X] = appendable.append(x)
       val kv: (Message, Appendable[X]) = msg -> updatedAppendable
-      unit(appendables + kv)
-    case None =>
+      unit(mapAppendables + kv).asInstanceOf[AbstractMultiVisitor[X]]
+    case (_, None) =>
       this
   }
 
   /**
-   * Creates a new `Visitor` instance with the provided updated appendables.
+   * Creates a new `Visitor` instance with the provided updated mapAppendables.
    *
    * This method is used to update the internal state of the Visitor by creating
    * a new instance with the modified mappings from `Message` to `Appendable`.
    *
    * @param updatedAppendables a map containing updated associations of `Message` to `Appendable[X]`
-   * @return a new `Visitor[X]` instance that reflects the updated appendables
+   * @return a new `Visitor[X]` instance that reflects the updated mapAppendables
    */
   def unit(updatedAppendables: Map[Message, Appendable[X]]): Visitor[X]
+
+  /**
+   * Retrieves an iterable collection of all `Appendable[X]` instances managed by the `AbstractMultiVisitor`.
+   *
+   * This method provides access to the `Appendable[X]` objects currently stored within the internal
+   * map of the `AbstractMultiVisitor`. The returned iterable contains all the values from the
+   * mapping without exposing the keys or the underlying map structure.
+   *
+   * @return an `Iterable` containing all `Appendable[X]` instances managed by the `AbstractMultiVisitor`
+   */
+  def appendables: Iterable[Appendable[X]] = mapAppendables.values
 }
 
 /**
@@ -109,12 +212,12 @@ abstract class AbstractMultiVisitor[X](appendables: Map[Message, Appendable[X]])
  * enabling the combination of multiple appendable elements while maintaining immutability.
  *
  * @tparam X the type of elements processed by the visitor and stored in the associated `Appendable` instances
- * @param appendables a mapping of `Message` to corresponding `Appendable[X]` instances
+ * @param mapAppendables a mapping of `Message` to corresponding `Appendable[X]` instances
  */
-case class MultiVisitor[X](appendables: Map[Message, Appendable[X]]) extends AbstractMultiVisitor[X](appendables) {
+case class MultiVisitor[X](mapAppendables: Map[Message, Appendable[X]]) extends AbstractMultiVisitor[X](mapAppendables) {
 
   /**
-   * Creates a new `Visitor` instance with the specified updated appendables.
+   * Creates a new `Visitor` instance with the specified updated mapAppendables.
    *
    * This method is used to generate a new `Visitor` instance, encapsulating the state
    * provided by the updated mapping of `Message` to `Appendable[X]`. It enables the

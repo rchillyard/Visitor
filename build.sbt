@@ -1,13 +1,13 @@
 
 organization := "com.phasmidsoftware"
 
-version := "0.0.1-SNAPSHOT"
+version := "0.0.2-SNAPSHOT"
 
 ThisBuild / scalaVersion := "3.3.0"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "Visitor"
+    name := "visitor"
   )
 
 val scalaTestVersion = "3.2.19"

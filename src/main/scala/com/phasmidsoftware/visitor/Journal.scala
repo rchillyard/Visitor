@@ -14,7 +14,19 @@ import scala.collection.immutable.Queue
  *
  * @tparam X the type of elements contained in the `Journal`
  */
-trait Journal[X] extends Appendable[X] with Iterable[X]
+trait Journal[X] extends Appendable[X] with Iterable[X] {
+
+  /**
+   * Closes the journal, performing any necessary cleanup or finalization operations.
+   *
+   * This method may be overridden by subclasses to implement custom close behavior.
+   *
+   * @return Unit (no specific value is returned)
+   */
+  def close(): Unit = {
+  }
+}
+
 
 /**
  * Represents a journal implemented as a list of elements of type `X`.
@@ -97,13 +109,16 @@ object QueueJournal {
 }
 
 /**
- * Represents a journal implemented as a list of elements of type `X`.
+ * A `MapJournal` is a concrete implementation of the `Journal` trait that maintains a collection
+ * of elements represented as key-value pairs using a `Map`.
  *
- * `ListJournal` is an immutable data structure that extends the `Journal` trait.
- * It provides functionality to append elements and to iterate over the stored elements.
+ * This class provides functionality to append new elements, retrieve elements by key,
+ * and iterate over the contents of the journal. It ensures immutability by returning
+ * a new instance when modifications, such as appending, are performed.
  *
- * @tparam X the type of elements stored in the journal
- * @param xs the list of elements in the journal
+ * @tparam K the type of keys maintained by the map
+ * @tparam V the type of values associated with the keys
+ * @param xs the underlying map storing the key-value pairs of the journal
  */
 case class MapJournal[K, V](xs: Map[K, V]) extends Journal[(K, V)] {
   /**
