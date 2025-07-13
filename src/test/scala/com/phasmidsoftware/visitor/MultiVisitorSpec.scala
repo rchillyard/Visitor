@@ -3,9 +3,9 @@ package com.phasmidsoftware.visitor
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
-class VisitorSpec extends AnyFlatSpec with should.Matchers {
+class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
 
-  behavior of "Visitor"
+  behavior of "MultiVisitor"
 
   it should "visit" in {
     val visitor0 = MultiVisitor[String](Pre -> QueueJournal.empty[String])
