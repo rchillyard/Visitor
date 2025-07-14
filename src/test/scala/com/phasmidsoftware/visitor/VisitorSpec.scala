@@ -27,4 +27,10 @@ class VisitorSpec extends AnyFlatSpec with should.Matchers {
     a[UnsupportedOperationException] should be thrownBy visitor0.visit(Pre)("Hello")
   }
 
+  it should "appendables" in {
+    val visitor0 = SimpleVisitor[String](QueueJournal.empty[String], Pre)
+    visitor0.close()
+    visitor0.appendables.size shouldBe 1
+  }
+
 }

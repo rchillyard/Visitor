@@ -119,3 +119,58 @@ object AppendableWriter {
   def apply(fileWriter: FileWriter): AppendableWriter =
     new AppendableWriter(new BufferedWriter(fileWriter))(fileWriter)
 }
+
+/**
+ * The `HasAppendables` trait defines an abstraction for entities that manage a collection of `Appendable` instances.
+ *
+ * This trait provides methods to access and interact with the associated `Appendable` and `Journal` elements,
+ * allowing filtering and additional operations on these appendable entities.
+ *
+ * @tparam X the type of elements managed by the appendables
+ */
+trait HasAppendables[X] {
+
+  /**
+   * Retrieves the collection of `Appendable[X]` instances associated with this `AbstractVisitor`.
+   *
+   * The method provides access to all the appendable entities that the visitor interacts with.
+   * This can be useful for iterating over, modifying, or closing the appendables as a group.
+   *
+   * @return an `Iterable` containing the appendable elements of type `Appendable[X]` associated with this visitor
+   */
+  def appendables: Iterable[Appendable[X]]
+
+  /**
+   * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor`.
+   *
+   * This method filters the iterable collection of `Appendable[X]` instances, returning only those
+   * that are of type `Journal[X]`. It performs a type check on each `Appendable[X]` and selectively
+   * includes those that match the `Journal[X]` type.
+   *
+   * @return an `Iterable` containing all `Journal[X]` instances managed by this `Visitor`
+   */
+  def journals: Iterable[Journal[X]] =
+    for {
+      appendable <- appendables
+      xjo: Option[Journal[X]] = appendable match {
+        case x: Journal[X] => Some(x);
+        case _ => None
+      }
+      journal <- xjo
+    } yield journal
+
+  /**
+   * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor`.
+   *
+   * This method filters the iterable collection of `Appendable[X]` instances, returning only those
+   * that are of type `Journal[X]`. It performs a type check on each `Appendable[X]` and selectively
+   * includes those that match the `Journal[X]` type.
+   *
+   * @return an `Iterable` containing all `Journal[X]` instances managed by this `Visitor`
+   */
+  def mapJournals: Iterable[Journal[X]] =
+    journals filter {
+      case x: MapJournal[_, _] => true;
+      case _ => false
+    }
+}

@@ -244,7 +244,7 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
    * @return a new `FunctionMapJournal[K, V]` instance containing the updated mapping
    */
   def appendByFunction(k: K): FunctionMapJournal[K, V] =
-    append(k -> f(k)).asInstanceOf[FunctionMapJournal[K, V]]
+    append(k -> apply(k)).asInstanceOf[FunctionMapJournal[K, V]]
 
   /**
    * Creates a new instance of `AbstractMapJournal` with the given map.

@@ -12,10 +12,10 @@ package com.phasmidsoftware.visitor
  *
  * @tparam X the type of the state or context that the visitor operates on.
  */
-trait Visitor[X] extends AutoCloseable {
+trait Visitor[X] extends HasAppendables[X] with AutoCloseable {
 
   /**
-   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`..
+   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
    *
    * This method defines the behavior for handling a `Message` in the context
    * of the Visitor pattern. The implementation of this method should use the provided
@@ -51,16 +51,6 @@ trait AbstractVisitor[X] extends Visitor[X] {
   protected var open: Boolean = true
 
   /**
-   * Retrieves the collection of `Appendable[X]` instances associated with this `AbstractVisitor`.
-   *
-   * The method provides access to all the appendable entities that the visitor interacts with.
-   * This can be useful for iterating over, modifying, or closing the appendables as a group.
-   *
-   * @return an `Iterable` containing the appendable elements of type `Appendable[X]` associated with this visitor
-   */
-  def appendables: Iterable[Appendable[X]]
-
-  /**
    * Closes all associated `Appendable` instances and marks this visitor as no longer open.
    *
    * This method iterates over each appendable in the collection and invokes their `close` method,
@@ -83,7 +73,8 @@ trait AbstractVisitor[X] extends Visitor[X] {
  * CONSIDER implementing this in terms of MultiVisitor
  *
  * @constructor Creates a new `SimpleVisitor` with the specified `Appendable` and `Message`.
- * @param appendable an `Appendable` instance representing the current state which can be updated with new values
+ * @param appendable an `Appendable` instance representing the current state,
+ *                   which can be updated with new values
  * @param msg        a `Message` instance that this visitor matches against during the `visit` operation
  * @tparam X the type of elements that the `SimpleVisitor` operates on
  */
@@ -160,7 +151,7 @@ abstract class AbstractMultiVisitor[X](mapAppendables: Map[Message, Appendable[X
     unit(mapAppendables + (msg -> appendable)).asInstanceOf[AbstractMultiVisitor[X]]
 
   /**
-   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`..
+   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
    *
    * This method defines the behavior for handling a `Message` in the context
    * of the Visitor pattern. The implementation of this method should use the provided
@@ -231,7 +222,7 @@ case class MultiVisitor[X](mapAppendables: Map[Message, Appendable[X]]) extends 
   def unit(updatedAppendables: Map[Message, Appendable[X]]): Visitor[X] = MultiVisitor(updatedAppendables)
 
   /**
-   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`..
+   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
    *
    * This method defines the behavior for handling a `Message` in the context
    * of the Visitor pattern. The implementation of this method should use the provided
