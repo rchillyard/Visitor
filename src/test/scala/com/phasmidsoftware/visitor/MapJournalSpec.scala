@@ -2,6 +2,7 @@ package com.phasmidsoftware.visitor
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
+import org.scalatest.matchers.should.Matchers.shouldBe
 
 class MapJournalSpec extends AnyFlatSpec with should.Matchers {
 
@@ -17,6 +18,13 @@ class MapJournalSpec extends AnyFlatSpec with should.Matchers {
     iterator.hasNext shouldBe true
     iterator.next shouldBe("b", 2)
     iterator.hasNext shouldBe false
+  }
+
+  it should "test map" in {
+    val emptyJournal = MapJournal.empty[String, Int]
+    val journal: MapJournal[String, Int] = emptyJournal.append("1" -> 1).append("2" -> 2)
+    val map: Map[String, Int] = journal.map
+    map shouldBe Map("1" -> 1, "2" -> 2)
   }
 
   it should "test get" in {

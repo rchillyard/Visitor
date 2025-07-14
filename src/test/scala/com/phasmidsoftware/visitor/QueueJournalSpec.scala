@@ -3,6 +3,8 @@ package com.phasmidsoftware.visitor
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
+import scala.collection.immutable.Queue
+
 class QueueJournalSpec extends AnyFlatSpec with should.Matchers {
 
   behavior of "QueueJournal"
@@ -17,5 +19,12 @@ class QueueJournalSpec extends AnyFlatSpec with should.Matchers {
     iterator.hasNext shouldBe true
     iterator.next shouldBe "b"
     iterator.hasNext shouldBe false
+  }
+
+  it should "test queue" in {
+    val emptyJournal = QueueJournal.empty[String]
+    val journal = emptyJournal.append("a").append("b")
+    val queue = journal.queue
+    queue shouldBe Queue("a", "b")
   }
 }

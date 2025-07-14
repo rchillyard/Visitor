@@ -1,7 +1,7 @@
 
 organization := "com.phasmidsoftware"
 
-version := "0.0.4-SNAPSHOT"
+version := "0.0.5-SNAPSHOT"
 
 ThisBuild / scalaVersion := "3.3.0"
 
