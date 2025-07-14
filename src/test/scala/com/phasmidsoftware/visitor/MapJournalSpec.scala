@@ -25,4 +25,26 @@ class MapJournalSpec extends AnyFlatSpec with should.Matchers {
     val journal = emptyJournal.append(("a", 1))
     journal.get("a") shouldBe Some(1)
   }
+
+  behavior of "FunctionMapJournal"
+
+  it should "test Iterator" in {
+    val f: String => Int = s => s.toInt
+    val emptyJournal = FunctionMapJournal.empty[String, Int](f)
+    emptyJournal.iterator.isEmpty shouldBe true
+    val journal = emptyJournal.appendByFunction("1").appendByFunction("2")
+    val iterator = journal.iterator
+    iterator.hasNext shouldBe true
+    iterator.next shouldBe("1", 1)
+    iterator.hasNext shouldBe true
+    iterator.next shouldBe("2", 2)
+    iterator.hasNext shouldBe false
+  }
+
+  it should "test get" in {
+    val emptyJournal = FunctionMapJournal.empty[String, String](identity)
+    emptyJournal.get("a") shouldBe None
+    val journal = emptyJournal.append(("a", "a"))
+    journal.get("a") shouldBe Some("a")
+  }
 }
