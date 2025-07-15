@@ -1,6 +1,6 @@
 package com.phasmidsoftware.visitor
 
-import com.phasmidsoftware.visitor.RecursiveVisitor.{recurseWithInVisit, updatedAppendables}
+import com.phasmidsoftware.visitor.RecursiveVisitor.recurseWithInVisit
 
 /**
  * A specialized visitor implementing recursive traversal and processing logic.
@@ -31,16 +31,31 @@ case class RecursiveVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X])
    *         and visiting the provided element and its sub-elements.
    */
   def recurse(x: X): RecursiveVisitor[X] = {
-    val xs = f(x)
-    val visitor = unit(updatedAppendables(x, Pre, map))
-    val result: AbstractMultiVisitor[X] =
-      if (Range.inclusive(0, 2).contains(xs.length) && map.contains(In))
+    def performRecursion(xs: Seq[X], visitor: RecursiveVisitor[X]) = {
+      val g: (RecursiveVisitor[X], X) => RecursiveVisitor[X] = _ recurse _
+      if (xs.length <= 2 && map.contains(In))
         recurseWithInVisit(visitor, x, xs)
-      else xs.foldLeft(visitor) {
-        (v, child) => v.recurse(child)
-      }
-    unit(updatedAppendables(x, Post, result.mapAppendables))
+      else
+        xs.foldLeft(visitor)(g)
+    }
+
+    // First do a pre-visit, next perform the recursion, finally do a post-visit
+    performRecursion(f(x), visit(Pre)(x)).visit(Post)(x)
   }
+
+
+  /**
+   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
+   *
+   * This method defines the behavior for handling a `Message` in the context
+   * of the Visitor pattern. The implementation of this method should use the provided
+   * message and state to determine the next state and return the appropriate `Visitor`.
+   *
+   * @param msg the message to be processed by the visitor
+   * @param x   the current state or context associated with the visitor
+   * @return a new `Visitor[X]` instance that represents the updated state after processing the message
+   */
+  override def visit(msg: Message)(x: X): RecursiveVisitor[X] = super.visit(msg)(x).asInstanceOf[RecursiveVisitor[X]]
 
   /**
    * Creates a new `Visitor` instance with the provided updated mapAppendables.
@@ -55,23 +70,29 @@ case class RecursiveVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X])
     copy(map = map)
 }
 
+/**
+ * Contains utility methods for processing recursive logic within the `RecursiveVisitor` class.
+ *
+ * This object provides an internal helper function used to facilitate specific
+ * recursive operations with handling of `In` messages during traversal.
+ */
 object RecursiveVisitor {
-  def updatedAppendables[X](x: X, msg: Message, map: Map[Message, Appendable[X]]): Map[Message, Appendable[X]] = {
-    map.map {
-      case (k@`msg`, a) => (k, a.append(x))
-      case e => e
-    }
-  }
 
+  /**
+   * Performs a recursive traversal with specific handling for "In" messages.
+   * This method processes the provided element `x` within a recursive structure
+   * and updates the visitor state accordingly, ensuring it supports the case
+   * of sequences with at most two elements.
+   *
+   * @param visitor the current `RecursiveVisitor` instance that maintains
+   *                the state of the recursive traversal.
+   * @param x       the element of type `X` that is being processed and traversed.
+   * @param xs      a sequence of type `X` representing the sub-elements related to `x`.
+   *                This sequence must contain at most two elements.
+   */
   private def recurseWithInVisit[X](visitor: RecursiveVisitor[X], x: X, xs: Seq[X]) = {
-    val maybeLeft = xs.headOption
-    val maybeRight = xs.lastOption
-    val visitedLeft = maybeLeft.fold(visitor)(visitor.recurse)
-    val visitedLeftAndElement = visitedLeft.visit(In)(x)
-    maybeRight.foldLeft(visitedLeftAndElement) {
-      case (v: RecursiveVisitor[X], last) =>
-        v.recurse(last)
-    }
+    require(xs.length <= 2, "xs must contain at most two elements")
+    val visitedLeft = xs.headOption.fold(visitor)(visitor.recurse)
+    xs.lastOption.fold(visitedLeft.visit(In)(x))(visitedLeft.visit(In)(x).recurse)
   }
-
 }
