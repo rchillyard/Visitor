@@ -120,7 +120,7 @@ case class SimpleVisitor[X](appendable: Appendable[X], msg: Message) extends Abs
  *
  * @tparam X the type of the state or context that the visitor operates on.
  * @param mapAppendables a map associating `Message` instances with their corresponding `Appendable` objects.
- *                    This map defines the initial state of the visitor.
+ *                       This map defines the initial state of the visitor.
  */
 abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendable[X]]) extends AbstractVisitor[X] {
 

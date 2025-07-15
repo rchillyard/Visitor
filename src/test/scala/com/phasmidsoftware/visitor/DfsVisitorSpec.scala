@@ -5,9 +5,9 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.util.{Success, Using}
 
-class RecursiveVisitorSpec extends AnyFlatSpec with Matchers {
+class DfsVisitorSpec extends AnyFlatSpec with Matchers {
 
-  behavior of "RecursiveVisitor"
+  behavior of "DfsVisitor"
 
   // Define a tree similar to a binary heap starting at slot 1
   //           10
@@ -25,7 +25,7 @@ class RecursiveVisitorSpec extends AnyFlatSpec with Matchers {
   it should "recurse pre-order" in {
 
     // Test a recursive pre-order traversal of the tree, starting at the root.
-    Using(RecursiveVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f)) {
+    Using(DfsVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f)) {
       visitor0 =>
         val visitor1 = visitor0.recurse(10)
         for {journal <- visitor1.journals
@@ -36,7 +36,7 @@ class RecursiveVisitorSpec extends AnyFlatSpec with Matchers {
 
   it should "recurse reverse post-order" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
-    Using(RecursiveVisitor[Int](Map(Post -> ListJournal.empty[Int]), f)) {
+    Using(DfsVisitor[Int](Map(Post -> ListJournal.empty[Int]), f)) {
       visitor =>
         for {journal <- visitor.recurse(10).journals
              entry <- journal
@@ -46,7 +46,7 @@ class RecursiveVisitorSpec extends AnyFlatSpec with Matchers {
 
   it should "recurse in-order" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
-    Using(RecursiveVisitor[Int](Map(In -> QueueJournal.empty[Int]), f)) {
+    Using(DfsVisitor[Int](Map(In -> QueueJournal.empty[Int]), f)) {
       visitor =>
         for {journal <- visitor.recurse(10).journals
              entry <- journal

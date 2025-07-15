@@ -1,6 +1,6 @@
 package com.phasmidsoftware.visitor
 
-import com.phasmidsoftware.visitor.RecursiveVisitor.recurseWithInVisit
+import com.phasmidsoftware.visitor.DfsVisitor.recurseWithInVisit
 
 /**
  * A specialized visitor implementing recursive traversal and processing logic.
@@ -19,20 +19,20 @@ import com.phasmidsoftware.visitor.RecursiveVisitor.recurseWithInVisit
  *            sub-elements (children) for recursive processing from a given instance of `X`.
  * @tparam X the type of elements being visited and processed recursively.
  */
-case class RecursiveVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) {
+case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) {
 
   /**
    * Recursively processes an element of type `X` using a depth-first traversal strategy.
-   * This method updates the internal state of the `RecursiveVisitor` at each step of the recursion,
+   * This method updates the internal state of the `DfsVisitor` at each step of the recursion,
    * applying pre-, in-, and post-visit modifications as determined by the `Pre`-, `In`- and `Post`-messages.
    *
    * @param x the element of type `X` to be processed and traversed recursively.
-   * @return a new instance of `RecursiveVisitor` with the updated state after processing
+   * @return a new instance of `DfsVisitor` with the updated state after processing
    *         and visiting the provided element and its sub-elements.
    */
-  def recurse(x: X): RecursiveVisitor[X] = {
-    def performRecursion(xs: Seq[X], visitor: RecursiveVisitor[X]) = {
-      val g: (RecursiveVisitor[X], X) => RecursiveVisitor[X] = _ recurse _
+  def recurse(x: X): DfsVisitor[X] = {
+    def performRecursion(xs: Seq[X], visitor: DfsVisitor[X]) = {
+      val g: (DfsVisitor[X], X) => DfsVisitor[X] = _ recurse _
       if (xs.length <= 2 && map.contains(In))
         recurseWithInVisit(visitor, x, xs)
       else
@@ -55,7 +55,7 @@ case class RecursiveVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X])
    * @param x   the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(x: X): RecursiveVisitor[X] = super.visit(msg)(x).asInstanceOf[RecursiveVisitor[X]]
+  override def visit(msg: Message)(x: X): DfsVisitor[X] = super.visit(msg)(x).asInstanceOf[DfsVisitor[X]]
 
   /**
    * Creates a new `Visitor` instance with the provided updated mapAppendables.
@@ -66,17 +66,17 @@ case class RecursiveVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X])
    * @param map a map containing updated associations of `Message` to `Appendable[X]`
    * @return a new `Visitor[X]` instance that reflects the updated mapAppendables
    */
-  def unit(map: Map[Message, Appendable[X]]): RecursiveVisitor[X] =
+  def unit(map: Map[Message, Appendable[X]]): DfsVisitor[X] =
     copy(map = map)
 }
 
 /**
- * Contains utility methods for processing recursive logic within the `RecursiveVisitor` class.
+ * Contains utility methods for processing recursive logic within the `DfsVisitor` class.
  *
  * This object provides an internal helper function used to facilitate specific
  * recursive operations with handling of `In` messages during traversal.
  */
-object RecursiveVisitor {
+object DfsVisitor {
 
   /**
    * Performs a recursive traversal with specific handling for "In" messages.
@@ -84,13 +84,13 @@ object RecursiveVisitor {
    * and updates the visitor state accordingly, ensuring it supports the case
    * of sequences with at most two elements.
    *
-   * @param visitor the current `RecursiveVisitor` instance that maintains
+   * @param visitor the current `DfsVisitor` instance that maintains
    *                the state of the recursive traversal.
    * @param x       the element of type `X` that is being processed and traversed.
    * @param xs      a sequence of type `X` representing the sub-elements related to `x`.
    *                This sequence must contain at most two elements.
    */
-  private def recurseWithInVisit[X](visitor: RecursiveVisitor[X], x: X, xs: Seq[X]) = {
+  private def recurseWithInVisit[X](visitor: DfsVisitor[X], x: X, xs: Seq[X]) = {
     require(xs.length <= 2, "xs must contain at most two elements")
     val visitedLeft = xs.headOption.fold(visitor)(visitor.recurse)
     xs.lastOption.fold(visitedLeft.visit(In)(x))(visitedLeft.visit(In)(x).recurse)
