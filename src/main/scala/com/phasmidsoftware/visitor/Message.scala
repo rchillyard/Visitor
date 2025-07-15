@@ -4,13 +4,13 @@ package com.phasmidsoftware.visitor
  * Represents a generic message that can be used in conjunction with the Visitor pattern.
  *
  * This trait serves as a marker type and is intended to be extended or instantiated
- * by specific message types for processing by a Visitor implementation. Objects like `Pre`,
+ * by specific message types for processing by a Visitor implementation. Objects like `Pre`, In,
  * `Post`, and `Nothing` are examples of concrete implementations of this trait.
  *
- * It is primarily used for defining behavior in methods such as `visit` in the Visitor pattern,
+ * It is primarily used for defining behavior in methods such as `visit` in the `Visitor` pattern,
  * where actions are performed based on the type or identity of the provided message.
  */
-trait Message
+sealed trait Message
 
 /**
  * `Pre` is an object that extends the `Message` trait.
@@ -37,6 +37,13 @@ object Pre extends Message
  * It is intended to be a concrete, immutable instance in the collection of predefined `Message` types.
  */
 object Post extends Message
+
+/**
+ * Represents a specific type of `Message` used in conjunction with the Visitor pattern.
+ *
+ * `In`-visitation occurs ONLY if an object has exactly two children (a binary tree, for instance).
+ */
+object In extends Message
 
 /**
  * `Nothing` is an object that extends the `Message` trait.

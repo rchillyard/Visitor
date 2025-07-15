@@ -122,7 +122,7 @@ case class SimpleVisitor[X](appendable: Appendable[X], msg: Message) extends Abs
  * @param mapAppendables a map associating `Message` instances with their corresponding `Appendable` objects.
  *                    This map defines the initial state of the visitor.
  */
-abstract class AbstractMultiVisitor[X](mapAppendables: Map[Message, Appendable[X]]) extends AbstractVisitor[X] {
+abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendable[X]]) extends AbstractVisitor[X] {
 
   /**
    * Retrieves an optional `Appendable[X]` associated with the specified `Message`.
@@ -203,9 +203,9 @@ abstract class AbstractMultiVisitor[X](mapAppendables: Map[Message, Appendable[X
  * enabling the combination of multiple appendable elements while maintaining immutability.
  *
  * @tparam X the type of elements processed by the visitor and stored in the associated `Appendable` instances
- * @param mapAppendables a mapping of `Message` to corresponding `Appendable[X]` instances
+ * @param map a mapping of `Message` to corresponding `Appendable[X]` instances
  */
-case class MultiVisitor[X](mapAppendables: Map[Message, Appendable[X]]) extends AbstractMultiVisitor[X](mapAppendables) {
+case class MultiVisitor[X](map: Map[Message, Appendable[X]]) extends AbstractMultiVisitor[X](map) {
 
   /**
    * Creates a new `Visitor` instance with the specified updated mapAppendables.
