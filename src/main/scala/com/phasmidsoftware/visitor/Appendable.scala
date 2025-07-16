@@ -1,6 +1,6 @@
 package com.phasmidsoftware.visitor
 
-import java.io.{BufferedWriter, File, FileWriter}
+import java.io.*
 
 /**
  * A generic trait representing a collection or structure that supports appending elements of type `X`.
@@ -26,17 +26,20 @@ trait Appendable[X] extends AutoCloseable {
 }
 
 /**
- * A class for appending string data to a `BufferedWriter`, enabling efficient
- * writing operations with the capability to append text in a chained manner.
+ * `AppendableWriter` is a case class that wraps a `Writer` instance, enabling string
+ * appending functionality along with proper resource management.
  *
- * The `AppendableWriter` is a wrapper around a `BufferedWriter` and an additional
- * `AutoCloseable` instance. It supports appending string content and ensures proper
- * management of the underlying resources through the `close` method.
+ * This class implements the `Appendable` trait specialized for `String`, providing an
+ * efficient way to append strings to an underlying writer.
  *
- * @param bufferedWriter the `BufferedWriter` instance used for writing data
- * @param closeable      an additional `AutoCloseable` resource associated with this writer
+ * The `closeable` parameter is an optional resource that will be closed when the
+ * `close` method is invoked, ensuring that any additional resources associated with
+ * the writer are properly released.
+ *
+ * @param writer    the underlying `Writer` instance to which strings are appended
+ * @param closeable an optional `AutoCloseable` resource that will be closed along with the writer
  */
-case class AppendableWriter(bufferedWriter: BufferedWriter)(closeable: AutoCloseable) extends Appendable[String] {
+case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends Appendable[String] {
 
   /**
    * Appends the specified string to this `AppendableWriter` instance.
@@ -47,7 +50,7 @@ case class AppendableWriter(bufferedWriter: BufferedWriter)(closeable: AutoClose
    * @return the current `AppendableWriter` instance with the appended string
    */
   def append(x: String): Appendable[String] = {
-    bufferedWriter.append(x)
+    writer.append(x)
     this
   }
 
@@ -60,8 +63,8 @@ case class AppendableWriter(bufferedWriter: BufferedWriter)(closeable: AutoClose
    * @return Unit.
    */
   def close(): Unit = {
-    bufferedWriter.close()
-    closeable.close()
+    writer.close()
+    closeable foreach (_.close())
   }
 }
 
@@ -117,7 +120,18 @@ object AppendableWriter {
    * @return a new `AppendableWriter` instance wrapping the provided `FileWriter`
    */
   def apply(fileWriter: FileWriter): AppendableWriter =
-    new AppendableWriter(new BufferedWriter(fileWriter))(fileWriter)
+    new AppendableWriter(new BufferedWriter(fileWriter))(Some(fileWriter))
+
+  /**
+   * Creates a new instance of `AppendableWriter` with a default `StringWriter` as the underlying writer.
+   *
+   * This method provides a convenient way to construct an `AppendableWriter`
+   * in-memory without specifying a file or an external writer.
+   *
+   * @return a new `AppendableWriter` instance wrapping a default `StringWriter`
+   */
+  def apply(): AppendableWriter =
+    new AppendableWriter(new StringWriter())(None)
 }
 
 /**
