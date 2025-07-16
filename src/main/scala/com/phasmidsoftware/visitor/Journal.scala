@@ -30,7 +30,7 @@ trait Journal[X] extends Appendable[X] with Iterable[X] {
 /**
  * A trait that combines the behavior of a function and a journal.
  *
- * `JournalFunction` extends both a function `(X => Y)` and `Journal[(X, Y)]`.
+ * `FunctionMappedJournal` extends both a function `(X => Y)` and `Journal[(X, Y)]`.
  * This allows it to act as a function that maps input of type `X` to output of type `Y`,
  * while also maintaining a journal of past inputs and outputs in the form of `(X, Y)` pairs.
  *
@@ -41,7 +41,7 @@ trait Journal[X] extends Appendable[X] with Iterable[X] {
  * @tparam X the type of input to the function
  * @tparam Y the type of output from the function
  */
-trait JournalFunction[X, Y] extends Journal[(X, Y)] with (X => Y)
+trait FunctionMappedJournal[X, Y] extends Journal[(X, Y)] with (X => Y)
 
 /**
  * Represents a journal implemented as a list of elements of type `X`.
@@ -259,9 +259,9 @@ object MapJournal {
 }
 
 /**
- * `FunctionMapJournal` is a case class that represents a specialized implementation of `AbstractMapJournal`,
+ * `FunctionMapMappedJournal` is a case class that represents a specialized implementation of `AbstractMapJournal`,
  * which maintains a journal of key-value pairs along with a function that can derive values
- * based on keys. It extends both `AbstractMapJournal` and `JournalFunction`, providing a combination
+ * based on keys. It extends both `AbstractMapJournal` and `FunctionMappedJournal`, providing a combination
  * of stateful journal behavior and functional operations.
  *
  * @param xs a map containing the initial key-value pairs in the journal
@@ -269,7 +269,7 @@ object MapJournal {
  * @tparam K the type of the keys in the journal
  * @tparam V the type of the values in the journal
  */
-case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMapJournal[K, V](xs) with JournalFunction[K, V] {
+case class FunctionMapMappedJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMapJournal[K, V](xs) with FunctionMappedJournal[K, V] {
 
   /**
    * Applies the function `f` to the given key and returns the resulting value.
@@ -284,13 +284,13 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
   /**
    * Appends a new entry to the journal by applying the stored function `f` to the given key `k`.
    * The resulting key-value pair is then appended to the internal map, producing a new instance
-   * of `FunctionMapJournal` that reflects the updated state.
+   * of `FunctionMapMappedJournal` that reflects the updated state.
    *
    * @param k the key for which the function `f` will be applied to generate its corresponding value
-   * @return a new `FunctionMapJournal[K, V]` instance containing the updated mapping
+   * @return a new `FunctionMapMappedJournal[K, V]` instance containing the updated mapping
    */
-  def appendByFunction(k: K): FunctionMapJournal[K, V] =
-    append(k -> apply(k)).asInstanceOf[FunctionMapJournal[K, V]]
+  def appendByFunction(k: K): FunctionMapMappedJournal[K, V] =
+    append(k -> apply(k)).asInstanceOf[FunctionMapMappedJournal[K, V]]
 
   /**
    * Creates a new instance of `AbstractMapJournal` with the given map.
@@ -299,13 +299,13 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
    * @return a new instance of `AbstractMapJournal` containing the elements of the provided map
    */
   def unit(xs: Map[K, V]): AbstractMapJournal[K, V] =
-    FunctionMapJournal(xs)(f)
+    FunctionMapMappedJournal(xs)(f)
 }
 
 /**
  * An implementation of a journal backed by a map and a key-value computing function.
  *
- * The `FunctionMapJournal` stores a map of keys and their associated values, as well as a function `f`
+ * The `FunctionMapMappedJournal` stores a map of keys and their associated values, as well as a function `f`
  * that computes the value for a given key. It provides methods to compute values, append to the journal
  * by applying the function `f` to a key, and create new instances with updated maps.
  *
@@ -313,14 +313,14 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
  * or updated using a predefined function.
  *
  */
-object FunctionMapJournal {
+object FunctionMapMappedJournal {
   /**
-   * Creates an empty instance of `FunctionMapJournal` with an initial empty map
+   * Creates an empty instance of `FunctionMapMappedJournal` with an initial empty map
    * and a function `f` that computes values based on keys.
    *
    * @param f a function that, given a key of type `K`, computes a corresponding value of type `V`
-   * @return a new `FunctionMapJournal[K, V]` instance with an empty map and the provided function
+   * @return a new `FunctionMapMappedJournal[K, V]` instance with an empty map and the provided function
    */
-  def empty[K, V](f: K => V): FunctionMapJournal[K, V] =
-    FunctionMapJournal(Map.empty)(f)
+  def empty[K, V](f: K => V): FunctionMapMappedJournal[K, V] =
+    FunctionMapMappedJournal(Map.empty)(f)
 }
