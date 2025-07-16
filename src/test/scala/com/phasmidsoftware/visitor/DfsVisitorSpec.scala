@@ -22,33 +22,33 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     Seq(twiceIndex, twiceIndex + 1).filter(x => x > 0 && x < tree.length).map(tree)
   }
 
-  it should "recurse pre-order" in {
+  it should "dfs pre-order" in {
 
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f)) {
       visitor0 =>
-        val visitor1 = visitor0.recurse(10)
+        val visitor1 = visitor0.dfs(10)
         for {journal <- visitor1.journals
              entry <- journal
              } yield entry
     } shouldBe Success(List(10, 5, 2, 1, 3, 6, 13, 11, 15))
   }
 
-  it should "recurse reverse post-order" in {
+  it should "dfs reverse post-order" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(Post -> ListJournal.empty[Int]), f)) {
       visitor =>
-        for {journal <- visitor.recurse(10).journals
+        for {journal <- visitor.dfs(10).journals
              entry <- journal
              } yield entry
     } shouldBe Success(List(10, 13, 15, 11, 5, 6, 2, 3, 1))
   }
 
-  it should "recurse in-order" in {
+  it should "dfs in-order" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(In -> QueueJournal.empty[Int]), f)) {
       visitor =>
-        for {journal <- visitor.recurse(10).journals
+        for {journal <- visitor.dfs(10).journals
              entry <- journal
              } yield entry
     } shouldBe Success(List(1, 2, 3, 5, 6, 10, 11, 13, 15))

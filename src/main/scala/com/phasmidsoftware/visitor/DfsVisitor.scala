@@ -20,7 +20,6 @@ import com.phasmidsoftware.visitor.DfsVisitor.recurseWithInVisit
  * @tparam X the type of elements being visited and processed recursively.
  */
 case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) {
-
   /**
    * Recursively processes an element of type `X` using a depth-first traversal strategy.
    * This method updates the internal state of the `DfsVisitor` at each step of the recursion,
@@ -30,14 +29,12 @@ case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) exten
    * @return a new instance of `DfsVisitor` with the updated state after processing
    *         and visiting the provided element and its sub-elements.
    */
-  def recurse(x: X): DfsVisitor[X] = {
-    def performRecursion(xs: Seq[X], visitor: DfsVisitor[X]) = {
-      val g: (DfsVisitor[X], X) => DfsVisitor[X] = _ recurse _
+  def dfs(x: X): DfsVisitor[X] = {
+    def performRecursion(xs: Seq[X], visitor: DfsVisitor[X]) =
       if (xs.length <= 2 && map.contains(In))
         recurseWithInVisit(visitor, x, xs)
       else
-        xs.foldLeft(visitor)(g)
-    }
+        xs.foldLeft(visitor)(_ dfs _)
 
     // First do a pre-visit, next perform the recursion, finally do a post-visit
     performRecursion(f(x), visit(Pre)(x)).visit(Post)(x)
@@ -92,7 +89,7 @@ object DfsVisitor {
    */
   private def recurseWithInVisit[X](visitor: DfsVisitor[X], x: X, xs: Seq[X]) = {
     require(xs.length <= 2, "xs must contain at most two elements")
-    val visitedLeft = xs.headOption.fold(visitor)(visitor.recurse)
-    xs.lastOption.fold(visitedLeft.visit(In)(x))(visitedLeft.visit(In)(x).recurse)
+    val visitedLeft = xs.headOption.fold(visitor)(visitor.dfs)
+    xs.lastOption.fold(visitedLeft.visit(In)(x))(visitedLeft.visit(In)(x).dfs)
   }
 }
