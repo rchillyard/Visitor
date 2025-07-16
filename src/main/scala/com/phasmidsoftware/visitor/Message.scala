@@ -5,7 +5,7 @@ package com.phasmidsoftware.visitor
  *
  * This trait serves as a marker type and is intended to be extended or instantiated
  * by specific message types for processing by a Visitor implementation. Objects like `Pre`, In,
- * `Post`, and `Nothing` are examples of concrete implementations of this trait.
+ * `Post`, and `SelfVisit` are examples of concrete implementations of this trait.
  *
  * It is primarily used for defining behavior in methods such as `visit` in the `Visitor` pattern,
  * where actions are performed based on the type or identity of the provided message.
@@ -46,10 +46,10 @@ object Post extends Message
 object In extends Message
 
 /**
- * `Nothing` is an object that extends the `Message` trait.
+ * `SelfVisit` is an object that extends the `Message` trait.
  *
  * It represents a specific type of `Message` within the context of the Visitor pattern.
- * `Nothing` serves as a predefined, immutable instance that may be used to signify
+ * `SelfVisit` serves as a predefined, immutable instance that may be used to signify
  * the absence of action or a neutral state in message processing.
  *
  * As part of the `Message` hierarchy, it can be passed to a `Visitor` implementation,
@@ -57,4 +57,4 @@ object In extends Message
  * This object provides a way to encode a semantic placeholder or non-operation
  * within the message processing flow.
  */
-object Nothing extends Message
+object SelfVisit extends Message

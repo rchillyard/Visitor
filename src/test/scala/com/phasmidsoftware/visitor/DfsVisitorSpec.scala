@@ -3,7 +3,7 @@ package com.phasmidsoftware.visitor
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.util.{Success, Using}
+import scala.util.{Failure, Success, Using}
 
 class DfsVisitorSpec extends AnyFlatSpec with Matchers {
 
@@ -23,7 +23,6 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "dfs pre-order" in {
-
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f)) {
       visitor0 =>
@@ -52,5 +51,44 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
              entry <- journal
              } yield entry
     } shouldBe Success(List(1, 2, 3, 5, 6, 10, 11, 13, 15))
+  }
+
+  it should "dfs with discovery" in {
+    case class Discoverable(i: Int, var discovered: Boolean = false) {
+      def discover(): Unit = discovered = true
+    }
+    object Discoverable {
+      def create(i: Int): Discoverable = new Discoverable(i, false)
+    }
+    val inputs: Seq[Discoverable] = Seq(10, 5, 13, 2, 6, 11, 15, 1, 3) map Discoverable.create
+    val f: Discoverable => Seq[Discoverable] = {
+      x =>
+        inputs.find(d => d.i == x.i) match {
+          case Some(d) =>
+            val index = inputs.indexOf(d)
+            if (index < 0)
+              throw new NoSuchElementException(s"No such element: $d")
+            else if (index < inputs.length - 1)
+              inputs.slice(index, index + 1) filterNot (d => d.discovered)
+            else
+              Seq.empty[Discoverable]
+          case None =>
+            throw new NoSuchElementException(s"No such element with value: $x")
+        }
+    }
+
+    val preEntry = Pre -> QueueJournal.empty[Discoverable]
+    val selfEntry = SelfVisit -> NonAppendable[Discoverable](_.discover())
+    Using(DfsVisitor(Map(preEntry, selfEntry), f)) {
+      visitor =>
+        for {journal <- visitor.dfs(Discoverable(10)).journals
+             entry <- journal
+             } yield entry
+    } match {
+      case Success(discoverables) =>
+        discoverables.forall(_.discovered) shouldBe true
+      case Failure(exception) =>
+        fail(exception)
+    }
   }
 }

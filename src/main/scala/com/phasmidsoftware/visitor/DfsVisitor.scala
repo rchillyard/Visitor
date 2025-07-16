@@ -36,8 +36,8 @@ case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) exten
       else
         xs.foldLeft(visitor)(_ dfs _)
 
-    // First do a pre-visit, next perform the recursion, finally do a post-visit
-    performRecursion(f(x), visit(Pre)(x)).visit(Post)(x)
+    // First do a pre-visit, then a "SelfVisit", next perform the recursion, finally do a post-visit
+    performRecursion(f(x), visit(Pre)(x).visit(SelfVisit)(x)).visit(Post)(x)
   }
 
 
