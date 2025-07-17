@@ -34,11 +34,11 @@ class MapJournalSpec extends AnyFlatSpec with should.Matchers {
     journal.get("a") shouldBe Some(1)
   }
 
-  behavior of "FunctionMapMappedJournal"
+  behavior of "FunctionMapJournal"
 
   it should "test Iterator" in {
     val f: String => Int = s => s.toInt
-    val emptyJournal = FunctionMapMappedJournal.empty[String, Int](f)
+    val emptyJournal = FunctionMapJournal.empty[String, Int](f)
     emptyJournal.iterator.isEmpty shouldBe true
     val journal = emptyJournal.appendByFunction("1").appendByFunction("2")
     val iterator = journal.iterator
@@ -50,7 +50,7 @@ class MapJournalSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "test get" in {
-    val emptyJournal = FunctionMapMappedJournal.empty[String, String](identity)
+    val emptyJournal = FunctionMapJournal.empty[String, String](identity)
     emptyJournal.get("a") shouldBe None
     val journal = emptyJournal.append(("a", "a"))
     journal.get("a") shouldBe Some("a")

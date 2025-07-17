@@ -259,7 +259,7 @@ object MapJournal {
 }
 
 /**
- * `FunctionMapMappedJournal` is a case class that represents a specialized implementation of `AbstractMapJournal`,
+ * `FunctionMapJournal` is a case class that represents a specialized implementation of `AbstractMapJournal`,
  * which maintains a journal of key-value pairs along with a function that can derive values
  * based on keys. It extends both `AbstractMapJournal` and `FunctionMappedJournal`, providing a combination
  * of stateful journal behavior and functional operations.
@@ -269,11 +269,13 @@ object MapJournal {
  * @tparam K the type of the keys in the journal
  * @tparam V the type of the values in the journal
  */
-case class FunctionMapMappedJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMapJournal[K, V](xs) with FunctionMappedJournal[K, V] {
+case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMapJournal[K, V](xs) with FunctionMappedJournal[K, V] {
 
   /**
    * Applies the function `f` to the given key and returns the resulting value.
    * This method uses the stored function `f` to compute the value associated with the provided key.
+   * TESTME is this method ever actually invoked? It seems like we always invoke apply((K,V))
+   * CONSIDER if this method isn't invoked, then we don't need the f parameter in the declaration.
    *
    * @param key the key for which the value is to be computed using the stored function `f`
    * @return the value corresponding to the provided key, computed by the function `f`
@@ -284,13 +286,13 @@ case class FunctionMapMappedJournal[K, V](xs: Map[K, V])(f: K => V) extends Abst
   /**
    * Appends a new entry to the journal by applying the stored function `f` to the given key `k`.
    * The resulting key-value pair is then appended to the internal map, producing a new instance
-   * of `FunctionMapMappedJournal` that reflects the updated state.
+   * of `FunctionMapJournal` that reflects the updated state.
    *
    * @param k the key for which the function `f` will be applied to generate its corresponding value
-   * @return a new `FunctionMapMappedJournal[K, V]` instance containing the updated mapping
+   * @return a new `FunctionMapJournal[K, V]` instance containing the updated mapping
    */
-  def appendByFunction(k: K): FunctionMapMappedJournal[K, V] =
-    append(k -> apply(k)).asInstanceOf[FunctionMapMappedJournal[K, V]]
+  def appendByFunction(k: K): FunctionMapJournal[K, V] =
+    append(k -> apply(k)).asInstanceOf[FunctionMapJournal[K, V]]
 
   /**
    * Creates a new instance of `AbstractMapJournal` with the given map.
@@ -299,13 +301,13 @@ case class FunctionMapMappedJournal[K, V](xs: Map[K, V])(f: K => V) extends Abst
    * @return a new instance of `AbstractMapJournal` containing the elements of the provided map
    */
   def unit(xs: Map[K, V]): AbstractMapJournal[K, V] =
-    FunctionMapMappedJournal(xs)(f)
+    FunctionMapJournal(xs)(f)
 }
 
 /**
  * An implementation of a journal backed by a map and a key-value computing function.
  *
- * The `FunctionMapMappedJournal` stores a map of keys and their associated values, as well as a function `f`
+ * The `FunctionMapJournal` stores a map of keys and their associated values, as well as a function `f`
  * that computes the value for a given key. It provides methods to compute values, append to the journal
  * by applying the function `f` to a key, and create new instances with updated maps.
  *
@@ -313,14 +315,14 @@ case class FunctionMapMappedJournal[K, V](xs: Map[K, V])(f: K => V) extends Abst
  * or updated using a predefined function.
  *
  */
-object FunctionMapMappedJournal {
+object FunctionMapJournal {
   /**
-   * Creates an empty instance of `FunctionMapMappedJournal` with an initial empty map
+   * Creates an empty instance of `FunctionMapJournal` with an initial empty map
    * and a function `f` that computes values based on keys.
    *
    * @param f a function that, given a key of type `K`, computes a corresponding value of type `V`
-   * @return a new `FunctionMapMappedJournal[K, V]` instance with an empty map and the provided function
+   * @return a new `FunctionMapJournal[K, V]` instance with an empty map and the provided function
    */
-  def empty[K, V](f: K => V): FunctionMapMappedJournal[K, V] =
-    FunctionMapMappedJournal(Map.empty)(f)
+  def empty[K, V](f: K => V): FunctionMapJournal[K, V] =
+    FunctionMapJournal(Map.empty)(f)
 }

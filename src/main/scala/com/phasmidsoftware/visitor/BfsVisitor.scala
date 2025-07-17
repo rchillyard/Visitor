@@ -8,7 +8,7 @@ import scala.collection.immutable.Queue
  * where a tree can, of course, be a subgraph of a graph.
  *
  * This case class extends `AbstractMultiVisitor` and is designed to handle recursive
- * visits of elements of type `X`, using the provided function `f` to generate sub-elements
+ * visits of elements of type `X`, using the provided function `children` to generate sub-elements
  * for recursion. It is initialized with a map linking specific `Message` instances
  * to corresponding `Appendable[X]` objects.
  * The `Message` types supported by this method are: `Pre`, `In`, and `Post`.
@@ -41,7 +41,7 @@ case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X
    *
    * This method executes the BFS traversal by processing elements from the queue,
    * visiting each element with a predefined message (`Pre`), and enqueuing the results
-   * of applying the function `f` to the current element. The traversal continues recursively
+   * of applying the function `children` to the current element. The traversal continues recursively
    * until the queue is empty.
    *
    * @return a new instance of `BfsVisitor[X]` representing the state after completing
