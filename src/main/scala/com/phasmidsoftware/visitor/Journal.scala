@@ -3,18 +3,18 @@ package com.phasmidsoftware.visitor
 import scala.collection.immutable.Queue
 
 /**
- * A trait representing a journal that maintains a collection of elements of type `X`.
+ * A trait representing a journal that maintains and manages entries of type `X`.
  *
- * `Journal` combines the behaviors of `Appendable` and `Iterable`, allowing elements to be appended
- * while also being iterable for operations like traversal, filtering, and mapping.
+ * A `Journal` extends the `Appendable` trait, enabling the appending of elements
+ * to create a new instance while retaining existing entries. It also provides
+ * functionality to close the journal, performing any necessary cleanup or finalization.
  *
- * This abstraction is intended to represent a sequence of log-like or journaled entries
- * that can be modified immutably and iterated over. It may be useful in scenarios where
- * maintaining an appendable history or audit log alongside iterable access is required.
+ * This trait can be used as a base for implementations that deal with logging, recording,
+ * or managing sequences of data entries, while ensuring immutability or controlled updates.
  *
- * @tparam X the type of elements contained in the `Journal`
+ * @tparam X the type of entries managed by this journal
  */
-trait Journal[X] extends Appendable[X] with Iterable[X] {
+trait Journal[X] extends Appendable[X] {
 
   /**
    * Closes the journal, performing any necessary cleanup or finalization operations.
@@ -26,6 +26,21 @@ trait Journal[X] extends Appendable[X] with Iterable[X] {
   def close(): Unit = {
   }
 }
+
+/**
+ * A trait that represents an iterable journal, combining the functionalities of both the `Journal`
+ * and `Iterable` traits. 
+ *
+ * `IterableJournal` is intended to maintain a collection of elements of type `X` that
+ * can be both appended (as supported by `Journal`) and iterated over (as supported by `Iterable`).
+ *
+ * This abstraction is useful for scenarios where a sequence of log-like entries or journaled
+ * elements is required, while also enabling iteration for traversal, filtering, mapping, or other
+ * higher-order functions.
+ *
+ * @tparam X the type of elements contained in the iterable journal
+ */
+trait IterableJournal[X] extends Journal[X] with Iterable[X]
 
 /**
  * A trait that combines the behavior of a function and a journal.
@@ -52,7 +67,7 @@ trait FunctionMappedJournal[X, Y] extends Journal[(X, Y)] with (X => Y)
  * @tparam X the type of elements stored in the journal
  * @param list the list of elements in the journal
  */
-case class ListJournal[X](list: List[X]) extends Journal[X] {
+case class ListJournal[X](list: List[X]) extends IterableJournal[X] {
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
    * of the `Appendable` with the element included.
@@ -95,7 +110,7 @@ object ListJournal {
  * @tparam X the type of elements stored in the journal
  * @param queue the list of elements in the journal
  */
-case class QueueJournal[X](queue: Queue[X]) extends Journal[X] {
+case class QueueJournal[X](queue: Queue[X]) extends IterableJournal[X] {
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
    * of the `Appendable` with the element included.
@@ -153,14 +168,6 @@ abstract class AbstractMapJournal[K, V](map: Map[K, V]) extends Journal[(K, V)] 
    */
   def append(x: (K, V)): AbstractMapJournal[K, V] =
     unit(map + x)
-
-  /**
-   * Returns an iterator over the elements of this collection.
-   *
-   * @return an `Iterator` containing the elements of this collection in order
-   */
-  def iterator: Iterator[(K, V)] =
-    map.iterator
 
   /**
    * Retrieves the value associated with the specified key from the underlying map.

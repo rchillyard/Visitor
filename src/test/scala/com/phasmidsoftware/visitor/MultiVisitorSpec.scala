@@ -14,7 +14,7 @@ class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
       visitor0 =>
         val visitor1 = visitor0.visit(Pre)("Hello").visit(Pre)("Goodbye")
         visitor1.appendable(Pre) match {
-          case Some(journal: Journal[_]) => journal.iterator.toList shouldBe List("Hello", "Goodbye")
+          case Some(journal: IterableJournal[_]) => journal.iterator.toList shouldBe List("Hello", "Goodbye")
           case _ => fail("No journal")
         }
     }
@@ -25,7 +25,7 @@ class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
       visitor =>
         val visitor1 = visitor.addAppendable(Pre, QueueJournal.empty[String]).visit(Pre)("Hello").visit(Pre)("Goodbye")
         visitor1.appendable(Pre) match {
-          case Some(journal: Journal[_]) => journal.iterator.toList shouldBe List("Hello", "Goodbye")
+          case Some(journal: IterableJournal[_]) => journal.iterator.toList shouldBe List("Hello", "Goodbye")
           case _ => fail("No journal")
         }
     }
@@ -36,7 +36,7 @@ class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
       visitor =>
         val visitor1 = visitor.visit(Pre)("Hello").visit(Pre)("Goodbye")
         visitor1.appendable(Pre) match {
-          case Some(journal: Journal[_]) =>
+          case Some(journal: IterableJournal[_]) =>
             journal.iterator.toList shouldBe List("Hello", "Goodbye")
           case _ =>
             fail("No journal")
@@ -44,11 +44,11 @@ class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
     }.isSuccess shouldBe false
   }
 
-  it should "journals" in {
+  it should "iterableJournals" in {
     Using(MultiVisitor[String](Pre -> QueueJournal.empty[String])) {
       visitor0 =>
         val visitor1 = visitor0.addAppendable(Post, ListJournal.empty[String]).visit(Pre)("Hello").visit(Post)("Go away!").visit(Pre)("Goodbye")
-        for {journal <- visitor1.journals
+        for {journal <- visitor1.iterableJournals
              entry <- journal
              } yield entry
     } shouldBe Success(List("Hello", "Goodbye", "Go away!"))
@@ -59,9 +59,8 @@ class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
       visitor0 =>
         val visitor1 = visitor0.addAppendable(Post, ListJournal.empty[(String, String)]).visit(Pre)("Hello" -> "Greeting").visit(Post)("Go away!" -> "").visit(Pre)("Goodbye" -> "Valediction")
         for {journal <- visitor1.mapJournals
-             entry <- journal
-             } yield entry
-    } shouldBe Success(List("Hello" -> "Greeting", "Goodbye" -> "Valediction"))
+             } yield journal
+    } shouldBe Success(List(MapJournal(Map("Hello" -> "Greeting", "Goodbye" -> "Valediction"))))
   }
 
 }

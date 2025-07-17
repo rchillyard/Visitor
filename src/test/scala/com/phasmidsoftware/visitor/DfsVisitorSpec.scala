@@ -26,7 +26,7 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f)) {
       visitor =>
-        for {journal <- visitor.dfs(10).journals
+        for {journal <- visitor.dfs(10).iterableJournals
              entry <- journal
              } yield entry
     } shouldBe Success(List(10, 5, 2, 1, 3, 6, 13, 11, 15))
@@ -39,7 +39,9 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     Using(DfsVisitorMapped[Int, String](Map(entry), function, f)) {
       visitor =>
         // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
-        visitor.dfs(10).journals.headOption.asInstanceOf[Option[FunctionMapJournal[Int, String]]]
+        val visited = visitor.dfs(10)
+        val mapJournals: Iterable[AbstractMapJournal[Int, String]] = visited.mapJournals
+        mapJournals.headOption.asInstanceOf[Option[FunctionMapJournal[Int, String]]]
     } match {
       case Success(Some(journal)) =>
         journal.get(10) shouldBe Some("10")
@@ -57,7 +59,7 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(Post -> ListJournal.empty[Int]), f)) {
       visitor =>
-        for {journal <- visitor.dfs(10).journals
+        for {journal <- visitor.dfs(10).iterableJournals
              entry <- journal
              } yield entry
     } shouldBe Success(List(10, 13, 15, 11, 5, 6, 2, 3, 1))
@@ -67,7 +69,7 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(In -> QueueJournal.empty[Int]), f)) {
       visitor =>
-        for {journal <- visitor.dfs(10).journals
+        for {journal <- visitor.dfs(10).iterableJournals
              entry <- journal
              } yield entry
     } shouldBe Success(List(1, 2, 3, 5, 6, 10, 11, 13, 15))
@@ -101,7 +103,7 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     val selfEntry = SelfVisit -> NonAppendable[Discoverable](_.discover())
     Using(DfsVisitor(Map(preEntry, selfEntry), f)) {
       visitor =>
-        for {journal <- visitor.dfs(Discoverable(10)).journals
+        for {journal <- visitor.dfs(Discoverable(10)).iterableJournals
              entry <- journal
              } yield entry
     } match {

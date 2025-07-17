@@ -10,14 +10,9 @@ class MapJournalSpec extends AnyFlatSpec with should.Matchers {
 
   it should "test Iterator" in {
     val emptyJournal = MapJournal.empty[String, Int]
-    emptyJournal.iterator.isEmpty shouldBe true
     val journal = emptyJournal.append(("a", 1)).append(("b", 2))
-    val iterator = journal.iterator
-    iterator.hasNext shouldBe true
-    iterator.next shouldBe("a", 1)
-    iterator.hasNext shouldBe true
-    iterator.next shouldBe("b", 2)
-    iterator.hasNext shouldBe false
+    val keys = journal.keys
+    keys.forall(key => journal.get(key).isDefined) shouldBe true
   }
 
   it should "test map" in {
@@ -39,14 +34,9 @@ class MapJournalSpec extends AnyFlatSpec with should.Matchers {
   it should "test Iterator" in {
     val f: String => Int = s => s.toInt
     val emptyJournal = FunctionMapJournal.empty[String, Int](f)
-    emptyJournal.iterator.isEmpty shouldBe true
     val journal = emptyJournal.appendByFunction("1").appendByFunction("2")
-    val iterator = journal.iterator
-    iterator.hasNext shouldBe true
-    iterator.next shouldBe("1", 1)
-    iterator.hasNext shouldBe true
-    iterator.next shouldBe("2", 2)
-    iterator.hasNext shouldBe false
+    val keys = journal.keys
+    keys.forall(key => journal.get(key).isDefined) shouldBe true
   }
 
   it should "test get" in {

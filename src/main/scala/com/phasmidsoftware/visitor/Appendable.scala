@@ -155,7 +155,7 @@ trait HasAppendables[X] {
   def appendables: Iterable[Appendable[X]]
 
   /**
-   * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor`.
+   * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor` that are Iterable.
    *
    * This method filters the iterable collection of `Appendable[X]` instances, returning only those
    * that are of type `Journal[X]`. It performs a type check on each `Appendable[X]` and selectively
@@ -163,11 +163,11 @@ trait HasAppendables[X] {
    *
    * @return an `Iterable` containing all `Journal[X]` instances managed by this `Visitor`
    */
-  def journals: Iterable[Journal[X]] =
+  def iterableJournals: Iterable[IterableJournal[X]] =
     for {
       appendable <- appendables
-      xjo: Option[Journal[X]] = appendable match {
-        case x: Journal[X] => Some(x);
+      xjo: Option[IterableJournal[X]] = appendable match {
+        case x: IterableJournal[X] => Some(x);
         case _ => None
       }
       journal <- xjo
@@ -182,9 +182,15 @@ trait HasAppendables[X] {
    *
    * @return an `Iterable` containing all `Journal[X]` instances managed by this `Visitor`
    */
-  def mapJournals: Iterable[Journal[X]] =
-    journals filter {
-      case x: MapJournal[_, _] => true;
-      case _ => false
-    }
+  def mapJournals[K, V]: Iterable[AbstractMapJournal[K, V]] =
+    for {
+      appendable <- appendables
+      xjo: Option[AbstractMapJournal[K, V]] = appendable match {
+        case x: AbstractMapJournal[K, V] =>
+          Some(x)
+        case _ =>
+          None
+      }
+      journal <- xjo
+    } yield journal
 }
