@@ -19,7 +19,7 @@ import com.phasmidsoftware.visitor.DfsVisitor.recurseWithInVisit
  *            sub-elements (children) for recursive processing from a given instance of `X`.
  * @tparam X the type of elements being visited and processed recursively.
  */
-case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) {
+case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) with Dfs[X, DfsVisitor[X]] {
   /**
    * Recursively processes an element of type `X` using a depth-first traversal strategy.
    * This method updates the internal state of the `DfsVisitor` at each step of the recursion,
@@ -110,15 +110,16 @@ object DfsVisitor {
  * @tparam K the type of the keys or elements being traversed.
  * @tparam V the type of the associated values produced during the traversal process.
  */
-case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractMultiVisitor[(K, V)](map) {
+case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractMultiVisitor[(K, V)](map) with Dfs[K, DfsVisitorMapped[K, V]] {
   /**
-   * Recursively processes an element of type `K` using a depth-first traversal strategy.
-   * This method updates the internal state of the `DfsVisitor` at each step of the recursion,
-   * applying pre-, in-, and post-visit modifications as determined by the `Pre`-, `In`- and `Post`-messages.
+   * Performs a depth-first traversal starting from the provided key `k`.
+   * This method applies visitor operations in a specific sequence: pre-visit, self-visit, recursive traversal, and post-visit.
    *
-   * @param k the element of type `K` to be processed and traversed recursively.
-   * @return a new instance of `DfsVisitor` with the updated state after processing
-   *         and visiting the provided element and its sub-elements.
+   * Depending on the conditions of the children of the key, the traversal may apply special in-visit logic if there are exactly two children.
+   * Returns an updated `DfsVisitorMapped` instance reflecting the changes made during the traversal.
+   *
+   * @param k the starting key for the depth-first search operation
+   * @return a new `DfsVisitorMapped[K, V]` instance after performing the DFS traversal from the given key
    */
   def dfs(k: K): DfsVisitorMapped[K, V] = {
     val v = f(k)
@@ -145,7 +146,8 @@ case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K =>
    * @param kv   the current state or context associated with the visitor
    * @return a new `DfsVisitorMapped[K, V]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(kv: (K, V)): DfsVisitorMapped[K, V] = super.visit(msg)(kv).asInstanceOf[DfsVisitorMapped[K, V]]
+  override def visit(msg: Message)(kv: (K, V)): DfsVisitorMapped[K, V] =
+    super.visit(msg)(kv).asInstanceOf[DfsVisitorMapped[K, V]]
 
   /**
    * Creates a new `Visitor` instance with the provided updated mapAppendables.
@@ -161,26 +163,20 @@ case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K =>
 }
 
 /**
- * Provides utility methods related to depth-first search traversal with mapped visitor functionality.
- * This object defines specific helper methods for managing recursive traversals and handling
- * visitor state updates in contexts where nodes may have at most two sub-elements.
+ * Companion object for the `DfsVisitorMapped` class, incorporating utility methods to manage
+ * depth-first traversal operations with a visitor-centric approach.
  */
 object DfsVisitorMapped {
 
   /**
-   * Performs a recursive traversal with specific handling for "In" messages.
-   * This method processes the provided element `k` within a recursive structure
-   * and updates the visitor state accordingly, ensuring it supports the case
-   * of sequences with at most two elements.
+   * Performs recursive operations on a key-value pair with a depth-first search (DFS) visitor,
+   * applying in-visit logic if the provided sequence of children contains at most two elements.
+   * Depending on the contents of the sequence `xs`, it updates the visitor state accordingly.
    *
-   * CONSIDER should we pass in the dfs function as a parameter?
-   * TESTME
-   *
-   * @param visitor the current `DfsVisitor` instance that maintains
-   *                the state of the recursive traversal.
-   * @param k       the element of type `X` that is being processed and traversed.
-   * @param xs      a sequence of type `X` representing the sub-elements related to `k`.
-   *                This sequence must contain at most two elements.
+   * @param visitor the initial DFS visitor instance to be updated during the recursive process
+   * @param k       the current key to be processed
+   * @param v       the current associated value of the key
+   * @param xs      a sequence of child keys to be processed; must contain at most two elements
    */
   private def recurseWithInVisit[K, V](visitor: DfsVisitorMapped[K, V], k: K, v: V, xs: Seq[K]) = {
     require(xs.length <= 2, "xs must contain at most two elements")
