@@ -75,6 +75,80 @@ case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) exten
 object DfsVisitor {
 
   /**
+   * Creates a new instance of `DfsVisitor` to perform a depth-first traversal of elements of type `X`.
+   * The traversal behavior is determined by the provided message, journal, and recursive function.
+   *
+   * @param message the `Message` type determining the current phase of the visit (e.g., Pre, In, Post).
+   * @param journal an `Appendable[X]` instance to manage and store the visited elements during traversal.
+   * @param f       a function of type `X => Seq[X]` that defines how to obtain the children of a given element.
+   * @return a new instance of `DfsVisitor[X]` initialized with the provided parameters.
+   */
+  def create[X](message: Message, journal: Appendable[X], f: X => Seq[X]): DfsVisitor[X] =
+    new DfsVisitor(Map(message -> journal), f)
+
+  /**
+   * Creates a `DfsVisitor` instance configured for depth-first traversal with a pre-visit strategy
+   * and an empty `QueueJournal` for maintaining state.
+   *
+   * This method initializes the visitor to process elements of type `X` using the provided function `f`
+   * to generate child elements for recursion. During traversal, elements are pre-visited before their children.
+   *
+   * @param f a function of type `X => Seq[X]` that defines how to retrieve
+   *          sub-elements (children) for recursive processing from a given instance of `X`
+   * @tparam X the type of the elements to be visited and processed recursively
+   * @return a `DfsVisitor[X]` instance configured with pre-visit strategy
+   *         and an empty `QueueJournal` for managing traversal state
+   */
+  def createPreQueue[X](f: X => Seq[X]): DfsVisitor[X] =
+    create(Pre, QueueJournal.empty[X], f)
+
+  /**
+   * Creates a `DfsVisitor` instance configured to use a post-order traversal
+   * with an empty `QueueJournal` for maintaining the traversal state.
+   *
+   * The returned visitor employs the provided function `f` to determine
+   * the sub-elements (children) of each element during the traversal process.
+   *
+   * @param f a function of type `X => Seq[X]` that specifies how to retrieve
+   *          the children of a given element of type `X` for the post-order traversal.
+   * @tparam X the type of elements to be processed during the depth-first traversal.
+   * @return a new instance of `DfsVisitor[X]` configured for post-order traversal
+   *         with a `QueueJournal` to handle traversal state.
+   */
+  def createPostQueue[X](f: X => Seq[X]): DfsVisitor[X] =
+    create(Post, QueueJournal.empty[X], f)
+
+  /**
+   * Creates a `DfsVisitor` instance that uses `Pre`-ordering and a `ListJournal` for traversal state.
+   *
+   * This method initializes a depth-first search visitor configured to perform
+   * a pre-order recursive traversal of a structure. The visitor uses the provided
+   * function to generate the children (sub-elements) for each visited element,
+   * and utilizes a `ListJournal` to manage the traversal state.
+   *
+   * @param f a function of type `X => Seq[X]` that takes an element of type `X` and returns
+   *          a sequence of child elements. This function is used to derive the recursive
+   *          structure that the visitor will traverse.
+   * @return a `DfsVisitor` instance configured for pre-order traversal with a `ListJournal`.
+   * @tparam X the type of the elements to be processed during the recursive traversal.
+   */
+  def createPreStack[X](f: X => Seq[X]): DfsVisitor[X] =
+    create(Pre, ListJournal.empty[X], f)
+
+  /**
+   * Creates a depth-first traversal visitor that uses a post-order traversal strategy
+   * and employs a stack structure (`ListJournal`) for maintaining the state during recursion.
+   *
+   * @param f a function of type `X => Seq[X]` which, given an element of type `X`,
+   *          produces a sequence of its child elements for recursive traversal.
+   * @tparam X the type of elements being visited and processed recursively.
+   * @return an instance of `DfsVisitor[X]` configured for post-order traversal
+   *         using a stack-based journal (`ListJournal`).
+   */
+  def createPostStack[X](f: X => Seq[X]): DfsVisitor[X] =
+    create(Post, ListJournal.empty[X], f)
+
+  /**
    * Performs a recursive traversal with specific handling for "In" messages.
    * This method processes the provided element `x` within a recursive structure
    * and updates the visitor state accordingly, ensuring it supports the case

@@ -78,7 +78,7 @@ trait AbstractVisitor[X] extends Visitor[X] {
  * @param msg        a `Message` instance that this visitor matches against during the `visit` operation
  * @tparam X the type of elements that the `SimpleVisitor` operates on
  */
-case class SimpleVisitor[X](appendable: Appendable[X], msg: Message) extends AbstractVisitor[X] {
+case class SimpleVisitor[X](msg: Message, appendable: Appendable[X]) extends AbstractVisitor[X] {
 
   /**
    * Processes a `Message` with a given value of type `X` and returns a new `Visitor`
@@ -110,6 +110,80 @@ case class SimpleVisitor[X](appendable: Appendable[X], msg: Message) extends Abs
   def appendables: Iterable[Appendable[X]] = Seq(appendable)
 }
 
+/**
+ * A utility object for creating and managing instances of the `SimpleVisitor` class.
+ *
+ * The `SimpleVisitor` object provides factory methods to conveniently initialize
+ * visitors with various configurations of `Message` and `Appendable` instances.
+ * These methods support common use cases of the `SimpleVisitor` class, enabling
+ * straightforward creation of pre-configured visitors for different processing requirements.
+ */
+object SimpleVisitor {
+
+  /**
+   * Creates a new instance of `SimpleVisitor` with the specified `Message` and `Appendable`.
+   *
+   * @param message the `Message` instance that this visitor processes
+   * @param journal an `Appendable` instance used to handle state updates and collect elements of type `X`
+   * @return a newly created `SimpleVisitor` instance configured with the provided `Message` and `Appendable`
+   */
+  def create[X](message: Message, journal: Appendable[X]): SimpleVisitor[X] =
+    new SimpleVisitor(message, journal)
+
+  /**
+   * Creates a `SimpleVisitor` instance that utilizes the `Pre` message type
+   * and an empty `QueueJournal` as its initial state.
+   *
+   * This method is particularly useful for scenarios where a `Visitor` is required
+   * with a `Pre` message directive and a queue-based journaling mechanism.
+   *
+   * @tparam X the type of elements that the `SimpleVisitor` will operate on
+   * @return an instance of `SimpleVisitor[X]` configured with the `Pre` message
+   *         and an empty `QueueJournal`
+   */
+  def createPreQueue[X]: SimpleVisitor[X] =
+    create(Pre, QueueJournal.empty[X])
+
+  /**
+   * Creates a `SimpleVisitor` instance configured with a `Post` message and an empty `QueueJournal`.
+   *
+   * This method is specifically designed to facilitate the creation of a visitor suited for handling
+   * `Post` messages while maintaining a queue-based state through the `QueueJournal` instance.
+   *
+   * @tparam X the type of elements that the `SimpleVisitor` will operate on
+   * @return a new instance of `SimpleVisitor[X]` initialized with the `Post` message and an empty `QueueJournal`
+   */
+  def createPostQueue[X]: SimpleVisitor[X] =
+    create(Post, QueueJournal.empty[X])
+
+  /**
+   * Creates a `SimpleVisitor` instance with a `Pre` message and an empty `ListJournal`.
+   *
+   * This method constructs a `SimpleVisitor` configured with a predefined `Pre` message,
+   * which typically indicates actions to be performed before other operations.
+   * The associated journal is an empty `ListJournal`, capable of storing and appending
+   * elements as the visitor processes messages.
+   *
+   * @tparam X the type of elements to be handled by the `SimpleVisitor`
+   * @return a new instance of `SimpleVisitor` initialized with the `Pre` message
+   *         and an empty `ListJournal`
+   */
+  def createPreStack[X]: SimpleVisitor[X] =
+    create(Pre, ListJournal.empty[X])
+
+  /**
+   * Creates a `SimpleVisitor` instance initialized with the `Post` message and an empty `ListJournal`.
+   *
+   * This method allows for constructing a visitor configured to operate with the `Post` message
+   * and a stack-like data structure (represented by the `ListJournal`).
+   *
+   * @tparam X the type of elements that the `SimpleVisitor` operates on
+   * @return a new `SimpleVisitor[X]` instance with the `Post` message and an empty `ListJournal`
+   */
+  def createPostStack[X]: SimpleVisitor[X] =
+    create(Post, ListJournal.empty[X])
+
+}
 /**
  * Abstract implementation of the `Visitor` trait, designed to work with multiple `Appendable` objects
  * mapped to specific `Message` instances.
