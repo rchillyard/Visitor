@@ -3,24 +3,20 @@ package com.phasmidsoftware.visitor
 import scala.collection.immutable.Queue
 
 /**
- * A specialized visitor implementing recursive traversal and processing logic.
- * Essentially, this method performs breadth-first-search on a tree structure,
- * where a tree can, of course, be a subgraph of a graph.
+ * A case class implementing a breadth-first search (BFS) traversal strategy within a visitor pattern.
  *
- * This case class extends `AbstractMultiVisitor` and is designed to handle recursive
- * visits of elements of type `X`, using the provided function `children` to generate sub-elements
- * for recursion. It is initialized with a map linking specific `Message` instances
- * to corresponding `Appendable[X]` objects.
- * The `Message` types supported by this method are: `Pre`, `In`, and `Post`.
+ * The `BfsVisitor` class encapsulates the state and behavior necessary to perform BFS over elements of type `X`.
+ * It utilizes a queue to manage the traversal order, a function to generate child elements, and a goal function
+ * to define termination criteria. The visitor pattern is leveraged to support extensible processing of elements
+ * during the traversal.
  *
- * @param queue a queue which starts out empty and is used to navigate through the tree.
- * @param map   a map associating `Message` types with `Appendable[X]` instances
- *              to manage state during the recursion process.
- * @param f     a function of type `X => Seq[X]` that defines how to retrieve
- *              sub-elements (children) for recursive processing from a given instance of `X`.
- * @tparam X the type of elements being visited and processed recursively.
+ * @param queue a queue of elements of type `X` representing the current state of the BFS traversal.
+ * @param map   a mapping from `Message` instances to `Appendable[X]`, used to manage processing behavior for each type of message.
+ * @param f     a function that takes an element of type `X` and generates a sequence of child elements for further traversal.
+ * @param goal  a predicate function used to determine if a specific element of type `X` satisfies the search goal.
+ * @tparam X the type of elements being visited and processed by the `BfsVisitor`.
  */
-case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) {
+case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean) extends AbstractMultiVisitor[X](map) with Bfs[X, BfsVisitor[X]] {
 
   /**
    * Performs a breadth-first search (BFS) starting from the given element `x`.
@@ -52,6 +48,8 @@ case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X
       this
     else
       queue.dequeue match {
+        case (x, q) if goal(x) =>
+          this.copy(queue = q)
         case (x, q) =>
           val visitor: BfsVisitor[X] = this.copy(queue = q).visit(Pre)(x)
           f(x).foldLeft(visitor)((v, x) => v.copy(queue = v.queue.enqueue(x))).inner
@@ -102,5 +100,5 @@ object BfsVisitor {
    * @return a new instance of `BfsVisitor[X]` initialized with an empty queue, the specified map,
    *         and the function for generating sub-elements.
    */
-  def apply[X](map: Map[Message, Appendable[X]], f: X => Seq[X]): BfsVisitor[X] = new BfsVisitor(Queue.empty, map, f)
+  def apply[X](map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] = new BfsVisitor(Queue.empty, map, f, goal)
 }
