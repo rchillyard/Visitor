@@ -89,16 +89,33 @@ case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X
  */
 object BfsVisitor {
   /**
-   * Creates a new instance of `BfsVisitor` that facilitates recursive traversal
-   * and processing of elements based on the given parameters.
+   * Constructs a new instance of `BfsVisitor[X]` to facilitate breadth-first search traversal.
+   * It doesn't make a lot of sense to set up a Post-messaged BFS visitor so message is not a parameter of this
+   * `create` method.
    *
-   * @param map a map that associates `Message` types with `Appendable[X]` instances.
-   *            This map manages the state and actions performed on the elements being visited.
-   * @param f   a function of type `X => Seq[X]` that generates a sequence of sub-elements
-   *            (children) for recursive traversal from a given element of type `X`.
-   * @tparam X the type of elements to be visited and processed.
-   * @return a new instance of `BfsVisitor[X]` initialized with an empty queue, the specified map,
-   *         and the function for generating sub-elements.
+   * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
+   * @param f       a function that accepts an element of type `X` and produces a sequence of child elements for traversal.
+   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal.
+   * @tparam X the type of elements that the `BfsVisitor[X]` is designed to traverse and process.
+   * @return a newly created `BfsVisitor[X]` instance configured with an empty queue, a map containing the given message and journal, and the provided traversal logic.
    */
-  def apply[X](map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] = new BfsVisitor(Queue.empty, map, f, goal)
+  def create[X](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    new BfsVisitor(Queue.empty, Map(Pre -> journal), f, goal)
+
+  /**
+   * Constructs a `BfsVisitor` configured for breadth-first traversal with a pre-visit strategy and an empty queue.
+   *
+   * This method initializes a `BfsVisitor` instance where the traversal is driven by a function to compute
+   * child elements (`f`) and a predicate to determine the goal state (`goal`). It uses a pre-visit message (`Pre`)
+   * and an empty `QueueJournal` for journaling the traversal progress.
+   *
+   * @param f    a function that takes an element of type `X` and generates a sequence of child elements for traversal
+   * @param goal a predicate function used to determine whether a given element of type `X` matches the search goal
+   * @tparam X the type of elements being traversed
+   * @return a new instance of `BfsVisitor[X]` initialized for pre-visit strategy
+   */
+  def createQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    create(QueueJournal.empty[X], f, goal)
+
+
 }

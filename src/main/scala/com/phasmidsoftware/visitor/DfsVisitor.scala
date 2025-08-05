@@ -243,6 +243,73 @@ case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K =>
 object DfsVisitorMapped {
 
   /**
+   * Creates a new instance of `DfsVisitorMapped` to manage depth-first traversal using a visitor pattern.
+   *
+   * @param message  the `Message` instance representing the context or phase of the traversal
+   * @param journal  the `Appendable` structure for recording visited elements as pairs of type `(K, V)`
+   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
+   * @return a new instance of `DfsVisitorMapped[K, V]` configured with the specified message, appendable structure, and functions
+   */
+  def create[K, V](message: Message, journal: AbstractMapJournal[K, V], f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    new DfsVisitorMapped(Map(message -> journal), f, children)
+
+  /**
+   * Creates a `DfsVisitorMapped` instance configured for depth-first traversal using a pre-visit phase
+   * and a queue-based mechanism for recording visited elements.
+   *
+   * This method sets up the traversal with a pre-order strategy, utilizing a queue as the journal
+   * to manage visited elements during the traversal process. The functions provided define the mapping
+   * of an element to a value and how the children of each element are determined for recursive traversal.
+   *
+   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
+   * @return a new `DfsVisitorMapped[K, V]` instance configured for pre-order traversal using a queue
+   */
+  def createPreMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Pre, MapJournal.empty, f, children)
+
+  /**
+   * Creates a depth-first search (DFS) visitor with a post-order traversal strategy
+   * using a queue as the journal to record visited elements.
+   *
+   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
+   * @return a new `DfsVisitorMapped[K, V]` instance configured for post-order traversal using a queue
+   */
+  def createPostMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Post, MapJournal.empty, f, children)
+
+  /**
+   * Creates a new `DfsVisitorMapped` instance configured with a pre-order stack-based traversal strategy.
+   *
+   * This method initializes the depth-first search traversal with a pre-order traversal approach,
+   * where the stack is used as the underlying data structure to manage visited elements.
+   * The provided functions define how each element is mapped to an associated value and the children
+   * of each element to traverse recursively.
+   *
+   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
+   * @return a new `DfsVisitorMapped[K, V]` instance configured for pre-order stack-based depth-first traversal
+   */
+  def createPreFunctionMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Pre, FunctionMapJournal.empty(f), f, children)
+
+  /**
+   * Creates a `DfsVisitorMapped` instance configured for depth-first traversal using a post-visit stack-based strategy.
+   *
+   * This method initializes a `DfsVisitorMapped` with a `Post` phase, an empty journal, and the specified
+   * transformation and child extraction functions. It is tailored for managing depth-first traversal
+   * where the post-visit operation is applied after visiting all the child elements of a node.
+   *
+   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
+   * @return a new instance of `DfsVisitorMapped[K, V]` configured with the post-visit traversal strategy
+   */
+  def createPostFunctionMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Post, FunctionMapJournal.empty(f), f, children)
+
+  /**
    * Performs recursive operations on a key-value pair with a depth-first search (DFS) visitor,
    * applying in-visit logic if the provided sequence of children contains at most two elements.
    * Depending on the contents of the sequence `xs`, it updates the visitor state accordingly.

@@ -28,22 +28,11 @@ class BfsVisitorSpec extends AnyFlatSpec with Matchers {
   it should "bfs pre-order" in {
 
     // Test a recursive pre-order traversal of the tree, starting at the root.
-    Using(BfsVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f, _ => false)) {
+    Using(BfsVisitor.create[Int](QueueJournal.empty[Int], f, _ => false)) {
       visitor0 =>
         for {journal <- visitor0.bfs(10).iterableJournals
              entry <- journal
              } yield entry
     } shouldBe Success(Queue(10, 5, 13, 2, 6, 11, 15, 1, 3))
-  }
-
-  // NOTE that bfs is not set up to respond to post-order visits.
-  ignore should "bfs reverse post-order" in {
-    // Test a recursive pre-order traversal of the tree, starting at the root.
-    Using(BfsVisitor[Int](Map(Post -> ListJournal.empty[Int]), f, _ => false)) {
-      visitor =>
-        for {journal <- visitor.bfs(10).iterableJournals
-             entry <- journal
-             } yield entry
-    } shouldBe Success(List(10, 13, 15, 11, 5, 6, 2, 3, 1))
   }
 }
