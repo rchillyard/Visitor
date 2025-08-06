@@ -120,20 +120,24 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
 
   it should "dfs pre-order with traversal type" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
-    val entry: (Pre.type, MapJournal[Int, Option[Int]]) = Pre -> MapJournal.empty[Int, Option[Int]]
-    Using(DfsComeFromVisitor[Int, Int](Map(entry), f, x => Some(x))) {
+    type Pair = (Int, Int)
+    val pairFunc: Int => Seq[Pair] = {
+      x => f(x) map (z => (x, z))
+    }
+    val entry: (Pre.type, MapJournal[Int, Option[Pair]]) = Pre -> MapJournal.empty[Int, Option[Pair]]
+    Using(DfsComeFromVisitor[Int, Pair](Map(entry), pairFunc, _._2)) {
       visitor =>
         // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
         val visited = visitor.dfs(10)
-        val mapJournals: Iterable[AbstractMapJournal[Int, Option[Int]]] = visited.mapJournals
-        mapJournals.headOption.asInstanceOf[Option[MapJournal[Int, Option[Int]]]]
+        val mapJournals: Iterable[AbstractMapJournal[Int, Option[Pair]]] = visited.mapJournals
+        mapJournals.headOption.asInstanceOf[Option[MapJournal[Int, Option[Pair]]]]
     } match {
       case Success(Some(journal)) =>
         journal.get(10) shouldBe Some(None)
-        journal.get(5) shouldBe Some(Some(10))
-        journal.get(6) shouldBe Some(Some(5))
-        journal.get(3) shouldBe Some(Some(2))
-        journal.get(15) shouldBe Some(Some(13))
+        journal.get(5) shouldBe Some(Some((10, 5)))
+        journal.get(6) shouldBe Some(Some((5, 6)))
+        journal.get(3) shouldBe Some(Some((2, 3)))
+        journal.get(15) shouldBe Some(Some((13, 15)))
       case Success(journal) =>
         fail(s"Expected MapJournal, got $journal")
       case Failure(exception) =>

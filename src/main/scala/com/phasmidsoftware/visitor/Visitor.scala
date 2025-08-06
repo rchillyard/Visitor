@@ -284,7 +284,7 @@ abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendab
  * @param f        a function to derive a value of type `V` from a key of type `K`.
  * @param children a function that returns a sequence of child keys given a key of type `K`.
  */
-abstract class AbstractVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractMultiVisitor[(K, V)](map)  {
+abstract class AbstractVisitorMapped[K, C, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[C]) extends AbstractMultiVisitor[(K, V)](map) {
   /**
    * Creates a key-value pair by applying the function `f` to a given key of type `K`.
    *
