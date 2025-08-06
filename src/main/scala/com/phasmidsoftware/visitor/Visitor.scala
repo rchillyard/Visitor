@@ -269,6 +269,32 @@ abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendab
 }
 
 /**
+ * Abstract implementation of a visitor that maps a key-value pair with additional
+ * functionality for hierarchical traversal and mapping within a visitor pattern.
+ *
+ * This class extends `AbstractMultiVisitor` with a generic mapping strategy defined by
+ * a function `f` that transforms keys of type `K` into values of type `V`, and another
+ * function `children` that determines the hierarchical structure by returning a sequence
+ * of child keys for a given key. The visitor provides processing mechanisms in conjunction
+ * with `Message` and `Appendable` types to handle the specified map of `Message` to `Appendable` instances.
+ *
+ * @tparam K the type of the keys in the hierarchical relationship.
+ * @tparam V the type of the values derived from the keys through the function `f`.
+ * @param map      a mapping from `Message` instances to `Appendable` objects, defining the state handled by this visitor.
+ * @param f        a function to derive a value of type `V` from a key of type `K`.
+ * @param children a function that returns a sequence of child keys given a key of type `K`.
+ */
+abstract class AbstractVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractMultiVisitor[(K, V)](map)  {
+  /**
+   * Creates a key-value pair by applying the function `f` to a given key of type `K`.
+   *
+   * @param k the key of type `K` from which the pair is derived
+   * @return a tuple `(K, V)` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `f` to `k`
+   */
+  def keyValuePair(k: K): (K, V) = (k, f(k))
+}
+
+  /**
  * A concrete implementation of `AbstractMultiVisitor` that represents a visitor
  * capable of handling multiple `Message` to `Appendable` mappings.
  *

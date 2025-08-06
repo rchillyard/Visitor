@@ -7,8 +7,6 @@ import scala.util.{Failure, Success, Using}
 
 class DfsVisitorSpec extends AnyFlatSpec with Matchers {
 
-  behavior of "DfsVisitor"
-
   // Define a tree similar to a binary heap starting at slot 1
   //           10
   //        5--------13
@@ -22,6 +20,8 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     Seq(twiceIndex, twiceIndex + 1).filter(x => x > 0 && x < tree.length).map(tree)
   }
 
+  behavior of "DfsVisitor"
+
   it should "dfs pre-order" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(DfsVisitor[Int](Map(Pre -> QueueJournal.empty[Int]), f)) {
@@ -30,29 +30,6 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
              entry <- journal
              } yield entry
     } shouldBe Success(List(10, 5, 2, 1, 3, 6, 13, 11, 15))
-  }
-
-  it should "dfs pre-order with traversal type" in {
-    val function: Int => String = x => x.toString
-    // Test a recursive pre-order traversal of the tree, starting at the root.
-    val entry: (Message, FunctionMapJournal[Int, String]) = Pre -> FunctionMapJournal.empty[Int, String](function)
-    Using(DfsVisitorMapped[Int, String](Map(entry), function, f)) {
-      visitor =>
-        // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
-        val visited = visitor.dfs(10)
-        val mapJournals: Iterable[AbstractMapJournal[Int, String]] = visited.mapJournals
-        mapJournals.headOption.asInstanceOf[Option[FunctionMapJournal[Int, String]]]
-    } match {
-      case Success(Some(journal)) =>
-        journal.get(10) shouldBe Some("10")
-        journal.get(15) shouldBe Some("15")
-        journal.get(13) shouldBe Some("13")
-        journal.get(2) shouldBe Some("2")
-      case Success(journal) =>
-        fail(s"Expected MapJournal, got $journal")
-      case Failure(exception) =>
-        fail(exception)
-    }
   }
 
   it should "dfs reverse post-order" in {
@@ -109,6 +86,56 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     } match {
       case Success(discoverables) =>
         discoverables.forall(_.discovered) shouldBe true
+      case Failure(exception) =>
+        fail(exception)
+    }
+  }
+
+  behavior of "DfsVisitorMapped"
+
+  it should "dfs pre-order with traversal type" in {
+    val function: Int => String = x => x.toString
+    // Test a recursive pre-order traversal of the tree, starting at the root.
+    val entry: (Message, FunctionMapJournal[Int, String]) = Pre -> FunctionMapJournal.empty[Int, String](function)
+    Using(DfsVisitorMapped[Int, String](Map(entry), function, f)) {
+      visitor =>
+        // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
+        val visited = visitor.dfs(10)
+        val mapJournals: Iterable[AbstractMapJournal[Int, String]] = visited.mapJournals
+        mapJournals.headOption.asInstanceOf[Option[FunctionMapJournal[Int, String]]]
+    } match {
+      case Success(Some(journal)) =>
+        journal.get(10) shouldBe Some("10")
+        journal.get(15) shouldBe Some("15")
+        journal.get(13) shouldBe Some("13")
+        journal.get(2) shouldBe Some("2")
+      case Success(journal) =>
+        fail(s"Expected MapJournal, got $journal")
+      case Failure(exception) =>
+        fail(exception)
+    }
+  }
+
+  behavior of "DfsComeFromVisitor"
+
+  it should "dfs pre-order with traversal type" in {
+    // Test a recursive pre-order traversal of the tree, starting at the root.
+    val entry: (Pre.type, MapJournal[Int, Option[Int]]) = Pre -> MapJournal.empty[Int, Option[Int]]
+    Using(DfsComeFromVisitor[Int, Int](Map(entry), f, x => Some(x))) {
+      visitor =>
+        // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
+        val visited = visitor.dfs(10)
+        val mapJournals: Iterable[AbstractMapJournal[Int, Option[Int]]] = visited.mapJournals
+        mapJournals.headOption.asInstanceOf[Option[MapJournal[Int, Option[Int]]]]
+    } match {
+      case Success(Some(journal)) =>
+        journal.get(10) shouldBe Some(None)
+        journal.get(5) shouldBe Some(Some(10))
+        journal.get(6) shouldBe Some(Some(5))
+        journal.get(3) shouldBe Some(Some(2))
+        journal.get(15) shouldBe Some(Some(13))
+      case Success(journal) =>
+        fail(s"Expected MapJournal, got $journal")
       case Failure(exception) =>
         fail(exception)
     }
