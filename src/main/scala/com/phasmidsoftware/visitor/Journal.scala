@@ -201,8 +201,16 @@ abstract class AbstractMapJournal[K, V](map: Map[K, V]) extends Journal[(K, V)] 
    *
    * @return an `Iterable` containing all the values present in the map
    */
-  def values: Iterable[V] =
+  def values: Iterable[V] = {
     map.values
+  }
+
+  /**
+   * Retrieves the entries of the underlying map as an iterable collection of key-value pairs.
+   *
+   * @return an `Iterable` containing all key-value pairs present in the map
+   */
+  def entries: Iterable[(K, V)] = map
 
   /**
    * Creates a new instance of `AbstractMapJournal` with the given map.

@@ -116,7 +116,7 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
     }
   }
 
-  behavior of "DfsComeFromVisitor"
+  behavior of "DfsOriginVisitor"
 
   it should "dfs pre-order with traversal type" in {
     // Test a recursive pre-order traversal of the tree, starting at the root.
@@ -125,7 +125,7 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
       x => f(x) map (z => (x, z))
     }
     val entry: (Pre.type, MapJournal[Int, Option[Pair]]) = Pre -> MapJournal.empty[Int, Option[Pair]]
-    Using(DfsComeFromVisitor[Int, Pair](Map(entry), pairFunc, _._2)) {
+    Using(DfsOriginVisitor[Int, Pair](Map(entry), pairFunc, _._2)) {
       visitor =>
         // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
         val visited = visitor.dfs(10)

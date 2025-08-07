@@ -340,26 +340,26 @@ object DfsVisitorMapped {
  * @tparam K the type of elements to be visited and processed during traversal.
  * @tparam V the value type that will be associated with each element of type `K`.
  */
-case class DfsComeFromVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractVisitorMapped[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsComeFromVisitor[K, V]] {
+case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractVisitorMapped[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsOriginVisitor[K, V]] {
 
   /**
    * Processes an element of type `K` with an optional value of type `V` using a depth-first traversal strategy.
    * This method applies pre-visit, in-visit (conditional on specific criteria), self-visit, and post-visit stages
-   * during the traversal and updates the state of the `DfsComeFromVisitor`.
+   * during the traversal and updates the state of the `DfsOriginVisitor`.
    *
    * @param k  the element of type `K` to be processed during the traversal.
    * @param vo an optional value of type `V` associated with the element `k`.
-   * @return a new instance of `DfsComeFromVisitor[K, V]` containing the updated state after processing
+   * @return a new instance of `DfsOriginVisitor[K, V]` containing the updated state after processing
    *         the provided element and its dependencies.
    */
-  def dfsComeFrom(k: K, vo: Option[V]): DfsComeFromVisitor[K, V] = {
+  def dfsOrigin(k: K, vo: Option[V]): DfsOriginVisitor[K, V] = {
     val kv: (K, Option[V]) = (k, vo)
 
-    def performRecursion(xs: Seq[(K, Option[V])], visitor: DfsComeFromVisitor[K,V]) =
+    def performRecursion(xs: Seq[(K, Option[V])], visitor: DfsOriginVisitor[K, V]) =
       if (xs.length <= 2 && map.contains(In))
-        DfsComeFromVisitor.recurseWithInVisit(visitor, kv, xs)
+        DfsOriginVisitor.recurseWithInVisit(visitor, kv, xs)
       else
-        xs.foldLeft[DfsComeFromVisitor[K,V]](visitor)((accum, z) => accum.dfsComeFrom.tupled(z))
+        xs.foldLeft[DfsOriginVisitor[K, V]](visitor)((accum, z) => accum.dfsOrigin.tupled(z))
 
     // First do a pre-visit, then a "SelfVisit", next perform the recursion, finally do a post-visit
     performRecursion(f(k) map (z => (h(z), Some(z))), visit(Pre)(kv).visit(SelfVisit)(kv)).visit(Post)(kv)
@@ -374,7 +374,8 @@ case class DfsComeFromVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]
    * @return a new instance of `DfsVisitor` with the updated state after processing
    *         and visiting the provided element and its sub-elements.
    */
-  def dfs(x: K): DfsComeFromVisitor[K, V] = dfsComeFrom(x, None)
+  def dfs(x: K): DfsOriginVisitor[K, V] =
+    dfsOrigin(x, None)
 
   /**
    * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
@@ -387,7 +388,8 @@ case class DfsComeFromVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]
    * @param kv   the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(kv: (K, Option[V])): DfsComeFromVisitor[K, V] = super.visit(msg)(kv).asInstanceOf[DfsComeFromVisitor[K, V]]
+  override def visit(msg: Message)(kv: (K, Option[V])): DfsOriginVisitor[K, V] =
+    super.visit(msg)(kv).asInstanceOf[DfsOriginVisitor[K, V]]
 
   /**
    * Creates a new `Visitor` instance with the provided updated mapAppendables.
@@ -398,15 +400,15 @@ case class DfsComeFromVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]
    * @param map a map containing updated associations of `Message` to `Appendable[K]`
    * @return a new `Visitor[K]` instance that reflects the updated mapAppendables
    */
-  def unit(map: Map[Message, Appendable[(K,Option[V])]]): DfsComeFromVisitor[K, V] =
+  def unit(map: Map[Message, Appendable[(K, Option[V])]]): DfsOriginVisitor[K, V] =
     copy(map = map)
 }
 
 /**
- * Companion object for the `DfsComeFromVisitor` class, providing factory methods
- * for creating instances of `DfsComeFromVisitor` with different configurations.
+ * Companion object for the `DfsOriginVisitor` class, providing factory methods
+ * for creating instances of `DfsOriginVisitor` with different configurations.
  */
-object DfsComeFromVisitor {
+object DfsOriginVisitor {
 
   /**
    * Creates a new instance of `DfsVisitorMapped` to manage depth-first traversal using a visitor pattern.
@@ -416,8 +418,8 @@ object DfsComeFromVisitor {
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new instance of `DfsVisitorMapped[K, V]` configured with the specified message, appendable structure, and functions
    */
-  def create[K, V](message: Message, journal: AbstractMapJournal[K, Option[V]], children: K => Seq[V], h: V => K): DfsComeFromVisitor[K, V] =
-    new DfsComeFromVisitor[K, V](Map(message -> journal), children, h)
+  def create[K, V](message: Message, journal: AbstractMapJournal[K, Option[V]], children: K => Seq[V], h: V => K): DfsOriginVisitor[K, V] =
+    new DfsOriginVisitor[K, V](Map(message -> journal), children, h)
 
   /**
    * Creates a `DfsVisitorMapped` instance configured for depth-first traversal using a pre-visit phase
@@ -430,7 +432,7 @@ object DfsComeFromVisitor {
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new `DfsVisitorMapped[K, V]` instance configured for pre-order traversal using a queue
    */
-  def createPreMapJournal[K, V](children: K => Seq[V], g: K => Option[V], h: V => K): DfsComeFromVisitor[K, V] =
+  def createPreMapJournal[K, V](children: K => Seq[V], h: V => K): DfsOriginVisitor[K, V] =
     create(Pre, MapJournal.empty, children, h)
 
   /**
@@ -440,7 +442,7 @@ object DfsComeFromVisitor {
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new `DfsVisitorMapped[K, V]` instance configured for post-order traversal using a queue
    */
-  def createPostMapJournal[K, V](children: K => Seq[V], g: K => Option[V], h: V => K): DfsComeFromVisitor[K, V] =
+  def createPostMapJournal[K, V](children: K => Seq[V], h: V => K): DfsOriginVisitor[K, V] =
     create(Post, MapJournal.empty, children, h)
 
   /**
@@ -457,10 +459,10 @@ object DfsComeFromVisitor {
    * @param xs      a sequence of type `X` representing the sub-elements related to `kv`.
    *                This sequence must contain at most two elements.
    */
-  private def recurseWithInVisit[X,Y](visitor: DfsComeFromVisitor[X,Y], x: (X,Option[Y]), xs: Seq[(X,Option[Y])]) = {
+  private def recurseWithInVisit[X, Y](visitor: DfsOriginVisitor[X, Y], x: (X, Option[Y]), xs: Seq[(X, Option[Y])]) = {
     require(xs.length <= 2, "xs must contain at most two elements")
-    val visitor1 = xs.headOption.fold(visitor)(visitor.dfsComeFrom)
+    val visitor1 = xs.headOption.fold(visitor)(visitor.dfsOrigin)
     val visitor2 = visitor1.visit(In)(x)
-    xs.lastOption.fold(visitor2)(visitor2.dfsComeFrom)
+    xs.lastOption.fold(visitor2)(visitor2.dfsOrigin)
   }
 }
