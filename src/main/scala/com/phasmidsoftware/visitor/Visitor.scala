@@ -184,6 +184,7 @@ object SimpleVisitor {
     create(Post, ListJournal.empty[X])
 
 }
+
 /**
  * Abstract implementation of the `Visitor` trait, designed to work with multiple `Appendable` objects
  * mapped to specific `Message` instances.
@@ -269,6 +270,44 @@ abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendab
 }
 
 /**
+ * Abstract base class for a visitor that maps `Message` instances to `Appendable` objects
+ * containing key-value pairs of type `(K, V)`.
+ *
+ * This class extends `AbstractMultiVisitor`, leveraging its capabilities to manage multiple
+ * `Appendable` objects while introducing specific functionality for handling journals of
+ * mapped key-value pairs. It provides a method to retrieve all journal entries that are
+ * of type `AbstractMapJournal[K, V]`.
+ *
+ * @tparam K the type of the key stored in the journal
+ * @tparam V the type of the value stored in the journal
+ * @param map a map associating `Message` instances with their corresponding `Appendable` objects
+ *            containing elements of type `(K, V)`. This defines the initial state of the visitor.
+ */
+abstract class AbstractVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]]) extends AbstractMultiVisitor[(K, V)](map) {
+
+  /**
+   * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor`.
+   *
+   * This method filters the iterable collection of `Appendable[X]` instances, returning only those
+   * that are of type `Journal[X]`. It performs a type check on each `Appendable[X]` and selectively
+   * includes those that match the `Journal[X]` type.
+   *
+   * @return an `Iterable` containing all `Journal[X]` instances managed by this `Visitor`
+   */
+  def mapJournals: Iterable[AbstractMapJournal[K, V]] =
+    for {
+      appendable <- appendables
+      xjo: Option[AbstractMapJournal[K, V]] = appendable match {
+        case x: AbstractMapJournal[K, V] =>
+          Some(x)
+        case _ =>
+          None
+      }
+      journal <- xjo
+    } yield journal
+}
+
+/**
  * Abstract implementation of a visitor that maps a key-value pair with additional
  * functionality for hierarchical traversal and mapping within a visitor pattern.
  *
@@ -284,7 +323,7 @@ abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendab
  * @param f        a function to derive a value of type `V` from a key of type `K`.
  * @param children a function that returns a sequence of child keys given a key of type `K`.
  */
-abstract class AbstractVisitorMapped[K, C, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[C]) extends AbstractMultiVisitor[(K, V)](map) {
+abstract class AbstractDfsVisitorMapped[K, C, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[C]) extends AbstractVisitorMapped[K, V](map) {
   /**
    * Creates a key-value pair by applying the function `f` to a given key of type `K`.
    *
@@ -294,7 +333,7 @@ abstract class AbstractVisitorMapped[K, C, V](map: Map[Message, Appendable[(K, V
   def keyValuePair(k: K): (K, V) = (k, f(k))
 }
 
-  /**
+/**
  * A concrete implementation of `AbstractMultiVisitor` that represents a visitor
  * capable of handling multiple `Message` to `Appendable` mappings.
  *
@@ -352,4 +391,44 @@ object MultiVisitor {
    */
   def apply[X](appendables: (Message, Appendable[X])*): MultiVisitor[X] =
     MultiVisitor(Map(appendables: _*))
+}
+
+/**
+ * A case class extending `AbstractVisitorMapped` for managing `Message` to `Appendable[(K, V)]` mappings
+ * within the context of the Visitor pattern.
+ *
+ * This class provides additional methods for updating and processing the internal mappings, allowing
+ * it to serve as a mutable visitor that accommodates changes in state as it processes messages.
+ *
+ * @tparam K the type of the key stored in the journal
+ * @tparam V the type of the value stored in the journal
+ * @param map a map associating `Message` instances with their corresponding `Appendable` objects
+ *            containing elements of type `(K, V)`. This defines the initial state of the visitor.
+ */
+case class VisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]]) extends AbstractVisitorMapped[K, V](map) {
+  /**
+   * Creates a new `Visitor` instance with the provided updated mapAppendables.
+   *
+   * This method is used to update the internal state of the Visitor by creating
+   * a new instance with the modified mappings from `Message` to `Appendable`.
+   *
+   * @param updatedAppendables a map containing updated associations of `Message` to `Appendable[X]`
+   * @return a new `Visitor[X]` instance that reflects the updated mapAppendables
+   */
+  def unit(updatedAppendables: Map[Message, Appendable[(K, V)]]): VisitorMapped[K, V] =
+    copy(map = updatedAppendables)
+
+  /**
+   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
+   *
+   * This method defines the behavior for handling a `Message` in the context
+   * of the Visitor pattern. The implementation of this method should use the provided
+   * message and state to determine the next state and return the appropriate `Visitor`.
+   *
+   * @param msg the message to be processed by the visitor
+   * @param x   the current state or context associated with the visitor
+   * @return a new `Visitor[X]` instance that represents the updated state after processing the message
+   */
+  override def visit(msg: Message)(x: (K, V)): VisitorMapped[K, V] =
+    super.visit(msg)(x).asInstanceOf[VisitorMapped[K, V]]
 }

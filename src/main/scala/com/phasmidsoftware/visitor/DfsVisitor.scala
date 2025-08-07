@@ -97,7 +97,7 @@ object DfsVisitor {
    * @param f a function of type `X => Seq[X]` that defines how to retrieve
    *          sub-elements (children) for recursive processing from a given instance of `X`
    * @tparam X the type of the elements to be visited and processed recursively
-   * @return a `DfsVisitor[X]` instance configured with pre-visit strategy
+   * @return a `DfsVisitor[X]` instance configured with the pre-visit strategy
    *         and an empty `QueueJournal` for managing traversal state
    */
   def createPreQueue[X](f: X => Seq[X]): DfsVisitor[X] =
@@ -124,7 +124,7 @@ object DfsVisitor {
    *
    * This method initializes a depth-first search visitor configured to perform
    * a pre-order recursive traversal of a structure. The visitor uses the provided
-   * function to generate the children (sub-elements) for each visited element,
+   * function to generate the children (sub-elements) for each visited element
    * and utilizes a `ListJournal` to manage the traversal state.
    *
    * @param f a function of type `X => Seq[X]` that takes an element of type `X` and returns
@@ -185,7 +185,7 @@ object DfsVisitor {
  * @tparam K the type of the keys or elements being traversed.
  * @tparam V the type of the associated values produced during the traversal process.
  */
-case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractVisitorMapped[K, K, V](map, f, children) with Dfs[K, DfsVisitorMapped[K, V]] {
+case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractDfsVisitorMapped[K, K, V](map, f, children) with Dfs[K, DfsVisitorMapped[K, V]] {
   /**
    * Performs a depth-first traversal starting from the provided key `k`.
    * This method applies visitor operations in a specific sequence: pre-visit, self-visit, recursive traversal, and post-visit.
@@ -210,14 +210,14 @@ case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K =>
   }
 
   /**
-   * Make a visit, with the given message and `(K,V)` value, on this `Visitor` and return a new `Visitor`.
+   * Make a visit, with the given message and `(K, V)` value, on this `Visitor` and return a new `Visitor`.
    *
    * This method defines the behavior for handling a `Message` in the context
    * of the Visitor pattern. The implementation of this method should use the provided
    * message and state to determine the next state and return the appropriate `Visitor`.
    *
    * @param msg the message to be processed by the visitor
-   * @param kv   the current state or context associated with the visitor
+   * @param kv  the current state or context associated with the visitor
    * @return a new `DfsVisitorMapped[K, V]` instance that represents the updated state after processing the message
    */
   override def visit(msg: Message)(kv: (K, V)): DfsVisitorMapped[K, V] =
@@ -229,7 +229,7 @@ case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K =>
    * This method is used to update the internal state of the Visitor by creating
    * a new instance with the modified mappings from `Message` to `Appendable`.
    *
-   * @param map a map containing updated associations of `Message` to `Appendable[(K,V)]`
+   * @param map a map containing updated associations of `Message` to `Appendable[(K, V)]`
    * @return a new `DfsVisitorMapped[K, V]` instance that reflects the updated mapAppendables
    */
   def unit(map: Map[Message, Appendable[(K, V)]]): DfsVisitorMapped[K, V] =
@@ -340,7 +340,7 @@ object DfsVisitorMapped {
  * @tparam K the type of elements to be visited and processed during traversal.
  * @tparam V the value type that will be associated with each element of type `K`.
  */
-case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractVisitorMapped[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsOriginVisitor[K, V]] {
+case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractDfsVisitorMapped[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsOriginVisitor[K, V]] {
 
   /**
    * Processes an element of type `K` with an optional value of type `V` using a depth-first traversal strategy.
@@ -385,7 +385,7 @@ case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]],
    * message and state to determine the next state and return the appropriate `Visitor`.
    *
    * @param msg the message to be processed by the visitor
-   * @param kv   the current state or context associated with the visitor
+   * @param kv  the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
   override def visit(msg: Message)(kv: (K, Option[V])): DfsOriginVisitor[K, V] =

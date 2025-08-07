@@ -55,9 +55,10 @@ class MultiVisitorSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "mapJournals" in {
-    Using(MultiVisitor[(String, String)](Pre -> MapJournal.empty[String, String])) {
-      visitor0 =>
-        val visitor1 = visitor0.addAppendable(Post, ListJournal.empty[(String, String)]).visit(Pre)("Hello" -> "Greeting").visit(Post)("Go away!" -> "").visit(Pre)("Goodbye" -> "Valediction")
+    Using(VisitorMapped[String, String](Map(Pre -> MapJournal.empty[String, String]))) {
+      visitor =>
+        val visitor0: VisitorMapped[String, String] = visitor.addAppendable(Post, ListJournal.empty[(String, String)]).asInstanceOf[VisitorMapped[String, String]]
+        val visitor1: VisitorMapped[String, String] = visitor0.visit(Pre)("Hello" -> "Greeting").visit(Post)("Go away!" -> "").visit(Pre)("Goodbye" -> "Valediction")
         for {journal <- visitor1.mapJournals
              } yield journal
     } shouldBe Success(List(MapJournal(Map("Hello" -> "Greeting", "Goodbye" -> "Valediction"))))
