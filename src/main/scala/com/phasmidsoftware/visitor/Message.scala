@@ -58,3 +58,11 @@ object In extends Message
  * within the message processing flow.
  */
 object SelfVisit extends Message
+
+object Message {
+  def fromJMessage(msg: JMessage): Message = msg match {
+    case JMessage.PRE => Pre
+    case JMessage.POST => Post
+    case JMessage.IN => In
+  }
+}

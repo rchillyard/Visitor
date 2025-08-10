@@ -121,6 +121,16 @@ case class SimpleVisitor[X](msg: Message, appendable: Appendable[X]) extends Abs
 object SimpleVisitor {
 
   /**
+   * Creates an instance of `SimpleVisitor` using the provided `Message` and an empty `QueueJournal`.
+   *
+   * @param message the `Message` to be processed by the `SimpleVisitor`
+   * @tparam X the type of elements that the `SimpleVisitor` will operate on
+   * @return a new instance of `SimpleVisitor[X]` configured with the specified `Message` and an empty `QueueJournal`
+   */
+  def apply[X](message: Message): SimpleVisitor[X] =
+    create(message, QueueJournal.empty[X])
+
+  /**
    * Creates a new instance of `SimpleVisitor` with the specified `Message` and `Appendable`.
    *
    * @param message the `Message` instance that this visitor processes
