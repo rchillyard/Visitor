@@ -8,7 +8,7 @@ import static org.junit.Assert.assertEquals;
 public class JVisitorTest {
 
     @org.junit.Test
-    public void testJVisitor() throws Exception {
+    public void testJVisitor() {
         try (JVisitor<String> visitor = JVisitor.createPreQueue()) {
             JVisitor<String> result = visitor.visit(PRE, "Hello");
             QueueJournal<String> journal = (QueueJournal<String>) result.iterableJournal();
@@ -19,5 +19,8 @@ public class JVisitorTest {
 
     @org.junit.Test
     public void testClose() {
+        JVisitor<String> visitor = JVisitor.createPreQueue();
+        JVisitor<String> result = visitor.visit(PRE, "Hello");
+        result.close();
     }
 }

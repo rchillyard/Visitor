@@ -52,7 +52,8 @@ case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) exten
    * @param x   the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(x: X): DfsVisitor[X] = super.visit(msg)(x).asInstanceOf[DfsVisitor[X]]
+  override def visit(msg: Message)(x: X): DfsVisitor[X] =
+    super.visit(msg)(x).asInstanceOf[DfsVisitor[X]]
 
   /**
    * Creates a new `Visitor` instance with the provided updated mapAppendables.
@@ -246,7 +247,7 @@ object DfsVisitorMapped {
    * Creates a new instance of `DfsVisitorMapped` to manage depth-first traversal using a visitor pattern.
    *
    * @param message  the `Message` instance representing the context or phase of the traversal
-   * @param journal  the `Appendable` structure for recording visited elements as pairs of type `(K, V)`
+   * @param journal  the `Appendable` structure for recording visited elements as pairs, each of type `(K, V)`
    * @param f        a function that maps an element of type `K` to its associated value of type `V`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new instance of `DfsVisitorMapped[K, V]` configured with the specified message, appendable structure, and functions
@@ -414,7 +415,7 @@ object DfsOriginVisitor {
    * Creates a new instance of `DfsVisitorMapped` to manage depth-first traversal using a visitor pattern.
    *
    * @param message  the `Message` instance representing the context or phase of the traversal
-   * @param journal  the `Appendable` structure for recording visited elements as pairs of type `(K, V)`
+   * @param journal  the `Appendable` structure for recording visited elements as pairs, each of type `(K, V)`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new instance of `DfsVisitorMapped[K, V]` configured with the specified message, appendable structure, and functions
    */
