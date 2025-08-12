@@ -1,8 +1,8 @@
 package com.phasmidsoftware.visitor;
 
-import com.phasmidsoftware.java.JDfsVisitor;
-import com.phasmidsoftware.java.JVisitor;
-import com.phasmidsoftware.java.JVisitor$;
+import com.phasmidsoftware.visitor.javaAPI.JDfsVisitor;
+import com.phasmidsoftware.visitor.javaAPI.JVisitor;
+import com.phasmidsoftware.visitor.javaAPI.JVisitor$;
 
 import java.util.Collection;
 import java.util.List;

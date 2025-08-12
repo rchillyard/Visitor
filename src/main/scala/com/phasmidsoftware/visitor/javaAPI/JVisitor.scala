@@ -1,11 +1,10 @@
-package com.phasmidsoftware.java
+package com.phasmidsoftware.visitor.javaAPI
 
 import com.phasmidsoftware.visitor
 import com.phasmidsoftware.visitor.*
 import com.phasmidsoftware.visitor.Message.fromJMessage
 
-import scala.concurrent.duration.DurationConversions.fromNowConvert.R
-import scala.jdk.CollectionConverters.{CollectionHasAsScala, IterableHasAsJava}
+import scala.jdk.CollectionConverters.IterableHasAsJava
 
 /**
  * A wrapper class for a `Visitor` instance, providing Java-compatible methods and functionalities.
@@ -17,27 +16,22 @@ import scala.jdk.CollectionConverters.{CollectionHasAsScala, IterableHasAsJava}
  * @param visitor the underlying Scala `Visitor` instance to be wrapped
  * @tparam X the type of the state or context associated with the `Visitor`
  */
-class JDfsVisitor[X](val visitor: DfsVisitor[X]) extends AutoCloseable {
+class JVisitor[X](val visitor: Visitor[X]) extends AutoCloseable {
 
   /**
-   * Executes a Depth-First Search (DFS) starting from the specified element `k`.
-   * The traversal follows a recursive strategy, where each visited element may invoke
-   * updates to the visiting state encapsulated in type `R`.
+   * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
    *
-   * @param k the starting element of type `K` for the DFS traversal
-   * @return an updated instance of type `R` that reflects the visitor's state after the traversal
+   * This method defines the behavior for handling a `Message` in the context
+   * of the Visitor pattern. The implementation of this method should use the provided
+   * message and state to determine the next state and return the appropriate `Visitor`.
+   *
+   * @param msg the message to be processed by the visitor
+   * @param x   the current state or context associated with the visitor
+   * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  def dfs(k: X): JDfsVisitor[X] =
-    new JDfsVisitor(visitor.dfs(k))
+  def visit(msg: JMessage, x: X): JVisitor[X] =
+    new JVisitor(visitor.visit(Message.fromJMessage(msg))(x))
 
-  /**
-   * Closes the visitor and all associated resources.
-   *
-   * This method ensures that the visitor, along with any underlying appendable resources, is properly
-   * finalized or cleaned up. Invoking this method indicates that the visitor is no longer active.
-   *
-   * @return Unit, as this method does not produce a result
-   */
   def close(): Unit =
     visitor.close()
 
@@ -82,7 +76,7 @@ class JDfsVisitor[X](val visitor: DfsVisitor[X]) extends AutoCloseable {
  * Companion object for `JVisitor`, providing factory methods to create
  * instances of `SimpleVisitor` with various configurations.
  */
-object JDfsVisitor {
+object JVisitor {
 
   /**
    * Creates a new instance of `SimpleVisitor` with the specified `Message` and `Appendable`.
@@ -91,10 +85,8 @@ object JDfsVisitor {
    * @param journal an `Appendable` instance used to handle state updates and collect elements of type `X`
    * @return a newly created `SimpleVisitor` instance configured with the provided `Message` and `Appendable`
    */
-  def createDfs[X](message: JMessage, journal: com.phasmidsoftware.visitor.Appendable[X], f: java.util.function.Function[X, java.util.List[X]]): JDfsVisitor[X] = {
-    val g: X => Seq[X] = x => f.apply(x).asScala.toSeq
-    new JDfsVisitor[X](com.phasmidsoftware.visitor.DfsVisitor.create(fromJMessage(message), journal, g))
-  }
+  def createSimple[X](message: JMessage, journal: com.phasmidsoftware.visitor.Appendable[X]): JVisitor[X] =
+    new JVisitor[X](com.phasmidsoftware.visitor.SimpleVisitor.create(fromJMessage(message), journal))
 
   /**
    * Creates a `SimpleVisitor` instance that utilizes the `Pre` message type
@@ -107,8 +99,8 @@ object JDfsVisitor {
    * @return an instance of `SimpleVisitor[X]` configured with the `Pre` message
    *         and an empty `QueueJournal`
    */
-  def createPreQueue[X](f: java.util.function.Function[X, java.util.List[X]]): JDfsVisitor[X] =
-    createDfs(JMessage.PRE, QueueJournal.empty[X], f)
+  def createPreQueue[X]: JVisitor[X] =
+    createSimple(JMessage.PRE, QueueJournal.empty[X])
 
   /**
    * Creates a `SimpleVisitor` instance configured with a `Post` message and an empty `QueueJournal`.
@@ -119,8 +111,8 @@ object JDfsVisitor {
    * @tparam X the type of elements that the `SimpleVisitor` will operate on
    * @return a new instance of `SimpleVisitor[X]` initialized with the `Post` message and an empty `QueueJournal`
    */
-  def createPostQueue[X](f: java.util.function.Function[X, java.util.List[X]]): JDfsVisitor[X] =
-    createDfs(JMessage.POST, QueueJournal.empty[X], f)
+  def createPostQueue[X]: JVisitor[X] =
+    createSimple(JMessage.POST, QueueJournal.empty[X])
 
   /**
    * Creates a `SimpleVisitor` instance with a `Pre` message and an empty `ListJournal`.
@@ -134,8 +126,8 @@ object JDfsVisitor {
    * @return a new instance of `SimpleVisitor` initialized with the `Pre` message
    *         and an empty `ListJournal`
    */
-  def createPreStack[X](f: java.util.function.Function[X, java.util.List[X]]): JDfsVisitor[X] =
-    createDfs(JMessage.PRE, ListJournal.empty[X], f)
+  def createPreStack[X]: JVisitor[X] =
+    createSimple(JMessage.PRE, ListJournal.empty[X])
 
   /**
    * Creates a `SimpleVisitor` instance initialized with the `Post` message and an empty `ListJournal`.
@@ -146,6 +138,14 @@ object JDfsVisitor {
    * @tparam X the type of elements that the `SimpleVisitor` operates on
    * @return a new `SimpleVisitor[X]` instance with the `Post` message and an empty `ListJournal`
    */
-  def createPostStack[X](f: java.util.function.Function[X, java.util.List[X]]): JDfsVisitor[X] =
-    createDfs(JMessage.POST, ListJournal.empty[X], f)
+  def createPostStack[X]: JVisitor[X] =
+    createSimple(JMessage.POST, ListJournal.empty[X])
+
+  /**
+   * Converts a Scala `Iterable` to a Java: `java.util.List`.
+   *
+   * @param xs the Scala `Iterable` to be converted
+   * @return a Java: `java.util.List` containing the elements of the provided `Iterable`
+   */
+  def toJava[X](xs: Iterable[X]): java.util.Collection[X] = xs.asJavaCollection
 }

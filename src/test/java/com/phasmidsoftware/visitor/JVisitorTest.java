@@ -1,6 +1,6 @@
 package com.phasmidsoftware.visitor;
 
-import com.phasmidsoftware.java.JVisitor;
+import com.phasmidsoftware.visitor.javaAPI.JVisitor;
 
 import static com.phasmidsoftware.visitor.JMessage.PRE;
 import static org.junit.Assert.assertEquals;
