@@ -35,7 +35,6 @@ public class JDfsVisitorTest {
                     .toList();
         };
 
-
         try (JDfsVisitor<Integer> visitor = JDfsVisitor.createPreQueue(g)) {
             JDfsVisitor<Integer> result = visitor.dfs(10);
             QueueJournal<Integer> journal = (QueueJournal<Integer>) result.iterableJournal();

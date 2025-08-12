@@ -15,4 +15,6 @@ val scalaTestVersion = "3.2.19"
 libraryDependencies += "org.slf4j" % "slf4j-api" % "2.0.17"
 libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.18" % "runtime"
 libraryDependencies += "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
+libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test" // NOTE vulnerability here
+
 
