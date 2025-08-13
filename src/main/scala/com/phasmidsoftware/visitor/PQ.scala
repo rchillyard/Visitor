@@ -99,7 +99,23 @@ abstract class AbstractPQ[X](pq: mutable.PriorityQueue[X]) extends PQ[X] {
  * @tparam X the type of elements stored in the priority queue
  * @constructor Creates an instance of a maximum-priority queue.
  */
-case class MaxPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[X])
+case class MaxPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[X]) {
+  /**
+   * Removes and returns the highest-priority element from the priority queue,
+   * along with the updated priority queue wrapped as `this`.
+   *
+   * @return a tuple containing the extracted element of type `X` and the current instance of the priority queue
+   */
+  override def take: (X, MaxPQ[X]) = super.take.asInstanceOf[(X, MaxPQ[X])]
+
+  /**
+   * Appends the specified element to this priority queue, returning the updated instance.
+   *
+   * @param x the element to be appended to the priority queue
+   * @return this `Appendable[X]` instance after the element has been added
+   */
+  override def append(x: X): MaxPQ[X] = super.append(x).asInstanceOf[MaxPQ[X]]
+}
 
 /**
  * A case class representing a minimum priority queue.
@@ -111,4 +127,20 @@ case class MaxPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[
  *
  * @tparam X the type of elements stored in the priority queue, which must provide evidence of an implicit `Ordering`
  */
-case class MinPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[X](using implicitly[Ordering[X]]).reverse)
+case class MinPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[X](using implicitly[Ordering[X]]).reverse) {
+  /**
+   * Removes and returns the highest-priority element from the priority queue,
+   * along with the updated priority queue wrapped as `this`.
+   *
+   * @return a tuple containing the extracted element of type `X` and the current instance of the priority queue
+   */
+  override def take: (X, MinPQ[X]) = super.take.asInstanceOf[(X, MinPQ[X])]
+
+  /**
+   * Appends the specified element to this priority queue, returning the updated instance.
+   *
+   * @param x the element to be appended to the priority queue
+   * @return this `Appendable[X]` instance after the element has been added
+   */
+  override def append(x: X): MinPQ[X] = super.append(x).asInstanceOf
+}

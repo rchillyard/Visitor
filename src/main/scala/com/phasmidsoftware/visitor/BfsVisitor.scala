@@ -88,15 +88,15 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
   def unitQueue(queue: Q[X]): AbstractBfsVisitor[Q, X]
 
   /**
-   * Recursively processes a breadth-first search (BFS) by consuming elements from the queue and 
+   * Recursively processes a breadth-first search (BFS) by consuming elements from the queue and
    * applying the visitor pattern to track the traversal state and results.
    *
-   * This method extracts elements from the queue using `doTake`, checks if the goal condition is met, 
-   * and either updates the traversal state or continues processing the queue. If a goal element is found, 
-   * it returns the current visitor state and the goal element wrapped in an `Option`. If the queue is 
+   * This method extracts elements from the queue using `doTake`, checks if the goal condition is met,
+   * and either updates the traversal state or continues processing the queue. If a goal element is found,
+   * it returns the current visitor state and the goal element wrapped in an `Option`. If the queue is
    * exhausted without finding a goal element, it returns the current visitor state and `None`.
    *
-   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]` representing 
+   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]` representing
    *         the current state of the visitor after processing, and the second element is an `Option[X]`
    *         that contains the goal element if found, or `None` if the goal element is not found.
    */
@@ -142,8 +142,8 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
    * A breadth-first search (BFS) visitor that maintains a queue to traverse elements
    * and a mapping of messages to appendable structures for storing intermediary states.
    *
-   * `BfsQueueVisitor` extends `AbstractBfsVisitor` and uses a queue-based mechanism to 
-   * explore elements in a breadth-first manner. It allows customization of the traversal 
+   * `BfsQueueableVisitor` extends `AbstractBfsVisitor` and uses a queue-based mechanism to
+   * explore elements in a breadth-first manner. It allows customization of the traversal
    * logic, the goal condition, and the mapping used for processing messages.
    *
    * @param queue     the initial queue containing elements of type `X` to start the traversal process
@@ -152,12 +152,12 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
    * @param goal      a function that evaluates whether a given element of type `X` satisfies the traversal goal
    * @param queueable a given instance of `Queueable[Q]` that provides operations for the queue data structure
    */
-  case class BfsQueueVisitor[Q[_], X](queue: Q[X], map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean)(using queueable: Queueable[Q]) extends AbstractBfsVisitor[Q, X](queue, map, f, goal) {
+  case class BfsQueueableVisitor[Q[_], X](queue: Q[X], map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean)(using queueable: Queueable[Q]) extends AbstractBfsVisitor[Q, X](queue, map, f, goal) {
 
     /**
      * Constructs a new `AbstractBfsVisitor` with the given queue.
      *
-     * This method provides a mechanism to update the visitor's state by replacing the 
+     * This method provides a mechanism to update the visitor's state by replacing the
      * current queue with a new queue, enabling custom queue configurations for BFS traversal.
      *
      * @param queue the new queue of type `Q[X]` to replace the current queue in the visitor
@@ -185,7 +185,7 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
  */
 object BfsVisitor {
   /**
-   * Constructs a new instance of `BfsVisitor[X]` to facilitate breadth-first search traversal.
+   * Constructs a new instance of `BfsQueueableVisitor[X]` to facilitate breadth-first search traversal.
    * It doesn't make a lot of sense to set up a Post-messaged BFS visitor, so `message` is not a parameter of this
    * `create` method.
    *
@@ -196,20 +196,28 @@ object BfsVisitor {
    * @return a newly created `BfsVisitor[X]` instance configured with an empty queue, a map containing the given message and journal, and the provided traversal logic.
    */
   def create[X](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    BfsQueueVisitor(Queue.empty, Map(Pre -> journal), f, goal)
+    BfsQueueableVisitor(Queue.empty, Map(Pre -> journal), f, goal)
 
   /**
-   * Constructs a `BfsVisitor` configured for breadth-first traversal with a pre-visit strategy and an empty queue.
+   * Creates a `BfsQueueableVisitor` instance for breadth-first search traversal using a queue for the journal.
    *
-   * This method initializes a `BfsVisitor` instance where the traversal is driven by a function to compute
-   * child elements (`f`) and a predicate to determine the goal state (`goal`). It uses a pre-visit message (`Pre`)
-   * and an empty `QueueJournal` for journaling the traversal progress.
-   *
-   * @param f    a function that takes an element of type `X` and generates a sequence of child elements for traversal
-   * @param goal a predicate function used to determine whether a given element of type `X` matches the search goal
-   * @tparam X the type of elements being traversed
-   * @return a new instance of `BfsVisitor[X]` initialized for pre-visit strategy
+   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
+   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements that the visitor operates on during the BFS traversal
+   * @return a `BfsQueueableVisitor[X]` instance initialized with an empty queue and provided traversal logic
    */
-  def createQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+  def createWithQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     create(QueueJournal.empty[X], f, goal)
+
+  def createByMinPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    BfsQueueableVisitor(MinPQ(), Map(Pre -> journal), f, goal)
+
+  def createByMinPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    createByMinPriority(QueueJournal.empty[X], f, goal)
+
+  def createByMaxPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    BfsQueueableVisitor(MaxPQ(), Map(Pre -> journal), f, goal)
+
+  def createByMaxPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    createByMaxPriority(QueueJournal.empty[X], f, goal)
 }
