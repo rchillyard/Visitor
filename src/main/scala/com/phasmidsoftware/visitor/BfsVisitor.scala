@@ -209,15 +209,55 @@ object BfsVisitor {
   def createWithQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     create(QueueJournal.empty[X], f, goal)
 
+  /**
+   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
+   * that processes elements by their minimum priority, as defined by the provided `Ordering` instance.
+   *
+   * @param journal an `Appendable[X]` instance that collects the elements visited during the traversal
+   * @param f       a function that, given an element of type `X`, produces a sequence of child elements to be traversed
+   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements that the BFS traversal processes, which must have an implicit `Ordering`
+   * @return a `BfsVisitor[X]` instance initialized for BFS traversal with a minimum priority queue
+   */
   def createByMinPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     BfsQueueableVisitor(MinPQ(), Map(Pre -> journal), f, goal)
 
+  /**
+   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
+   * with elements prioritized by their minimum value, as defined by the given ordering.
+   *
+   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
+   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements handled by this visitor, which must have an implicit `Ordering` defined
+   * @return a `BfsVisitor[X]` instance configured with a priority queue for traversal, using the provided child generation function and goal predicate
+   */
   def createByMinPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     createByMinPriority(QueueJournal.empty[X], f, goal)
 
+  /**
+   * Creates a `BfsQueueableVisitor` instance for breadth-first search traversal using a maximum priority queue.
+   *
+   * This method sets up a `BfsQueueableVisitor` that traverses elements according to their priority,
+   * where elements with higher priorities (as determined by the provided `Ordering`) are processed first.
+   *
+   * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
+   * @param f       a function that accepts an element of type `X` and produces a sequence of child elements for traversal.
+   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal.
+   * @tparam X the type of elements that the breadth-first search will operate on.
+   * @return a `BfsVisitor[X]` instance configured with a maximum priority queue for traversal.
+   */
   def createByMaxPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     BfsQueueableVisitor(MaxPQ(), Map(Pre -> journal), f, goal)
 
+  /**
+   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
+   * where elements are ordered by a maximum-priority criterion.
+   *
+   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
+   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements that the visitor operates on during the BFS traversal, requiring an implicit `Ordering` for priority comparison
+   * @return a `BfsVisitor[X]` instance initialized with an empty priority queue (using maximum priority) and the provided traversal logic
+   */
   def createByMaxPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     createByMaxPriority(QueueJournal.empty[X], f, goal)
 }

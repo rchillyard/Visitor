@@ -28,6 +28,8 @@ trait Queueable[Q[_]] {
   /**
    * Removes an element from the provided queue-like container and returns a tuple containing the
    * extracted element and a new queue-like container with the element removed.
+   * 
+   * CONSIDER returning (Option[T], Q[T]) in order to handle empty queueables.
    *
    * @param q the queue-like container of type `Q[T]` from which an element will be removed
    * @tparam T the type of the elements stored in the queue-like container
