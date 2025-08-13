@@ -29,8 +29,8 @@ class BfsVisitorSpec extends AnyFlatSpec with Matchers {
 
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(BfsVisitor.create[Int](QueueJournal.empty[Int], f, _ => false)) {
-      visitor0 =>
-        for {journal <- visitor0.bfs(10).iterableJournals
+      visitor =>
+        for {journal <- visitor.bfs(10)._1.iterableJournals
              entry <- journal
              } yield entry
     } shouldBe Success(Queue(10, 5, 13, 2, 6, 11, 15, 1, 3))

@@ -1,59 +1,66 @@
 package com.phasmidsoftware.visitor
 
+import scala.annotation.tailrec
 import scala.collection.immutable.Queue
 
 /**
- * A case class implementing a breadth-first search (BFS) traversal strategy within a visitor pattern.
+ * Represents a visitor designed for performing breadth-first search (BFS) traversal
+ * on a graph or tree-like structure. This trait extends the functionalities of the
+ * generic `Visitor` trait, enabling stateful BFS traversal while managing visited nodes
+ * and pending nodes to explore.
  *
- * The `BfsVisitor` class encapsulates the state and behavior necessary to perform BFS over elements of type `X`.
- * It utilizes a queue to manage the traversal order, a function to generate child elements, and a goal function
- * to define termination criteria. The visitor pattern is leveraged to support extensible processing of elements
- * during the traversal.
+ * The `BfsVisitor` trait supports the initialization, execution, and continuation of a BFS
+ * traversal starting from a specified element. It maintains the traversal state, which
+ * includes a queue of nodes to visit and an optional current element being processed.
  *
- * @param queue a queue of elements of type `X` representing the current state of the BFS traversal.
- * @param map   a mapping from `Message` instances to `Appendable[X]`, used to manage processing behavior for each type of message.
- * @param f     a function that takes an element of type `X` and generates a sequence of child elements for further traversal.
- * @param goal  a predicate function used to determine if a specific element of type `X` satisfies the search goal.
- * @tparam X the type of elements being visited and processed by the `BfsVisitor`.
+ * @tparam X the type of elements that the visitor operates on during the BFS traversal.
  */
-case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean) extends AbstractMultiVisitor[X](map) with Bfs[X, BfsVisitor[X]] {
-
+trait BfsVisitor[X] extends Visitor[X] {
   /**
-   * Performs a breadth-first search (BFS) starting from the given element `x`.
-   * This method initializes the queue with the specified element and triggers
-   * the BFS traversal through the `inner` method.
+   * Performs a breadth-first search (BFS) starting from the given element `x` and returns
+   * a tuple containing the updated BFS visitor state and an optional element,
+   * which will be defined if the goal was satisfied.
    *
-   * CONSIDER expanding this method to take a sequence of X values.
-   *
-   * @param x the starting element of type `X` for the BFS traversal.
-   * @return a new instance of `BfsVisitor` representing the state after
-   *         completing the BFS traversal.
+   * @param x the starting element for the BFS traversal
+   * @return a tuple where the first element is the updated `BfsVisitor[X]` instance
+   *         representing the state after processing, and the second element is an optional `X`
+   *         representing the goal, otherwise `None`.
    */
-  def bfs(x: X): BfsVisitor[X] =
-    copy(queue = Queue(x)).inner
+  def bfs(x: X): (BfsVisitor[X], Option[X])
+}
 
+/**
+ * Abstract class that provides a framework for implementing breadth-first search (BFS) traversal
+ * using the Visitor pattern. It combines the features of queue-based traversal and visitor behavior,
+ * allowing customized handling of nodes during BFS.
+ *
+ * @tparam Q the higher-kinded type representing the queue structure used for BFS
+ * @tparam X the type of elements being visited and traversed in the BFS
+ * @constructor
+ * Creates a new `AbstractBfsVisitor` with the provided queue, mapping of messages to appendable containers,
+ * a function to determine children of an element in the traversal, and a goal function for termination.
+ * @param queue     the initial queue instance to manage elements during the BFS traversal
+ * @param map       a mapping of `Message` types to `Appendable` instances, allowing state to be appended
+ *                  based on messages during the visitation
+ * @param f         a function that generates child nodes from a given node being visited
+ * @param goal      a predicate function that determines if the goal or termination condition is met
+ * @param queueable an implicit `Queueable[Q]` typeclass instance providing operations for the queue
+ */
+abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean)(using queueable: Queueable[Q]) extends AbstractMultiVisitor[X](map) with BfsVisitor[X] {
   /**
-   * Performs the inner recursive logic of a breadth-first search (BFS) traversal.
+   * Executes a breadth-first search (BFS) starting from the given element `x`.
    *
-   * This method executes the BFS traversal by processing elements from the queue,
-   * visiting each element with a predefined message (`Pre`), and enqueuing the results
-   * of applying the function `children` to the current element. The traversal continues recursively
-   * until the queue is empty.
+   * This method initiates the BFS traversal by enqueuing the starting element,
+   * processing the queue iteratively using the `inner` method, and returning
+   * the updated visitor state and an optional result if a goal element is found.
    *
-   * @return a new instance of `BfsVisitor[X]` representing the state after completing
-   *         the BFS traversal or the current state if the queue is empty.
+   * @param x the starting element for the BFS traversal
+   * @return a tuple where the first element is the updated `BfsVisitor[X]` instance
+   *         representing the visitor's state after traversal, and the second element
+   *         is an optional `X` representing the goal element if found, otherwise `None`.
    */
-  def inner: BfsVisitor[X] =
-    if (queue.isEmpty)
-      this
-    else
-      queue.dequeue match {
-        case (x, q) if goal(x) =>
-          this.copy(queue = q)
-        case (x, q) =>
-          val visitor: BfsVisitor[X] = this.copy(queue = q).visit(Pre)(x)
-          f(x).foldLeft(visitor)((v, x) => v.copy(queue = v.queue.enqueue(x))).inner
-      }
+  def bfs(x: X): (BfsVisitor[X], Option[X]) =
+    unitQueue(queueable.offer(queue)(x)).inner
 
   /**
    * Make a visit, with the given message and `X` value, on this `Visitor` and return a new `Visitor`.
@@ -66,20 +73,109 @@ case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X
    * @param x   the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(x: X): BfsVisitor[X] = super.visit(msg)(x).asInstanceOf[BfsVisitor[X]]
+  override def visit(msg: Message)(x: X): AbstractBfsVisitor[Q, X] = super.visit(msg)(x).asInstanceOf[AbstractBfsVisitor[Q, X]]
 
   /**
-   * Creates a new `Visitor` instance with the provided updated mapAppendables.
+   * Constructs a new `AbstractBfsVisitor` instance with the provided queue.
    *
-   * This method is used to update the internal state of the Visitor by creating
-   * a new instance with the modified mappings from `Message` to `Appendable`.
+   * This method serves as a constructor or initializer for creating a visitor instance
+   * that operates using the given `queue`. It is used to establish the visitor's
+   * initial state and context for breadth-first search (BFS) traversal.
    *
-   * @param map a map containing updated associations of `Message` to `Appendable[X]`
-   * @return a new `Visitor[X]` instance that reflects the updated mapAppendables
+   * @param queue the queue of type `Q[X]` to be used for managing BFS traversal elements
+   * @return an instance of `AbstractBfsVisitor[Q, X]` initialized with the specified queue
    */
-  def unit(map: Map[Message, Appendable[X]]): BfsVisitor[X] =
-    copy(map = map)
+  def unitQueue(queue: Q[X]): AbstractBfsVisitor[Q, X]
+
+  /**
+   * Recursively processes a breadth-first search (BFS) by consuming elements from the queue and 
+   * applying the visitor pattern to track the traversal state and results.
+   *
+   * This method extracts elements from the queue using `doTake`, checks if the goal condition is met, 
+   * and either updates the traversal state or continues processing the queue. If a goal element is found, 
+   * it returns the current visitor state and the goal element wrapped in an `Option`. If the queue is 
+   * exhausted without finding a goal element, it returns the current visitor state and `None`.
+   *
+   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]` representing 
+   *         the current state of the visitor after processing, and the second element is an `Option[X]`
+   *         that contains the goal element if found, or `None` if the goal element is not found.
+   */
+  @tailrec
+  private def inner: (AbstractBfsVisitor[Q, X], Option[X]) = doTake() match {
+    case None =>
+      (this, None)
+    case Some((x, q)) if goal(x) =>
+      (unitQueue(q), Some(x))
+    case Some((x, q)) =>
+      val visitor: AbstractBfsVisitor[Q, X] = unitQueue(q).visit(Pre)(x)
+      f(x).foldLeft(visitor) { (v, x) => v.unitQueue(v.doOffer(x)) }.inner
+  }
+
+  /**
+   * Offers the given element to the queue, returning a new queue with the element added.
+   *
+   * This method utilizes the `queueable.offer` function to enqueue the specified element
+   * into the provided queue, ensuring a pseudo-immutable operation by returning a new
+   * queue instance with the updated state.
+   *
+   * @param x the element of type `X` to be added to the queue
+   * @return a new `Q[X]` instance representing the queue after adding the given element
+   */
+  private def doOffer(x: X): Q[X] =
+    queueable.offer(queue)(x)
+
+  /**
+   * Extracts an element from the queue if it is not empty.
+   *
+   * This method checks if the queue is empty using the `queueable.isEmpty` function. If the queue
+   * contains elements, it retrieves the first element and the remaining queue using the `queueable.take` function
+   * and wraps the result in an `Option`. If the queue is empty, it returns `None`.
+   *
+   * @return an `Option` containing a tuple of the extracted element and the updated queue (`(X, Q[X])`)
+   *         if the queue is not empty, or `None` if the queue is empty.
+   */
+  private def doTake(): Option[(X, Q[X])] =
+    Option.when(!queueable.isEmpty(queue))(queueable.take(queue))
 }
+
+  /**
+   * A breadth-first search (BFS) visitor that maintains a queue to traverse elements
+   * and a mapping of messages to appendable structures for storing intermediary states.
+   *
+   * `BfsQueueVisitor` extends `AbstractBfsVisitor` and uses a queue-based mechanism to 
+   * explore elements in a breadth-first manner. It allows customization of the traversal 
+   * logic, the goal condition, and the mapping used for processing messages.
+   *
+   * @param queue     the initial queue containing elements of type `X` to start the traversal process
+   * @param map       a mapping of `Message` types to `Appendable[X]`, used for handling messages during traversal
+   * @param f         a function that takes an element of type `X` and returns a sequence of new elements to be explored
+   * @param goal      a function that evaluates whether a given element of type `X` satisfies the traversal goal
+   * @param queueable a given instance of `Queueable[Q]` that provides operations for the queue data structure
+   */
+  case class BfsQueueVisitor[Q[_], X](queue: Q[X], map: Map[Message, Appendable[X]], f: X => Seq[X], goal: X => Boolean)(using queueable: Queueable[Q]) extends AbstractBfsVisitor[Q, X](queue, map, f, goal) {
+
+    /**
+     * Constructs a new `AbstractBfsVisitor` with the given queue.
+     *
+     * This method provides a mechanism to update the visitor's state by replacing the 
+     * current queue with a new queue, enabling custom queue configurations for BFS traversal.
+     *
+     * @param queue the new queue of type `Q[X]` to replace the current queue in the visitor
+     * @return a new `AbstractBfsVisitor[Q, X]` instance with the updated queue
+     */
+    def unitQueue(queue: Q[X]): AbstractBfsVisitor[Q, X] = copy(queue = queue)
+
+    /**
+     * Creates a new `Visitor` instance with the provided updated mapAppendables.
+     *
+     * This method is used to update the internal state of the Visitor by creating
+     * a new instance with the modified mappings from `Message` to `Appendable`.
+     *
+     * @param map a map containing updated associations of `Message` to `Appendable[X]`
+     * @return a new `Visitor[X]` instance that reflects the updated mapAppendables
+     */
+    def unit(map: Map[Message, Appendable[X]]): Visitor[X] = copy(map = map)
+  }
 
 /**
  * Contains utility methods for processing recursive logic within the `BfsVisitor` class.
@@ -90,7 +186,7 @@ case class BfsVisitor[X](queue: Queue[X], map: Map[Message, Appendable[X]], f: X
 object BfsVisitor {
   /**
    * Constructs a new instance of `BfsVisitor[X]` to facilitate breadth-first search traversal.
-   * It doesn't make a lot of sense to set up a Post-messaged BFS visitor so message is not a parameter of this
+   * It doesn't make a lot of sense to set up a Post-messaged BFS visitor, so `message` is not a parameter of this
    * `create` method.
    *
    * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
@@ -100,7 +196,7 @@ object BfsVisitor {
    * @return a newly created `BfsVisitor[X]` instance configured with an empty queue, a map containing the given message and journal, and the provided traversal logic.
    */
   def create[X](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    new BfsVisitor(Queue.empty, Map(Pre -> journal), f, goal)
+    BfsQueueVisitor(Queue.empty, Map(Pre -> journal), f, goal)
 
   /**
    * Constructs a `BfsVisitor` configured for breadth-first traversal with a pre-visit strategy and an empty queue.
@@ -116,6 +212,4 @@ object BfsVisitor {
    */
   def createQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     create(QueueJournal.empty[X], f, goal)
-
-
 }
