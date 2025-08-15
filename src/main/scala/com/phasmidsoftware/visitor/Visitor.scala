@@ -318,6 +318,36 @@ abstract class AbstractVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]]
 }
 
 /**
+ * Abstract class that extends `AbstractVisitorMapped` and provides additional functionality
+ * for mapping keys to values with children elements.
+ *
+ * This class enhances the base functionality of `AbstractVisitorMapped` by allowing 
+ * the mapping of keys of type `K` to values of type `V` while also establishing a relationship 
+ * with children elements, where children are derived from a key of type `K`.
+ *
+ * Typical use cases for this class include scenarios where hierarchical data needs to be processed 
+ * or traversed, and the mapping of each key can generate a corresponding value along with potentially 
+ * associated child elements.
+ *
+ * @tparam K the type of the key
+ * @tparam C the type of children associated with a key
+ * @tparam V the type of the value derived from the key
+ * @param map      a `Map` associating `Message` instances with their corresponding 
+ *                 `Appendable` objects containing key-value pairs of type `(K, V)`
+ * @param f        a function that maps a key of type `K` to a corresponding value of type `V`
+ * @param children a function that generates a sequence of children of type `C` for a given key of type `K`
+ */
+abstract class AbstractVisitorMappedWithChildren[K, C, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[C]) extends AbstractVisitorMapped[K, V](map) {
+  /**
+   * Creates a key-value pair by applying the function `f` to a given key of type `K`.
+   *
+   * @param k the key of type `K` from which the pair is derived
+   * @return a tuple `(K, V)` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `f` to `k`
+   */
+  def keyValuePair(k: K): (K, V) = (k, f(k))
+}
+
+/**
  * A concrete implementation of `AbstractMultiVisitor` that represents a visitor
  * capable of handling multiple `Message` to `Appendable` mappings.
  *
@@ -380,6 +410,8 @@ object MultiVisitor {
 /**
  * A case class extending `AbstractVisitorMapped` for managing `Message` to `Appendable[(K, V)]` mappings
  * within the context of the Visitor pattern.
+ *
+ * TESTME this is not used currently.
  *
  * This class provides additional methods for updating and processing the internal mappings, allowing
  * it to serve as a mutable visitor that accommodates changes in state as it processes messages.

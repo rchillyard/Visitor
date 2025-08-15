@@ -173,32 +173,6 @@ object DfsVisitor {
 }
 
 /**
- * Abstract implementation of a visitor that maps a key-value pair with additional
- * functionality for hierarchical traversal and mapping within a visitor pattern.
- *
- * This class extends `AbstractMultiVisitor` with a generic mapping strategy defined by
- * a function `f` that transforms keys of type `K` into values of type `V`, and another
- * function `children` that determines the hierarchical structure by returning a sequence
- * of child keys for a given key. The visitor provides processing mechanisms in conjunction
- * with `Message` and `Appendable` types to handle the specified map of `Message` to `Appendable` instances.
- *
- * @tparam K the type of the keys in the hierarchical relationship.
- * @tparam V the type of the values derived from the keys through the function `f`.
- * @param map      a mapping from `Message` instances to `Appendable` objects, defining the state handled by this visitor.
- * @param f        a function to derive a value of type `V` from a key of type `K`.
- * @param children a function that returns a sequence of child keys given a key of type `K`.
- */
-abstract class AbstractDfsVisitorMapped[K, C, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[C]) extends AbstractVisitorMapped[K, V](map) {
-  /**
-   * Creates a key-value pair by applying the function `f` to a given key of type `K`.
-   *
-   * @param k the key of type `K` from which the pair is derived
-   * @return a tuple `(K, V)` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `f` to `k`
-   */
-  def keyValuePair(k: K): (K, V) = (k, f(k))
-}
-
-/**
  * A case class for managing depth-first traversal using the Visitor design pattern based on a key-value pair.
  *
  * `DfsVisitorMapped` combines a custom traversal strategy with visitor behavior,
@@ -212,7 +186,7 @@ abstract class AbstractDfsVisitorMapped[K, C, V](map: Map[Message, Appendable[(K
  * @tparam K the type of the keys or elements being traversed.
  * @tparam V the type of the associated values produced during the traversal process.
  */
-case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractDfsVisitorMapped[K, K, V](map, f, children) with Dfs[K, DfsVisitorMapped[K, V]] {
+case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractVisitorMappedWithChildren[K, K, V](map, f, children) with Dfs[K, DfsVisitorMapped[K, V]] {
   /**
    * Performs a depth-first traversal starting from the provided key `k`.
    * This method applies visitor operations in a specific sequence: pre-visit, self-visit, recursive traversal, and post-visit.
@@ -367,7 +341,7 @@ object DfsVisitorMapped {
  * @tparam K the type of elements to be visited and processed during traversal.
  * @tparam V the value type that will be associated with each element of type `K`.
  */
-case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractDfsVisitorMapped[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsOriginVisitor[K, V]] {
+case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractVisitorMappedWithChildren[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsOriginVisitor[K, V]] {
 
   /**
    * Processes an element of type `K` with an optional value of type `V` using a depth-first traversal strategy.
