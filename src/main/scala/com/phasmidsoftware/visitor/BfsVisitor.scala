@@ -441,7 +441,7 @@ case class BfsQueueVisitorMapped[K, V](queue: Queue[K], map: Map[Message, Append
  * @tparam K the type of keys in the traversal, which must have an implicit `Ordering`
  * @tparam V the type of state values associated with the keys
  */
-case class BfsMinPQVisitorMapped[K: Ordering, V](queue: MinPQ[K], map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K], goal: K => Boolean) extends AbstractQueueableVisitorMapped(queue, map, f, children, goal) {
+case class BfsMinPQVisitorMapped[K: Ordering, V](queue: PQ[K], map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K], goal: K => Boolean) extends AbstractQueueableVisitorMapped(queue, map, f, children, goal) {
   /**
    * Performs a breadth-first search (BFS) starting with the given key `k`.
    *
@@ -489,7 +489,7 @@ case class BfsMinPQVisitorMapped[K: Ordering, V](queue: MinPQ[K], map: Map[Messa
    * @param queue the queue of type `Q[X]` to be used for managing BFS traversal elements
    * @return an instance of `AbstractBfsVisitor[Q, X]` initialized with the specified queue
    */
-  def unitQueue(queue: MinPQ[K]): BfsMinPQVisitorMapped[K, V] =
+  def unitQueue(queue: PQ[K]): BfsMinPQVisitorMapped[K, V] =
     copy(queue = queue)
 }
 
@@ -506,14 +506,14 @@ object BfsMinPQVisitorMapped {
 }
 
 /**
- * A specialized visitor for conducting breadth-first search (BFS) traversal using a maximum priority queue (MaxPQ).
+ * A specialized visitor for conducting breadth-first search (BFS) traversal using a maximum priority queue (PQ).
  *
- * This case class extends `AbstractQueueableVisitorMapped` and incorporates a `MaxPQ` to manage
+ * This case class extends `AbstractQueueableVisitorMapped` and incorporates a `PQ` to manage
  * traversal order, a mapping between messages and appendable collections, and functions for deriving
  * the BFS state and transitions. It evaluates traversal based on goal conditions while allowing flexible
  * association of keys and transformed values.
  *
- * @param queue    the `MaxPQ` used for managing keys during the BFS traversal
+ * @param queue the `PQ` used for managing keys during the BFS traversal
  * @param map      a mapping of `Message` to `Appendable[(K, V)]` to manage visit states
  * @param f        a function transforming keys of type `K` into values of type `V`
  * @param children a function defining the child keys for a given key of type `K`
@@ -521,7 +521,7 @@ object BfsMinPQVisitorMapped {
  * @tparam K the type of keys used for BFS traversal, required to have an implicit `Ordering`
  * @tparam V the type of values associated with keys, derived using the function `f`
  */
-case class BfsMaxPQVisitorMapped[K: Ordering, V](queue: MaxPQ[K], map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K], goal: K => Boolean) extends AbstractQueueableVisitorMapped(queue, map, f, children, goal) {
+case class BfsMaxPQVisitorMapped[K: Ordering, V](queue: PQ[K], map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K], goal: K => Boolean) extends AbstractQueueableVisitorMapped(queue, map, f, children, goal) {
   /**
    * Performs a breadth-first search (BFS) starting with the given key `k`.
    *
@@ -569,12 +569,12 @@ case class BfsMaxPQVisitorMapped[K: Ordering, V](queue: MaxPQ[K], map: Map[Messa
    * @param queue the queue of type `Q[X]` to be used for managing BFS traversal elements
    * @return an instance of `AbstractBfsVisitor[Q, X]` initialized with the specified queue
    */
-  def unitQueue(queue: MaxPQ[K]): BfsMaxPQVisitorMapped[K, V] = copy(queue = queue)
+  def unitQueue(queue: PQ[K]): BfsMaxPQVisitorMapped[K, V] = copy(queue = queue)
 }
 
 /**
  * Provides a factory method for creating a specialized visitor for performing breadth-first search (BFS)
- * with a maximum priority queue (MaxPQ) and mapped values.
+ * with a maximum priority queue (PQ) and mapped values.
  *
  * This object facilitates the creation of `BfsMaxPQVisitorMapped` instances, enabling configurable
  * BFS traversal with custom child determination, goal evaluation, and value mapping.
@@ -582,7 +582,7 @@ case class BfsMaxPQVisitorMapped[K: Ordering, V](queue: MaxPQ[K], map: Map[Messa
 object BfsMaxPQVisitorMapped {
   /**
    * Creates a specialized visitor for performing breadth-first search (BFS) traversal
-   * using a maximum priority queue (MaxPQ) and mapped values.
+   * using a maximum priority queue (PQ) and mapped values.
    *
    * This method initializes and returns a `BfsMaxPQVisitorMapped` instance, which enables
    * configurable BFS traversal by providing functions for deriving child nodes, evaluating

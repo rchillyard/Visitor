@@ -86,14 +86,14 @@ given Queueable[Queue] with {
 }
 
 /**
- * A given instance of the `Queueable` type class for the `PQ` type, representing a priority queue.
+ * A given instance of the `Queueable` type class for the `PQLike` type, representing a priority queue.
  * This instance provides the implementation for the abstract methods `offer` and `take`, enabling
- * enqueueing and dequeueing operations specific to the `PQ` type.
+ * enqueueing and dequeueing operations specific to the `PQLike` type.
  *
- * The `offer` method appends an element into the `PQ`, while the `take` method removes and returns the
- * highest-priority element, ensuring immutability by producing new `PQ` instances.
+ * The `offer` method appends an element into the `PQLike`, while the `take` method removes and returns the
+ * highest-priority element, ensuring immutability by producing new `PQLike` instances.
  */
-given Queueable[MinPQ] with {
+given Queueable[PQ] with {
   /**
    * Adds the specified element to the given priority queue and returns a new instance of the priority queue
    * with the element appended. The operation does not modify the original priority queue, preserving its immutability.
@@ -101,19 +101,19 @@ given Queueable[MinPQ] with {
    * @param q the priority queue to which the element should be added
    * @param t the element to be added to the priority queue
    * @tparam T the type of elements stored in the priority queue
-   * @return a new `PQ[T]` instance containing the existing elements along with the newly added element
+   * @return a new `PQLike[T]` instance containing the existing elements along with the newly added element
    */
-  def offer[T](q: MinPQ[T])(t: T): MinPQ[T] = q.append(t)
+  def offer[T](q: PQ[T])(t: T): PQ[T] = q.append(t)
 
   /**
    * Removes and returns the highest-priority element from the specified priority queue,
    * along with the updated priority queue ensuring immutability.
    *
-   * @param q the priority queue of type `PQ[T]` from which the highest-priority element is extracted
-   * @return a tuple containing the extracted element of type `T` and a new `PQ[T]` instance
+   * @param q the priority queue of type `PQLike[T]` from which the highest-priority element is extracted
+   * @return a tuple containing the extracted element of type `T` and a new `PQLike[T]` instance
    *         with the element removed
    */
-  def take[T](q: MinPQ[T]): (T, MinPQ[T]) = q.take
+  def take[T](q: PQ[T]): (T, PQ[T]) = q.take
 
   /**
    * Checks whether the given priority queue is empty.
@@ -121,41 +121,41 @@ given Queueable[MinPQ] with {
    * @param q the priority queue to be checked
    * @return true if the priority queue is empty, false otherwise
    */
-  def isEmpty[T](q: MinPQ[T]): Boolean = q.isEmpty
+  def isEmpty[T](q: PQ[T]): Boolean = q.isEmpty
 }
-
-/**
- * Implicit implementation of the `Queueable` typeclass for the `MaxPQ` data structure.
- * This provides methods for adding elements to the priority queue, removing the highest-priority element,
- * and checking if the queue is empty, adhering to the `Queueable` typeclass interface.
- *
- * The `MaxPQ` is a maximum-priority queue, ensuring that elements are dequeued in order of
- * descending priority based on the implicit ordering of the element type.
- */
-given Queueable[MaxPQ] with {
-  /**
-   * Appends the specified element `t` to the given maximum-priority queue `q` and returns the updated queue.
-   *
-   * @param q the instance of the maximum-priority queue to which the element `t` will be appended
-   * @param t the element to be appended to the priority queue
-   * @return the updated instance of the maximum-priority queue with the element `t` added
-   */
-  def offer[T](q: MaxPQ[T])(t: T): MaxPQ[T] = q.append(t)
-
-  /**
-   * Removes and returns the highest-priority element from the given maximum-priority queue,
-   * along with the updated priority queue.
-   *
-   * @param q the input maximum-priority queue from which the highest-priority element is to be removed
-   * @return a tuple containing the extracted element of type `T` and the updated `MaxPQ[T]` instance
-   */
-  def take[T](q: MaxPQ[T]): (T, MaxPQ[T]) = q.take
-
-  /**
-   * Checks if the given maximum-priority queue is empty.
-   *
-   * @param q the `MaxPQ` instance to be checked
-   * @return true if the priority queue is empty, false otherwise
-   */
-  def isEmpty[T](q: MaxPQ[T]): Boolean = q.isEmpty
-}
+//
+///**
+// * Implicit implementation of the `Queueable` typeclass for the `PQ` data structure.
+// * This provides methods for adding elements to the priority queue, removing the highest-priority element,
+// * and checking if the queue is empty, adhering to the `Queueable` typeclass interface.
+// *
+// * The `PQ` is a maximum-priority queue, ensuring that elements are dequeued in order of
+// * descending priority based on the implicit ordering of the element type.
+// */
+//given Queueable[PQ] with {
+//  /**
+//   * Appends the specified element `t` to the given maximum-priority queue `q` and returns the updated queue.
+//   *
+//   * @param q the instance of the maximum-priority queue to which the element `t` will be appended
+//   * @param t the element to be appended to the priority queue
+//   * @return the updated instance of the maximum-priority queue with the element `t` added
+//   */
+//  def offer[T](q: PQ[T])(t: T): PQ[T] = q.append(t)
+//
+//  /**
+//   * Removes and returns the highest-priority element from the given maximum-priority queue,
+//   * along with the updated priority queue.
+//   *
+//   * @param q the input maximum-priority queue from which the highest-priority element is to be removed
+//   * @return a tuple containing the extracted element of type `T` and the updated `PQ[T]` instance
+//   */
+//  def take[T](q: PQ[T]): (T, PQ[T]) = q.take
+//
+//  /**
+//   * Checks if the given maximum-priority queue is empty.
+//   *
+//   * @param q the `PQ` instance to be checked
+//   * @return true if the priority queue is empty, false otherwise
+//   */
+//  def isEmpty[T](q: PQ[T]): Boolean = q.isEmpty
+//}
