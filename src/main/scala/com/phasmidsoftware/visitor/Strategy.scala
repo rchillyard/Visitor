@@ -58,7 +58,18 @@ trait Bfs[K, R <: Visitor[_]] extends Strategy[K, R] {
    * @param k the starting key of type `K` to begin the BFS traversal
    * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal
    */
-  def bfs(k: K): R
+  def bfs(k: K): (R, Option[K])
+}
+
+/**
+ * A trait representing goal-oriented behavior for generic types.
+ *
+ * The `GoalOriented` trait is meant to define a goal function that can evaluate
+ * whether a given result satisfies a specific goal condition.
+ *
+ * @tparam K the type of the input to the goal function
+ */
+trait GoalOriented[K] {
 
   /**
    * Evaluates whether the given result `r` satisfies the goal condition.
