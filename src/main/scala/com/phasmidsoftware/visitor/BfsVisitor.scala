@@ -30,6 +30,91 @@ trait BfsVisitor[X] extends Visitor[X] with Bfs[X, BfsVisitor[X]] {
 }
 
 /**
+ * Contains utility methods for processing recursive logic within the `BfsVisitor` class.
+ *
+ * This object provides an internal helper function used to facilitate specific
+ * recursive operations with handling of `In` messages during traversal.
+ */
+object BfsVisitor {
+  /**
+   * Constructs a new instance of `BfsQueueableVisitor[X]` to facilitate breadth-first search traversal.
+   * It doesn't make a lot of sense to set up a Post-messaged BFS visitor, so `message` is not a parameter of this
+   * `create` method.
+   *
+   * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
+   * @param f       a function that accepts an element of type `X` and produces a sequence of child elements for traversal.
+   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal.
+   * @tparam X the type of elements that the `BfsVisitor[X]` is designed to traverse and process.
+   * @return a newly created `BfsVisitor[X]` instance configured with an empty queue, a map containing the given message and journal, and the provided traversal logic.
+   */
+  def create[X](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    BfsQueueableVisitor(Queue.empty, Map(Pre -> journal), f, goal)
+
+  /**
+   * Creates a `BfsQueueableVisitor` instance for breadth-first search traversal using a queue for the journal.
+   *
+   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
+   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements that the visitor operates on during the BFS traversal
+   * @return a `BfsQueueableVisitor[X]` instance initialized with an empty queue and provided traversal logic
+   */
+  def createWithQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    create(QueueJournal.empty[X], f, goal)
+
+  /**
+   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
+   * that processes elements by their minimum priority, as defined by the provided `Ordering` instance.
+   *
+   * @param journal an `Appendable[X]` instance that collects the elements visited during the traversal
+   * @param f       a function that, given an element of type `X`, produces a sequence of child elements to be traversed
+   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements that the BFS traversal processes, which must have an implicit `Ordering`
+   * @return a `BfsVisitor[X]` instance initialized for BFS traversal with a minimum priority queue
+   */
+  def createByMinPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    BfsQueueableVisitor(MinPQ.empty, Map(Pre -> journal), f, goal)
+
+  /**
+   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
+   * with elements prioritized by their minimum value, as defined by the given ordering.
+   *
+   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
+   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements handled by this visitor, which must have an implicit `Ordering` defined
+   * @return a `BfsVisitor[X]` instance configured with a priority queue for traversal, using the provided child generation function and goal predicate
+   */
+  def createByMinPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    createByMinPriority(QueueJournal.empty[X], f, goal)
+
+  /**
+   * Creates a `BfsQueueableVisitor` instance for breadth-first search traversal using a maximum priority queue.
+   *
+   * This method sets up a `BfsQueueableVisitor` that traverses elements according to their priority,
+   * where elements with higher priorities (as determined by the provided `Ordering`) are processed first.
+   *
+   * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
+   * @param f       a function that accepts an element of type `X` and produces a sequence of child elements for traversal.
+   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal.
+   * @tparam X the type of elements that the breadth-first search will operate on.
+   * @return a `BfsVisitor[X]` instance configured with a maximum priority queue for traversal.
+   */
+  def createByMaxPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    BfsQueueableVisitor(MaxPQ.empty[X], Map(Pre -> journal), f, goal)
+
+  /**
+   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
+   * where elements are ordered by a maximum-priority criterion.
+   *
+   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
+   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
+   * @tparam X the type of elements that the visitor operates on during the BFS traversal, requiring an implicit `Ordering` for priority comparison
+   * @return a `BfsVisitor[X]` instance initialized with an empty priority queue (using maximum priority) and the provided traversal logic
+   */
+  def createByMaxPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
+    createByMaxPriority(QueueJournal.empty[X], f, goal)
+}
+
+/**
  * Abstract class that provides a framework for implementing breadth-first search (BFS) traversal
  * using the Visitor pattern. It combines the features of queue-based traversal and visitor behavior,
  * allowing customized handling of nodes during BFS.
@@ -73,7 +158,8 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
    * @param x   the current state or context associated with the visitor
    * @return a new `Visitor[X]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(x: X): AbstractBfsVisitor[Q, X] = super.visit(msg)(x).asInstanceOf[AbstractBfsVisitor[Q, X]]
+  override def visit(msg: Message)(x: X): AbstractBfsVisitor[Q, X] =
+    super.visit(msg)(x).asInstanceOf[AbstractBfsVisitor[Q, X]]
 
   /**
    * Constructs a new `AbstractBfsVisitor` instance with the provided queue.
@@ -96,7 +182,7 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
    * it returns the current visitor state and the goal element wrapped in an `Option`. If the queue is
    * exhausted without finding a goal element, it returns the current visitor state and `None`.
    *
-   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]`, 
+   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]`,
    *         and the second element is an `Option[X]` that contains the goal element if found, otherwise `None`.
    */
   @tailrec
@@ -162,7 +248,8 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
      * @param queue the new queue of type `Q[X]` to replace the current queue in the visitor
      * @return a new `AbstractBfsVisitor[Q, X]` instance with the updated queue
      */
-    def unitQueue(queue: Q[X]): AbstractBfsVisitor[Q, X] = copy(queue = queue)
+    def unitQueue(queue: Q[X]): AbstractBfsVisitor[Q, X] =
+      copy(queue = queue)
 
     /**
      * Creates a new `Visitor` instance with the provided updated mapAppendables.
@@ -173,93 +260,9 @@ abstract class AbstractBfsVisitor[Q[_], X](queue: Q[X], map: Map[Message, Append
      * @param map a map containing updated associations of `Message` to `Appendable[X]`
      * @return a new `Visitor[X]` instance that reflects the updated mapAppendables
      */
-    def unit(map: Map[Message, Appendable[X]]): Visitor[X] = copy(map = map)
+    def unit(map: Map[Message, Appendable[X]]): Visitor[X] =
+      copy(map = map)
   }
-
-/**
- * Contains utility methods for processing recursive logic within the `BfsVisitor` class.
- *
- * This object provides an internal helper function used to facilitate specific
- * recursive operations with handling of `In` messages during traversal.
- */
-object BfsVisitor {
-  /**
-   * Constructs a new instance of `BfsQueueableVisitor[X]` to facilitate breadth-first search traversal.
-   * It doesn't make a lot of sense to set up a Post-messaged BFS visitor, so `message` is not a parameter of this
-   * `create` method.
-   *
-   * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
-   * @param f       a function that accepts an element of type `X` and produces a sequence of child elements for traversal.
-   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal.
-   * @tparam X the type of elements that the `BfsVisitor[X]` is designed to traverse and process.
-   * @return a newly created `BfsVisitor[X]` instance configured with an empty queue, a map containing the given message and journal, and the provided traversal logic.
-   */
-  def create[X](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    BfsQueueableVisitor(Queue.empty, Map(Pre -> journal), f, goal)
-
-  /**
-   * Creates a `BfsQueueableVisitor` instance for breadth-first search traversal using a queue for the journal.
-   *
-   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
-   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
-   * @tparam X the type of elements that the visitor operates on during the BFS traversal
-   * @return a `BfsQueueableVisitor[X]` instance initialized with an empty queue and provided traversal logic
-   */
-  def createWithQueue[X](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    create(QueueJournal.empty[X], f, goal)
-
-  /**
-   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
-   * that processes elements by their minimum priority, as defined by the provided `Ordering` instance.
-   *
-   * @param journal an `Appendable[X]` instance that collects the elements visited during the traversal
-   * @param f       a function that, given an element of type `X`, produces a sequence of child elements to be traversed
-   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal
-   * @tparam X the type of elements that the BFS traversal processes, which must have an implicit `Ordering`
-   * @return a `BfsVisitor[X]` instance initialized for BFS traversal with a minimum priority queue
-   */
-  def createByMinPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    BfsQueueableVisitor(MinPQ(), Map(Pre -> journal), f, goal)
-
-  /**
-   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
-   * with elements prioritized by their minimum value, as defined by the given ordering.
-   *
-   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
-   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
-   * @tparam X the type of elements handled by this visitor, which must have an implicit `Ordering` defined
-   * @return a `BfsVisitor[X]` instance configured with a priority queue for traversal, using the provided child generation function and goal predicate
-   */
-  def createByMinPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    createByMinPriority(QueueJournal.empty[X], f, goal)
-
-  /**
-   * Creates a `BfsQueueableVisitor` instance for breadth-first search traversal using a maximum priority queue.
-   *
-   * This method sets up a `BfsQueueableVisitor` that traverses elements according to their priority,
-   * where elements with higher priorities (as determined by the provided `Ordering`) are processed first.
-   *
-   * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
-   * @param f       a function that accepts an element of type `X` and produces a sequence of child elements for traversal.
-   * @param goal    a predicate function that determines whether a given element of type `X` satisfies the search goal.
-   * @tparam X the type of elements that the breadth-first search will operate on.
-   * @return a `BfsVisitor[X]` instance configured with a maximum priority queue for traversal.
-   */
-  def createByMaxPriority[X: Ordering](journal: Appendable[X], f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    BfsQueueableVisitor(MaxPQ(), Map(Pre -> journal), f, goal)
-
-  /**
-   * Creates a `BfsVisitor` instance for breadth-first search traversal using a priority queue
-   * where elements are ordered by a maximum-priority criterion.
-   *
-   * @param f    a function that accepts an element of type `X` and returns a sequence of child elements for traversal
-   * @param goal a predicate function that determines whether a given element of type `X` satisfies the search goal
-   * @tparam X the type of elements that the visitor operates on during the BFS traversal, requiring an implicit `Ordering` for priority comparison
-   * @return a `BfsVisitor[X]` instance initialized with an empty priority queue (using maximum priority) and the provided traversal logic
-   */
-  def createByMaxPriorityWithQueue[X: Ordering](f: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
-    createByMaxPriority(QueueJournal.empty[X], f, goal)
-}
 
 /**
  * An abstract class for implementing a visitor-based breadth-first search (BFS) traversal
@@ -303,8 +306,8 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V](queue: Q[K], map: Map[
    * it returns the current visitor state and the goal element wrapped in an `Option`. If the queue is
    * exhausted without finding a goal element, it returns the current visitor state and `None`.
    *
-   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]`, 
-   *         and the second element is an `Option[X]` that contains the goal element if found, othersise `None`.
+   * @return a tuple where the first element is an updated instance of `AbstractBfsVisitor[Q, X]`,
+   *         and the second element is an `Option[X]` that contains the goal element if found, otherwise `None`.
    */
   @tailrec
   private def inner: (AbstractQueueableVisitorMapped[Q, K, V], Option[K]) = doTake() match {
@@ -419,5 +422,179 @@ case class BfsQueueVisitorMapped[K, V](queue: Queue[K], map: Map[Message, Append
    * @param queue the queue of type `Q[X]` to be used for managing BFS traversal elements
    * @return an instance of `AbstractBfsVisitor[Q, X]` initialized with the specified queue
    */
-  def unitQueue(queue: Queue[K]): AbstractQueueableVisitorMapped[Queue, K, V] = copy(queue = queue)
+  def unitQueue(queue: Queue[K]): AbstractQueueableVisitorMapped[Queue, K, V] =
+    copy(queue = queue)
+}
+
+/**
+ * A specialized breadth-first search (BFS) visitor implementation that operates with a priority queue and an associated mapping.
+ *
+ * The `BfsMinPQVisitorMapped` class combines BFS traversal with the use of a minimum priority queue and a mapping of messages
+ * to state appendable operations. It leverages the Visitor design pattern to provide flexible behavior through message handling
+ * and allows mapping of keys to custom state values via user-defined transformations (`f`).
+ *
+ * @param queue    the minimum priority queue used for managing BFS traversal elements
+ * @param map      a mapping from `Message` to `Appendable[(K, V)]`, dictating actions for state management during traversal
+ * @param f        a function that maps a key of type `K` to a state value of type `V`
+ * @param children a function that determines the child nodes of a given key `K` for traversal purposes
+ * @param goal     a predicate function that identifies if a given key `K` satisfies the traversal goal
+ * @tparam K the type of keys in the traversal, which must have an implicit `Ordering`
+ * @tparam V the type of state values associated with the keys
+ */
+case class BfsMinPQVisitorMapped[K: Ordering, V](queue: MinPQ[K], map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K], goal: K => Boolean) extends AbstractQueueableVisitorMapped(queue, map, f, children, goal) {
+  /**
+   * Performs a breadth-first search (BFS) starting with the given key `k`.
+   *
+   * @param k the starting key of type `K` to begin the BFS traversal
+   * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal
+   */
+  override def bfs(k: K): (BfsMinPQVisitorMapped[K, V], Option[K]) = {
+    val (q, ko) = super.bfs(k)
+    q.asInstanceOf[BfsMinPQVisitorMapped[K, V]] -> ko
+  }
+
+  /**
+   * Make a visit, with the given message and `(K, V)` value, on this `Visitor` and return a new `Visitor`.
+   *
+   * This method defines the behavior for handling a `Message` in the context
+   * of the Visitor pattern. The implementation of this method should use the provided
+   * message and state to determine the next state and return the appropriate `Visitor`.
+   *
+   * @param msg the message to be processed by the visitor
+   * @param kv  the current state or context associated with the visitor
+   * @return a new `DfsVisitorMapped[K, V]` instance that represents the updated state after processing the message
+   */
+  override def visit(msg: Message)(kv: (K, V)): BfsMinPQVisitorMapped[K, V] =
+    super.visit(msg)(kv).asInstanceOf[BfsMinPQVisitorMapped[K, V]]
+
+  /**
+   * Creates a new `Visitor` instance with the provided updated mapAppendables.
+   *
+   * This method is used to update the internal state of the Visitor by creating
+   * a new instance with the modified mappings from `Message` to `Appendable`.
+   *
+   * @param map a map containing updated associations of `Message` to `Appendable[(K, V)]`
+   * @return a new `DfsVisitorMapped[K, V]` instance that reflects the updated mapAppendables
+   */
+  def unit(map: Map[Message, Appendable[(K, V)]]): BfsMinPQVisitorMapped[K, V] =
+    copy(map = map)
+
+  /**
+   * Constructs a new `AbstractQueueableVisitorMapped` instance with the provided queue.
+   *
+   * This method serves as a constructor or initializer for creating a visitor instance
+   * that operates using the given `queue`. It is used to establish the visitor's
+   * initial state and context for breadth-first search (BFS) traversal.
+   *
+   * @param queue the queue of type `Q[X]` to be used for managing BFS traversal elements
+   * @return an instance of `AbstractBfsVisitor[Q, X]` initialized with the specified queue
+   */
+  def unitQueue(queue: MinPQ[K]): BfsMinPQVisitorMapped[K, V] =
+    copy(queue = queue)
+}
+
+/**
+ * The `BfsMinPQVisitorMapped` object is a companion object for the `BfsMinPQVisitorMapped` class.
+ *
+ * It provides utility methods for creating and managing instances of the `BfsMinPQVisitorMapped` class,
+ * which is designed for performing breadth-first searches (BFS) using a priority queue (MinPQ) and
+ * mapping keys of type `K` to values of type `V`.
+ */
+object BfsMinPQVisitorMapped {
+  def createBfsVisitor[K: Ordering, V](f: K => V, children: K => Seq[K], goal: K => Boolean): BfsMinPQVisitorMapped[K, V] =
+    BfsMinPQVisitorMapped(MinPQ.empty[K], Map(Pre -> MapJournal.empty[K, V]), f, children, goal)
+}
+
+/**
+ * A specialized visitor for conducting breadth-first search (BFS) traversal using a maximum priority queue (MaxPQ).
+ *
+ * This case class extends `AbstractQueueableVisitorMapped` and incorporates a `MaxPQ` to manage
+ * traversal order, a mapping between messages and appendable collections, and functions for deriving
+ * the BFS state and transitions. It evaluates traversal based on goal conditions while allowing flexible
+ * association of keys and transformed values.
+ *
+ * @param queue    the `MaxPQ` used for managing keys during the BFS traversal
+ * @param map      a mapping of `Message` to `Appendable[(K, V)]` to manage visit states
+ * @param f        a function transforming keys of type `K` into values of type `V`
+ * @param children a function defining the child keys for a given key of type `K`
+ * @param goal     a function specifying the goal condition, returning `true` for completion
+ * @tparam K the type of keys used for BFS traversal, required to have an implicit `Ordering`
+ * @tparam V the type of values associated with keys, derived using the function `f`
+ */
+case class BfsMaxPQVisitorMapped[K: Ordering, V](queue: MaxPQ[K], map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K], goal: K => Boolean) extends AbstractQueueableVisitorMapped(queue, map, f, children, goal) {
+  /**
+   * Performs a breadth-first search (BFS) starting with the given key `k`.
+   *
+   * @param k the starting key of type `K` to begin the BFS traversal
+   * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal
+   */
+  override def bfs(k: K): (BfsMaxPQVisitorMapped[K, V], Option[K]) = {
+    val (q, ko) = super.bfs(k)
+    q.asInstanceOf[BfsMaxPQVisitorMapped[K, V]] -> ko
+  }
+
+  /**
+   * Make a visit, with the given message and `(K, V)` value, on this `Visitor` and return a new `Visitor`.
+   *
+   * This method defines the behavior for handling a `Message` in the context
+   * of the Visitor pattern. The implementation of this method should use the provided
+   * message and state to determine the next state and return the appropriate `Visitor`.
+   *
+   * @param msg the message to be processed by the visitor
+   * @param kv  the current state or context associated with the visitor
+   * @return a new `DfsVisitorMapped[K, V]` instance that represents the updated state after processing the message
+   */
+  override def visit(msg: Message)(kv: (K, V)): BfsMaxPQVisitorMapped[K, V] =
+    super.visit(msg)(kv).asInstanceOf[BfsMaxPQVisitorMapped[K, V]]
+
+  /**
+   * Creates a new `Visitor` instance with the provided updated mapAppendables.
+   *
+   * This method is used to update the internal state of the Visitor by creating
+   * a new instance with the modified mappings from `Message` to `Appendable`.
+   *
+   * @param map a map containing updated associations of `Message` to `Appendable[(K, V)]`
+   * @return a new `DfsVisitorMapped[K, V]` instance that reflects the updated mapAppendables
+   */
+  def unit(map: Map[Message, Appendable[(K, V)]]): BfsMaxPQVisitorMapped[K, V] =
+    copy(map = map)
+
+  /**
+   * Constructs a new `AbstractQueueableVisitorMapped` instance with the provided queue.
+   *
+   * This method serves as a constructor or initializer for creating a visitor instance
+   * that operates using the given `queue`. It is used to establish the visitor's
+   * initial state and context for breadth-first search (BFS) traversal.
+   *
+   * @param queue the queue of type `Q[X]` to be used for managing BFS traversal elements
+   * @return an instance of `AbstractBfsVisitor[Q, X]` initialized with the specified queue
+   */
+  def unitQueue(queue: MaxPQ[K]): BfsMaxPQVisitorMapped[K, V] = copy(queue = queue)
+}
+
+/**
+ * Provides a factory method for creating a specialized visitor for performing breadth-first search (BFS)
+ * with a maximum priority queue (MaxPQ) and mapped values.
+ *
+ * This object facilitates the creation of `BfsMaxPQVisitorMapped` instances, enabling configurable
+ * BFS traversal with custom child determination, goal evaluation, and value mapping.
+ */
+object BfsMaxPQVisitorMapped {
+  /**
+   * Creates a specialized visitor for performing breadth-first search (BFS) traversal
+   * using a maximum priority queue (MaxPQ) and mapped values.
+   *
+   * This method initializes and returns a `BfsMaxPQVisitorMapped` instance, which enables
+   * configurable BFS traversal by providing functions for deriving child nodes, evaluating
+   * goal conditions, and mapping keys to values.
+   *
+   * @param f        a function transforming a key of type `K` into a value of type `V`
+   * @param children a function returning the sequence of child keys for a given key of type `K`
+   * @param goal     a function defining the goal condition, returning `true` if the goal is met for a key
+   * @tparam K the type of keys used for the BFS traversal, equipped with an `Ordering`
+   * @tparam V the type of values associated with keys, derived using the function `f`
+   * @return a new instance of `BfsMaxPQVisitorMapped[K, V]`
+   */
+  def createBfsVisitor[K: Ordering, V](f: K => V, children: K => Seq[K], goal: K => Boolean): BfsMaxPQVisitorMapped[K, V] =
+    BfsMaxPQVisitorMapped(MaxPQ.empty[K], Map(Pre -> MapJournal.empty[K, V]), f, children, goal)
 }

@@ -99,7 +99,7 @@ abstract class AbstractPQ[X](pq: mutable.PriorityQueue[X]) extends PQ[X] {
  * @tparam X the type of elements stored in the priority queue
  * @constructor Creates an instance of a maximum-priority queue.
  */
-case class MaxPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[X]) {
+case class MaxPQ[X](pq: mutable.PriorityQueue[X]) extends AbstractPQ[X](pq) {
   /**
    * Removes and returns the highest-priority element from the priority queue,
    * along with the updated priority queue wrapped as `this`.
@@ -118,16 +118,47 @@ case class MaxPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[
 }
 
 /**
- * A case class representing a minimum priority queue.
+ * Companion object for the `MaxPQ` class, providing factory methods for constructing
+ * instances of a maximum-priority queue.
  *
- * The `MinPQ` class extends the functionality of `AbstractPQ` by using a reversed `PriorityQueue`
- * to manage elements in ascending order of priority, ensuring that the smallest element has the highest priority.
+ * NOTE (Important) The pq provided already has its ordering determined. In that sense, the name MinPQ is very misleading.
  *
- * NOTE that there's currently no way to create a MinPQ with an explicit priority queue.
- *
- * @tparam X the type of elements stored in the priority queue, which must provide evidence of an implicit `Ordering`
+ * The methods in this object allow easy construction of `MaxPQ` instances either
+ * from a collection of specified elements (via `apply`) or as an empty priority
+ * queue (via `empty`). The priority queue is ordered based on the implicit `Ordering[X]`
+ * of the element type.
  */
-case class MinPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[X](using implicitly[Ordering[X]]).reverse) {
+object MaxPQ {
+  /**
+   * Constructs a `MaxPQ` (maximum-priority queue) instance containing the provided elements `xs`.
+   * The queue is ordered based on the implicit `Ordering[X]` for the element type `X`.
+   *
+   * @param xs a variable number of elements of type `X` to initialize the priority queue
+   * @return an instance of `MaxPQ[X]` containing the specified elements
+   */
+  def apply[X: Ordering](xs: X*): MaxPQ[X] = MaxPQ(mutable.PriorityQueue(xs: _*))
+
+  /**
+   * Creates an empty instance of a maximum-priority queue for elements of type `X`.
+   * The priority queue is initialized with an implicit `Ordering[X]` to determine
+   * the element ordering.
+   *
+   * @return an empty `MaxPQ[X]` instance
+   */
+  def empty[X: Ordering]: MaxPQ[X] = MaxPQ(mutable.PriorityQueue.empty[X](using implicitly[Ordering[X]]))
+}
+
+/**
+ * A case class representing a minimum priority queue (`MinPQ`), implemented as a wrapper around a reversed
+ * Scala mutable `PriorityQueue`. The `MinPQ` ensures that the smallest element has the highest priority.
+ *
+ * NOTE (Important) The pq provided already has its ordering determined. In that sense, the name MinPQ is very misleading.
+ *
+ * @param pq the underlying mutable `PriorityQueue` instance used to manage the internal state
+ *           of the `MinPQ`. The priority queue must implicitly provide an `Ordering` for type `X`.
+ * @tparam X the type of elements stored in the priority queue, requiring an implicit `Ordering` instance
+ */
+case class MinPQ[X](pq: mutable.PriorityQueue[X]) extends AbstractPQ[X](pq) {
   /**
    * Removes and returns the highest-priority element from the priority queue,
    * along with the updated priority queue wrapped as `this`.
@@ -143,4 +174,34 @@ case class MinPQ[X: Ordering]() extends AbstractPQ[X](new mutable.PriorityQueue[
    * @return this `Appendable[X]` instance after the element has been added
    */
   override def append(x: X): MinPQ[X] = super.append(x).asInstanceOf
+}
+
+/**
+ * Companion object for the `MinPQ` class.
+ *
+ * Provides factory methods to create instances of the minimum priority queue (`MinPQ`).
+ * The `MinPQ` uses a reversed `PriorityQueue` to manage elements such that the smallest element
+ * is always at the front of the queue.
+ */
+object MinPQ {
+  /**
+   * Constructs a `MinPQ` instance using the provided sequence of elements.
+   * The elements are stored in a reversed `PriorityQueue` to maintain a minimum priority queue,
+   * where the smallest element has the highest priority.
+   *
+   * @param xs the sequence of elements of type `X` to initialize the minimum priority queue
+   *           (must provide evidence of an implicit `Ordering` for type `X`)
+   * @return a `MinPQ[X]` instance containing the elements in ascending order of priority
+   */
+  def apply[X: Ordering](xs: X*): MinPQ[X] = MinPQ(mutable.PriorityQueue(xs: _*)(using implicitly[Ordering[X]]).reverse)
+
+  /**
+   * Creates and returns an empty minimum priority queue (`MinPQ`).
+   * The queue is initialized with a reversed `PriorityQueue` to ensure the smallest
+   * element always has the highest priority.
+   *
+   * @tparam X the type of elements stored in the priority queue, requiring an implicit `Ordering` instance
+   * @return an empty `MinPQ[X]` instance
+   */
+  def empty[X: Ordering]: MinPQ[X] = MinPQ(mutable.PriorityQueue.empty(using implicitly[Ordering[X]]).reverse)
 }

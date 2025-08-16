@@ -24,7 +24,7 @@ class PQSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "append/take 2" in {
-    val pq: PQ[Int] = MinPQ[Int]().append(1).append(2)
+    val pq: PQ[Int] = MinPQ.empty[Int].append(1).append(2)
     pq.isEmpty shouldBe false
     val (x1, pqDash) = pq.take
     pqDash.isEmpty shouldBe false
