@@ -43,7 +43,7 @@ class AbstractQueueableVisitorMappedSpec extends AnyFlatSpec with should.Matcher
   behavior of "BfsMinPQVisitorMapped"
 
   it should "bfs" in {
-    val visitor: BfsMinPQVisitorMapped[Int, String] = BfsMinPQVisitorMapped.createBfsVisitor(x => x.toString, children, _ => false)
+    val visitor: BfsPQVisitorMapped[Int, String] = BfsPQVisitorMapped.createMax(x => x.toString, children, _ => false)
     // TODO check that this is the correct expected result--it seems wrong.
     val expected = Success(List((5, "5"), (10, "10"), (1, "1"), (6, "6"), (13, "13"), (2, "2"), (3, "3"), (11, "11"), (15, "15")))
     val actual = Using(visitor) {
@@ -56,10 +56,10 @@ class AbstractQueueableVisitorMappedSpec extends AnyFlatSpec with should.Matcher
     actual shouldBe expected
   }
 
-  behavior of "BfsMaxPQVisitorMapped"
+  behavior of "BfsPQVisitorMapped"
 
   it should "bfs" in {
-    val visitor: BfsMaxPQVisitorMapped[Int, String] = BfsMaxPQVisitorMapped.createBfsVisitor(x => x.toString, children, _ => false)
+    val visitor: BfsPQVisitorMapped[Int, String] = BfsPQVisitorMapped.createMax(x => x.toString, children, _ => false)
     // TODO check that this is the correct expected result--it seems wrong.
     val expected = Success(List((5, "5"), (10, "10"), (1, "1"), (6, "6"), (13, "13"), (2, "2"), (3, "3"), (11, "11"), (15, "15")))
     val actual = Using(visitor) {
