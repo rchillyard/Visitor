@@ -287,7 +287,7 @@ abstract class AbstractBfsVisitor[Q[_], X]
  * @param queueable the typeclass instance describing queue-like operations for the `Q[_]` structure
  */
 abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
-(queue: Q[K], map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[K], goal: K => Boolean)
+(queue: Q[K], map: Map[Message, Appendable[(K, V)]], fulfill: Option[K] => K => V, children: K => Seq[K], goal: K => Boolean)
 (using queueable: Queueable[Q]) extends
   AbstractVisitorMappedWithChildren[K, K, V](map, fulfill, children)
   with Bfs[K, AbstractQueueableVisitorMapped[Q, K, V]]
@@ -348,7 +348,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
     case Some((k, q)) =>
       // XXX first, we update the queue of this visitor.
       // XXX then, because we are taking the `k` value out of the queue, we make a post-visit based on `k -> fulfill(k)`.
-      val visitor = unitQueue(q).visit(Post)(k -> fulfill(k))
+      val visitor = unitQueue(q).visit(Post)(k -> fulfill(None)(k))
       // XXX for each child of `k`, we make a pre-visit and add the child to this visitor's queue
       processChildren(k, visitor).inner
   }
@@ -365,7 +365,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
   private def processChildren(k: K, visitor: AbstractQueueableVisitorMapped[Q, K, V]) =
     children(k).foldLeft(visitor) {
       (v, child) =>
-        v.visit(Pre)(child -> fulfill(k)).unitQueue(v.doOffer(child))
+        v.visit(Pre)(child -> fulfill(Some(k))(child)).unitQueue(v.doOffer(child))
     }
 
   /**
@@ -411,7 +411,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
  * @tparam V the type of values derived from elements of type `K` using the function `fulfill`
  */
 case class BfsQueueVisitorMapped[K, V]
-(queue: Queue[K], map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[K], goal: K => Boolean) extends
+(queue: Queue[K], map: Map[Message, Appendable[(K, V)]], fulfill: Option[K] => K => V, children: K => Seq[K], goal: K => Boolean) extends
   AbstractQueueableVisitorMapped(queue, map, fulfill, children, goal) {
   /**
    * Performs a breadth-first search (BFS) starting with the given key `k`.
@@ -483,7 +483,7 @@ case class BfsQueueVisitorMapped[K, V]
  * @param goal     a function specifying the goal condition to determine when traversal is complete
  */
 case class BfsPQVisitorMapped[K: Ordering, V]
-(queue: PQ[K], map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[K], goal: K => Boolean) extends
+(queue: PQ[K], map: Map[Message, Appendable[(K, V)]], fulfill: Option[K] => K => V, children: K => Seq[K], goal: K => Boolean) extends
   AbstractQueueableVisitorMapped(queue, map, fulfill, children, goal) {
   /**
    * Performs a breadth-first search (BFS) starting from the given key `k` and returns the updated visitor instance
@@ -561,7 +561,7 @@ object BfsPQVisitorMapped {
    * @return an instance of `BfsPQVisitorMapped[K, V]` configured with a maximum-priority queue
    */
   def createMax[K: Ordering, V](fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
-    BfsPQVisitorMapped(MaxPQ.empty[K], Map(Post -> MapJournal.empty[K, V]), fulfill, children, goal)
+    BfsPQVisitorMapped(MaxPQ.empty[K], Map(Post -> MapJournal.empty[K, V]), None => fulfill, children, goal)
 
   /**
    * Creates a breadth-first search (BFS) visitor using a minimum priority queue (MinPQ).
@@ -576,5 +576,5 @@ object BfsPQVisitorMapped {
    * @return an instance of `BfsPQVisitorMapped[K, V]`, configured with a minimum priority queue and the provided functions
    */
   def createMin[K: Ordering, V](fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
-    BfsPQVisitorMapped(MinPQ.empty[K], Map(Post -> MapJournal.empty[K, V]), fulfill, children, goal)
+    BfsPQVisitorMapped(MinPQ.empty[K], Map(Post -> MapJournal.empty[K, V]), None => fulfill, children, goal)
 }

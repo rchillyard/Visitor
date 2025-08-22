@@ -188,7 +188,7 @@ object DfsVisitor {
  */
 case class DfsVisitorMapped[K, V]
 (map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[K]) extends
-  AbstractVisitorMappedWithChildren[K, K, V](map, fulfill, children)
+  AbstractVisitorMappedWithChildren[K, K, V](map, None => fulfill, children)
   with Dfs[K, DfsVisitorMapped[K, V]] {
   /**
    * Performs a depth-first traversal starting from the provided key `k`.
@@ -352,7 +352,8 @@ object DfsVisitorMapped {
  * @param children a function that takes an element of type `K` and returns its sequence of child elements of type `V`
  * @param unmap    a function that "unmaps" a value of type `V` to an appropriate element of type `K`
  */
-case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], children: K => Seq[V], unmap: V => K) extends AbstractVisitorMappedWithChildren[K, V, Option[V]](map, _ => None, children) with Dfs[K, DfsOriginVisitor[K, V]] {
+case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], children: K => Seq[V], unmap: V => K) extends
+  AbstractVisitorMappedWithChildren[K, V, Option[V]](map, vo => _ => vo, children) with Dfs[K, DfsOriginVisitor[K, V]] {
 
   /**
    * Processes an element of type `K` with an optional value of type `V` using a depth-first traversal strategy.

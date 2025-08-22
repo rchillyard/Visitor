@@ -341,7 +341,7 @@ abstract class AbstractVisitorMapped[K, V]
  * @param children a function that generates a sequence of children of type `C` for a given key of type `K`
  */
 abstract class AbstractVisitorMappedWithChildren[K, C, V]
-(map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[C]) extends
+(map: Map[Message, Appendable[(K, V)]], fulfill: Option[C] => K => V, children: K => Seq[C]) extends
   AbstractVisitorMapped[K, V](map) {
   /**
    * Creates a key-value pair by applying the function `fulfill` to a given key of type `K`.
@@ -349,7 +349,7 @@ abstract class AbstractVisitorMappedWithChildren[K, C, V]
    * @param k the key of type `K` from which the pair is derived
    * @return a tuple `(K, V)` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `fulfill` to `k`
    */
-  def keyValuePair(k: K): (K, V) = k -> fulfill(k)
+  def keyValuePair(k: K): (K, V) = k -> fulfill(None)(k)
 }
 
 /**
