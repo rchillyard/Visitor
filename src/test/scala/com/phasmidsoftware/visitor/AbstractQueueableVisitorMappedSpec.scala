@@ -24,7 +24,7 @@ class AbstractQueueableVisitorMappedSpec extends AnyFlatSpec with should.Matcher
   behavior of "BfsQueueVisitorMapped"
 
   it should "bfs" in {
-    val visitor = BfsQueueVisitorMapped(Queue.empty[Int], Map(Pre -> QueueJournal.empty[(Int, String)]), x => x.toString, children, _ => false)
+    val visitor = BfsQueueVisitorMapped(Queue.empty[Int], Map(Post -> QueueJournal.empty[(Int, String)]), x => x.toString, children, _ => false)
     // Test a recursive pre-order traversal of the tree, starting at the root.
     val expected = Success(List(10 -> "10", 5 -> "5", 13 -> "13", 2 -> "2", 6 -> "6", 11 -> "11", 15 -> "15", 1 -> "1", 3 -> "3"))
     val actual = Using(visitor) {
