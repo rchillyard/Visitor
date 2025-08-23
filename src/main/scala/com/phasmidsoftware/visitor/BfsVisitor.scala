@@ -269,7 +269,7 @@ abstract class AbstractBfsVisitor[Q[_], X]
  *
  * This class provides the foundational logic to perform goal-oriented BFS traversal,
  * where the state of traversal is maintained via a queue (`Q[K]`) and results
- * are stored in a `Map[Message, Appendable[(K, V)]]`. It integrates the Visitor and
+ * are stored in a `Map[Message, Appendable[(K, Option[V])]]`. It integrates the Visitor and
  * Queueable patterns to support extensibility and separation of concerns.
  *
  * TESTME not referenced
@@ -281,13 +281,13 @@ abstract class AbstractBfsVisitor[Q[_], X]
  *              key-value transformation function, child node generator, and goal condition.
  * @param queue     the initial queue instance used for traversing elements
  * @param map       a mapping from `Message` to `Appendable` collections for storing traversal states
- * @param fulfill   a function that takes a value of type `K` and yields a value of type `V`
+ * @param fulfill   a function that takes a value of type `Option[K]` and yields a function of type `K => Option[V]`
  * @param children  a function that generates the child elements of a given key `K`
  * @param goal      a function that determines if a given key `K` meets the traversal goal
  * @param queueable the typeclass instance describing queue-like operations for the `Q[_]` structure
  */
 abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
-(queue: Q[K], map: Map[Message, Appendable[(K, V)]], fulfill: Option[K] => K => V, children: K => Seq[K], goal: K => Boolean)
+(queue: Q[K], map: Map[Message, Appendable[(K, Option[V])]], fulfill: Option[K] => K => Option[V], children: K => Seq[K], goal: K => Boolean)
 (using queueable: Queueable[Q]) extends
   AbstractVisitorMappedWithChildren[K, K, V](map, fulfill, children)
   with Bfs[K, AbstractQueueableVisitorMapped[Q, K, V]]
@@ -325,7 +325,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
    * @param x   the current state or context associated with the visitor
    * @return a new `AbstractQueueableVisitorMapped[Q, K, V]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(x: (K, V)): AbstractQueueableVisitorMapped[Q, K, V] = super.visit(msg)(x).asInstanceOf[AbstractQueueableVisitorMapped[Q, K, V]]
+  override def visit(msg: Message)(x: (K, Option[V])): AbstractQueueableVisitorMapped[Q, K, V] = super.visit(msg)(x).asInstanceOf[AbstractQueueableVisitorMapped[Q, K, V]]
 
   /**
    * Recursively processes a breadth-first search (BFS) by consuming elements from the queue and
@@ -404,14 +404,14 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
  *
  * @param queue    the queue used for managing BFS traversal elements
  * @param map      a map defining associations between `Message` instances and `Appendable` collections
- * @param fulfill  a function that transforms elements of type `K` into elements of type `V`
+ * @param fulfill  a function that transforms elements of type `Option[K]` into functions of type `K => Option[V]`
  * @param children a function that determines the children of an element for BFS traversal
  * @param goal     a function that evaluates whether the goal condition is met for an element
  * @tparam K the type of elements managed in the queue and traversed during BFS
  * @tparam V the type of values derived from elements of type `K` using the function `fulfill`
  */
 case class BfsQueueVisitorMapped[K, V]
-(queue: Queue[K], map: Map[Message, Appendable[(K, V)]], fulfill: Option[K] => K => V, children: K => Seq[K], goal: K => Boolean) extends
+(queue: Queue[K], map: Map[Message, Appendable[(K, Option[V])]], fulfill: Option[K] => K => Option[V], children: K => Seq[K], goal: K => Boolean) extends
   AbstractQueueableVisitorMapped(queue, map, fulfill, children, goal) {
   /**
    * Performs a breadth-first search (BFS) starting with the given key `k`.
@@ -435,7 +435,7 @@ case class BfsQueueVisitorMapped[K, V]
    * @param kv  the current state or context associated with the visitor
    * @return a new `DfsVisitorMapped[K, V]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(kv: (K, V)): BfsQueueVisitorMapped[K, V] =
+  override def visit(msg: Message)(kv: (K, Option[V])): BfsQueueVisitorMapped[K, V] =
     super.visit(msg)(kv).asInstanceOf[BfsQueueVisitorMapped[K, V]]
 
   /**
@@ -444,10 +444,10 @@ case class BfsQueueVisitorMapped[K, V]
    * This method is used to update the internal state of the Visitor by creating
    * a new instance with the modified mappings from `Message` to `Appendable`.
    *
-   * @param map a map containing updated associations of `Message` to `Appendable[(K, V)]`
+   * @param map a map containing updated associations of `Message` to `Appendable[(K, Option[V])]`
    * @return a new `DfsVisitorMapped[K, V]` instance that reflects the updated mapAppendables
    */
-  def unit(map: Map[Message, Appendable[(K, V)]]): BfsQueueVisitorMapped[K, V] =
+  def unit(map: Map[Message, Appendable[(K, Option[V])]]): BfsQueueVisitorMapped[K, V] =
     copy(map = map)
 
   /**
@@ -478,12 +478,12 @@ case class BfsQueueVisitorMapped[K, V]
  * @tparam V the type of values associated with the keys
  * @param queue    the priority queue used to manage the traversal elements
  * @param map      a mapping from `Message` to `Appendable` structures, used for state management during traversal
- * @param fulfill  a function to transform keys of type `K` into values of type `V`
+ * @param fulfill  a function that transforms elements of type `Option[K]` into functions of type `K => Option[V]`
  * @param children a function defining the child keys for a given key of type `K`
  * @param goal     a function specifying the goal condition to determine when traversal is complete
  */
 case class BfsPQVisitorMapped[K: Ordering, V]
-(queue: PQ[K], map: Map[Message, Appendable[(K, V)]], fulfill: Option[K] => K => V, children: K => Seq[K], goal: K => Boolean) extends
+(queue: PQ[K], map: Map[Message, Appendable[(K, Option[V])]], fulfill: Option[K] => K => Option[V], children: K => Seq[K], goal: K => Boolean) extends
   AbstractQueueableVisitorMapped(queue, map, fulfill, children, goal) {
   /**
    * Performs a breadth-first search (BFS) starting from the given key `k` and returns the updated visitor instance
@@ -511,7 +511,7 @@ case class BfsPQVisitorMapped[K: Ordering, V]
    * @param kv  the current state or context associated with the visitor
    * @return a new `DfsVisitorMapped[K, V]` instance that represents the updated state after processing the message
    */
-  override def visit(msg: Message)(kv: (K, V)): BfsPQVisitorMapped[K, V] =
+  override def visit(msg: Message)(kv: (K, Option[V])): BfsPQVisitorMapped[K, V] =
     super.visit(msg)(kv).asInstanceOf[BfsPQVisitorMapped[K, V]]
 
   /**
@@ -520,10 +520,10 @@ case class BfsPQVisitorMapped[K: Ordering, V]
    * This method is used to update the internal state of the Visitor by creating
    * a new instance with the modified mappings from `Message` to `Appendable`.
    *
-   * @param map a map containing updated associations of `Message` to `Appendable[(K, V)]`
+   * @param map a map containing updated associations of `Message` to `Appendable[(K, Option[V])]`
    * @return a new `DfsVisitorMapped[K, V]` instance that reflects the updated mapAppendables
    */
-  def unit(map: Map[Message, Appendable[(K, V)]]): BfsPQVisitorMapped[K, V] =
+  def unit(map: Map[Message, Appendable[(K, Option[V])]]): BfsPQVisitorMapped[K, V] =
     copy(map = map)
 
   /**
@@ -555,13 +555,13 @@ object BfsPQVisitorMapped {
    * using a priority queue that prioritizes maximum elements, along with a mapping
    * of values derived from keys and functions defining the traversal process.
    *
-   * @param fulfill a function transforming keys of type `K` into values of type `V`
+   * @param fulfill a function transforming keys of type `K` into values of type `Option[V]`
    * @param children a function defining the child keys for a given key of type `K`
    * @param goal     a function specifying the goal condition, returning `true` for completion
    * @return an instance of `BfsPQVisitorMapped[K, V]` configured with a maximum-priority queue
    */
-  def createMax[K: Ordering, V](message: Message, fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
-    BfsPQVisitorMapped(MaxPQ.empty[K], Map(message -> MapJournal.empty[K, V]), * => fulfill, children, goal)
+  def createMax[K: Ordering, V](message: Message, fulfill: K => Option[V], children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
+    BfsPQVisitorMapped(MaxPQ.empty[K], Map(message -> MapJournal.empty[K, Option[V]]), * => fulfill, children, goal)
 
   /**
    * Creates a breadth-first search (BFS) visitor using a minimum priority queue (MinPQ).
@@ -570,11 +570,11 @@ object BfsPQVisitorMapped {
    * a mapping of pre-visit states to an empty `MapJournal`, and user-defined functions for
    * transforming keys, determining child keys, and evaluating the goal condition.
    *
-   * @param fulfill a function that derives values of type `V` from keys of type `K`
+   * @param fulfill a function that derives values of type `Option[V]` from keys of type `K`
    * @param children a function that specifies the child keys for a given key of type `K`
    * @param goal     a function that defines the goal condition, returning `true` for a satisfied goal
    * @return an instance of `BfsPQVisitorMapped[K, V]`, configured with a minimum priority queue and the provided functions
    */
-  def createMin[K: Ordering, V](message: Message, fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
-    BfsPQVisitorMapped(MinPQ.empty[K], Map(message -> MapJournal.empty[K, V]), * => fulfill, children, goal)
+  def createMin[K: Ordering, V](message: Message, fulfill: K => Option[V], children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
+    BfsPQVisitorMapped(MinPQ.empty[K], Map(message -> MapJournal.empty[K, Option[V]]), * => fulfill, children, goal)
 }
