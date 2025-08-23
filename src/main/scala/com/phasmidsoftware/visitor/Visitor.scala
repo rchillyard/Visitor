@@ -94,9 +94,10 @@ case class SimpleVisitor[X](msg: Message, appendable: Appendable[X]) extends Abs
    */
   def visit(msg: Message)(x: X): SimpleVisitor[X] =
     if (open)
-      if (msg == this.msg)
-        copy(appendable = appendable.append(x))
-      else
+      if (msg == this.msg) {
+        import Logging.*
+        copy(appendable = appendable.append(s"visit($msg)" !! x))
+      } else
         this
     else
       throw new UnsupportedOperationException(s"Visitor $this is closed")
@@ -250,7 +251,8 @@ abstract class AbstractMultiVisitor[X]
   def visit(msg: Message)(x: X): AbstractMultiVisitor[X] = (open, mapAppendables.get(msg)) match {
     case (false, _) => throw new UnsupportedOperationException(s"Visitor $this is closed")
     case (_, Some(appendable)) =>
-      val updatedAppendable: Appendable[X] = appendable.append(x)
+      import Logging.*
+      val updatedAppendable: Appendable[X] = appendable.append(s"visit($msg)" !! x)
       val kv: (Message, Appendable[X]) = msg -> updatedAppendable
       unit(mapAppendables + kv).asInstanceOf[AbstractMultiVisitor[X]]
     case (_, None) =>

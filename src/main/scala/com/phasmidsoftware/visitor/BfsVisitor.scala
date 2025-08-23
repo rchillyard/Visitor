@@ -13,6 +13,8 @@ import scala.collection.immutable.Queue
  * traversal starting from a specified element. It maintains the traversal state, which
  * includes a queue of nodes to visit and an optional current element being processed.
  *
+ * NOTE this trait does not extend AbstractMultiVisitor but AbstractBfsVisitor does.
+ *
  * @tparam X the type of elements that the visitor operates on during the BFS traversal.
  */
 trait BfsVisitor[X] extends Visitor[X] with Bfs[X, BfsVisitor[X]]
@@ -101,6 +103,40 @@ object BfsVisitor {
    */
   def createByMaxPriorityWithQueue[X: Ordering](children: X => Seq[X], goal: X => Boolean): BfsVisitor[X] =
     createByMaxPriority(QueueJournal.empty[X], children, goal)
+
+  /**
+   * Generic method which attempts to take an element from the provided queue. If the queue is not empty,
+   * the method extracts an element along with the remaining queue.
+   *
+   * @param queue     the queue-like data structure of type `Q[X]` from which an element is to be taken
+   * @param queueable an implicit instance of the `Queueable` typeclass that provides operations
+   *                  for the queue-like structure
+   * @tparam Q the higher-kinded type representing the queue-like structure
+   * @tparam X the type of elements stored in the queue
+   * @return an `Option` containing a tuple of the extracted element and the remaining queue if the
+   *         queue is not empty; otherwise, `None`.
+   */
+  def doTake[Q[_], X](queue: Q[X])(using queueable: Queueable[Q]): Option[(X, Q[X])] =
+    Option.when(!queueable.isEmpty(queue)) {
+      import Logging.*
+      val (x, q) = queueable.take(queue)
+      (s"dequeue" !! x, q)
+    }
+
+  /**
+   * Adds an element to the given queue-like structure.
+   * This method uses the provided `Queueable` typeclass to handle the `offer` operation on the queue.
+   *
+   * @param queue     the queue-like data structure of type `Q[X]` to which an element will be added
+   * @param x         the element of type `X` to be added to the queue
+   * @param queueable an implicit instance of the `Queueable` typeclass that provides operations for the queue-like structure
+   * @tparam Q the higher-kinded type representing the queue-like structure
+   * @tparam X the type of elements stored in the queue
+   * @return the updated queue of type `Q[X]` with the new element added
+   */
+  def doOffer[Q[_], X](queue: Q[X])(x: X)(using queueable: Queueable[Q]): Q[X] =
+    import Logging.*
+    queueable.offer(queue)(s"enqueue" !! x)
 }
 
 /**
@@ -203,7 +239,7 @@ abstract class AbstractBfsVisitor[Q[_], X]
    * @return a new `Q[X]` instance representing the queue after adding the given element
    */
   private def doOffer(x: X): Q[X] =
-    queueable.offer(queue)(x)
+    BfsVisitor.doOffer(queue)(x)
 
   /**
    * Extracts an element from the queue if it is not empty.
@@ -216,7 +252,7 @@ abstract class AbstractBfsVisitor[Q[_], X]
    *         if the queue is not empty, or `None` if the queue is empty.
    */
   private def doTake(): Option[(X, Q[X])] =
-    Option.when(!queueable.isEmpty(queue))(queueable.take(queue))
+    BfsVisitor.doTake(queue)
 }
 
   /**
@@ -379,7 +415,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
    * @return a new `Q[X]` instance representing the queue after adding the given element
    */
   private def doOffer(x: K): Q[K] =
-    queueable.offer(queue)(x)
+    BfsVisitor.doOffer(queue)(x)
 
   /**
    * Extracts an element from the queue if it is not empty.
@@ -392,7 +428,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
    *         if the queue is not empty, or `None` if the queue is empty.
    */
   private def doTake(): Option[(K, Q[K])] =
-    Option.when(!queueable.isEmpty(queue))(queueable.take(queue))
+    BfsVisitor.doTake(queue)
 }
 
 /**

@@ -26,7 +26,7 @@ class BfsVisitorSpec extends AnyFlatSpec with Matchers {
   }
 
   it should "bfs pre-order" in {
-
+    Logging.setLogging(true)
     // Test a recursive pre-order traversal of the tree, starting at the root.
     Using(BfsVisitor.create[Int](QueueJournal.empty[Int], f, _ => false)) {
       visitor =>
@@ -34,6 +34,7 @@ class BfsVisitorSpec extends AnyFlatSpec with Matchers {
              entry <- journal
              } yield entry
     } shouldBe Success(Queue(10, 5, 13, 2, 6, 11, 15, 1, 3))
+    Logging.setLogging(false)
   }
 
   it should "bfs minPQ with Queue" in {

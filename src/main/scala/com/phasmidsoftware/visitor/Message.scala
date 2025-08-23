@@ -13,6 +13,20 @@ package com.phasmidsoftware.visitor
 sealed trait Message
 
 /**
+ * Represents a message with an associated name.
+ *
+ * NamedMessage is an abstract class that extends the `Message` trait, providing a predefined
+ * `toString` implementation that returns the value of its `name` property.
+ *
+ * This class is intended to be subclassed by messages that require a unique name to identify them.
+ *
+ * @param name the name associated with this message
+ */
+abstract class NamedMessage(val name: String) extends Message {
+  override def toString: String = name
+}
+
+/**
  * `Pre` is an object that extends the `Message` trait.
  *
  * It is a specific type of `Message` and can be used in conjunction with the Visitor pattern.
@@ -22,7 +36,7 @@ sealed trait Message
  * Typically used as a marker or control structure, `Pre` serves as a meaningful, predefined
  * instance within the overall context of message handling in the Visitor pattern.
  */
-object Pre extends Message
+object Pre extends NamedMessage("Pre")
 
 /**
  * `Post` is an object that extends the `Message` trait.
@@ -36,14 +50,14 @@ object Pre extends Message
  *
  * It is intended to be a concrete, immutable instance in the collection of predefined `Message` types.
  */
-object Post extends Message
+object Post extends NamedMessage("Post")
 
 /**
  * Represents a specific type of `Message` used in conjunction with the Visitor pattern.
  *
  * `In`-visitation occurs ONLY if an object has exactly two children (a binary tree, for instance).
  */
-object In extends Message
+object In extends NamedMessage("In")
 
 /**
  * `SelfVisit` is an object that extends the `Message` trait.
@@ -57,7 +71,7 @@ object In extends Message
  * This object provides a way to encode a semantic placeholder or non-operation
  * within the message processing flow.
  */
-object SelfVisit extends Message
+object SelfVisit extends NamedMessage("Self")
 
 object Message {
   def fromJMessage(msg: JMessage): Message = msg match {
