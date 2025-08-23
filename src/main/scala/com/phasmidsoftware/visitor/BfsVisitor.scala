@@ -27,7 +27,7 @@ object BfsVisitor {
   /**
    * Constructs a new instance of `BfsQueueableVisitor[X]` to facilitate breadth-first search traversal.
    * The message is always `Pre`. CONSIDER that may not be appropriate.
-   * It doesn't make a lot of sense to set up a Post-messaged BFS visitor, so `message` is not a parameter of this
+   * It doesn't make a lot of sense to set up a Pre-messaged BFS visitor, so `message` is not a parameter of this
    * `create` method.
    *
    * @param journal an instance of `Appendable[X]` that maintains a collection of traversed elements.
@@ -300,7 +300,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
    * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal
    */
   def bfs(k: K): (AbstractQueueableVisitorMapped[Q, K, V], Option[K]) =
-    unitQueue(queueable.offer(queue)(k)).inner
+    unitQueue(queueable.offer(queue)(k)).visit(Pre)(k -> fulfill(None)(k)).inner
 
   /**
    * Constructs a new `AbstractQueueableVisitorMapped` instance with the provided queue.
@@ -560,8 +560,8 @@ object BfsPQVisitorMapped {
    * @param goal     a function specifying the goal condition, returning `true` for completion
    * @return an instance of `BfsPQVisitorMapped[K, V]` configured with a maximum-priority queue
    */
-  def createMax[K: Ordering, V](fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
-    BfsPQVisitorMapped(MaxPQ.empty[K], Map(Post -> MapJournal.empty[K, V]), None => fulfill, children, goal)
+  def createMax[K: Ordering, V](message: Message, fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
+    BfsPQVisitorMapped(MaxPQ.empty[K], Map(message -> MapJournal.empty[K, V]), * => fulfill, children, goal)
 
   /**
    * Creates a breadth-first search (BFS) visitor using a minimum priority queue (MinPQ).
@@ -575,6 +575,6 @@ object BfsPQVisitorMapped {
    * @param goal     a function that defines the goal condition, returning `true` for a satisfied goal
    * @return an instance of `BfsPQVisitorMapped[K, V]`, configured with a minimum priority queue and the provided functions
    */
-  def createMin[K: Ordering, V](fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
-    BfsPQVisitorMapped(MinPQ.empty[K], Map(Post -> MapJournal.empty[K, V]), None => fulfill, children, goal)
+  def createMin[K: Ordering, V](message: Message, fulfill: K => V, children: K => Seq[K], goal: K => Boolean): BfsPQVisitorMapped[K, V] =
+    BfsPQVisitorMapped(MinPQ.empty[K], Map(message -> MapJournal.empty[K, V]), * => fulfill, children, goal)
 }
