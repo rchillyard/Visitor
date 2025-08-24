@@ -42,7 +42,7 @@ class JDfsVisitor[X](val visitor: DfsVisitor[X]) extends AutoCloseable {
     visitor.close()
 
   /**
-   * Retrieves the collection of `Appendable[X]` instances associated with this `AbstractVisitor`.
+   * Retrieves the collection of `Appendable[X]` instances associated with this `JDfsVisitor`.
    *
    * The method provides access to all the appendable entities that the visitor interacts with.
    * This can be useful for iterating over, modifying, or closing the appendables as a group.
