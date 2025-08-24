@@ -218,7 +218,7 @@ abstract class AbstractBfsVisitor[Q[_], X]
    *         and the second element is an `Option[X]` that contains the goal element if found, otherwise `None`.
    */
   @tailrec
-  private def inner: (AbstractBfsVisitor[Q, X], Option[X]) = doTake() match {
+  private def inner: (AbstractBfsVisitor[Q, X], Option[X]) = BfsVisitor.doTake(queue) match {
     case None =>
       (this, None)
     case Some((x, q)) if goal(x) =>
@@ -240,19 +240,6 @@ abstract class AbstractBfsVisitor[Q[_], X]
    */
   private def doOffer(x: X): Q[X] =
     BfsVisitor.doOffer(queue)(x)
-
-  /**
-   * Extracts an element from the queue if it is not empty.
-   *
-   * This method checks if the queue is empty using the `queueable.isEmpty` function. If the queue
-   * contains elements, it retrieves the first element and the remaining queue using the `queueable.take` function
-   * and wraps the result in an `Option`. If the queue is empty, it returns `None`.
-   *
-   * @return an `Option` containing a tuple of the extracted element and the updated queue (`(X, Q[X])`)
-   *         if the queue is not empty, or `None` if the queue is empty.
-   */
-  private def doTake(): Option[(X, Q[X])] =
-    BfsVisitor.doTake(queue)
 }
 
   /**
@@ -376,7 +363,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
    *         and the second element is an `Option[X]` that contains the goal element if found, otherwise `None`.
    */
   @tailrec
-  private def inner: (AbstractQueueableVisitorMapped[Q, K, V], Option[K]) = doTake() match {
+  private def inner: (AbstractQueueableVisitorMapped[Q, K, V], Option[K]) = BfsVisitor.doTake(queue) match {
     case None =>
       (this, None)
     case Some((k, q)) if goal(k) =>
@@ -416,19 +403,6 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
    */
   private def doOffer(x: K): Q[K] =
     BfsVisitor.doOffer(queue)(x)
-
-  /**
-   * Extracts an element from the queue if it is not empty.
-   *
-   * This method checks if the queue is empty using the `queueable.isEmpty` function. If the queue
-   * contains elements, it retrieves the first element and the remaining queue using the `queueable.take` function
-   * and wraps the result in an `Option`. If the queue is empty, it returns `None`.
-   *
-   * @return an `Option` containing a tuple of the extracted element and the updated queue (`(X, Q[X])`)
-   *         if the queue is not empty, or `None` if the queue is empty.
-   */
-  private def doTake(): Option[(K, Q[K])] =
-    BfsVisitor.doTake(queue)
 }
 
 /**
