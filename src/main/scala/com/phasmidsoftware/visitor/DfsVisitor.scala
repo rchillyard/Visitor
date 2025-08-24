@@ -16,11 +16,11 @@ import com.phasmidsoftware.visitor.DfsVisitor.recurseWithInVisit
  *
  * @param map a map associating `Message` types with `Appendable[X]` instances
  *            to manage state during the recursion process.
- * @param f   a function of type `X => Seq[X]` that defines how to retrieve
+ * @param children a function of type `X => Seq[X]` that defines how to retrieve
  *            sub-elements (children) for recursive processing from a given instance of `X`.
  * @tparam X the type of elements being visited and processed recursively.
  */
-case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) extends AbstractMultiVisitor[X](map) with Dfs[X, DfsVisitor[X]] {
+case class DfsVisitor[X](map: Map[Message, Appendable[X]], children: X => Seq[X]) extends AbstractMultiVisitor[X](map) with Dfs[X, DfsVisitor[X]] {
   /**
    * Recursively processes an element of type `X` using a depth-first traversal strategy.
    * This method updates the internal state of the `DfsVisitor` at each step of the recursion,
@@ -38,7 +38,7 @@ case class DfsVisitor[X](map: Map[Message, Appendable[X]], f: X => Seq[X]) exten
         xs.foldLeft(visitor)(_ dfs _)
 
     // First do a pre-visit, then a "SelfVisit", next perform the recursion, finally do a post-visit
-    performRecursion(f(x), visit(Pre)(x).visit(SelfVisit)(x)).visit(Post)(x)
+    performRecursion(children(x), visit(Pre)(x).visit(SelfVisit)(x)).visit(Post)(x)
   }
 
   /**
@@ -82,43 +82,43 @@ object DfsVisitor {
    *
    * @param message the `Message` type determining the current phase of the visit (e.g., Pre, In, Post).
    * @param journal an `Appendable[X]` instance to manage and store the visited elements during traversal.
-   * @param f       a function of type `X => Seq[X]` that defines how to obtain the children of a given element.
+   * @param children a function of type `X => Seq[X]` that defines how to obtain the children of a given element.
    * @return a new instance of `DfsVisitor[X]` initialized with the provided parameters.
    */
-  def create[X](message: Message, journal: Appendable[X], f: X => Seq[X]): DfsVisitor[X] =
-    new DfsVisitor(Map(message -> journal), f)
+  def create[X](message: Message, journal: Appendable[X], children: X => Seq[X]): DfsVisitor[X] =
+    new DfsVisitor(Map(message -> journal), children)
 
   /**
    * Creates a `DfsVisitor` instance configured for depth-first traversal with a pre-visit strategy
    * and an empty `QueueJournal` for maintaining state.
    *
-   * This method initializes the visitor to process elements of type `X` using the provided function `f`
+   * This method initializes the visitor to process elements of type `X` using the provided function `children`
    * to generate child elements for recursion. During traversal, elements are pre-visited before their children.
    *
-   * @param f a function of type `X => Seq[X]` that defines how to retrieve
+   * @param children a function of type `X => Seq[X]` that defines how to retrieve
    *          sub-elements (children) for recursive processing from a given instance of `X`
    * @tparam X the type of the elements to be visited and processed recursively
    * @return a `DfsVisitor[X]` instance configured with the pre-visit strategy
    *         and an empty `QueueJournal` for managing traversal state
    */
-  def createPreQueue[X](f: X => Seq[X]): DfsVisitor[X] =
-    create(Pre, QueueJournal.empty[X], f)
+  def createPreQueue[X](children: X => Seq[X]): DfsVisitor[X] =
+    create(Pre, QueueJournal.empty[X], children)
 
   /**
    * Creates a `DfsVisitor` instance configured to use a post-order traversal
    * with an empty `QueueJournal` for maintaining the traversal state.
    *
-   * The returned visitor employs the provided function `f` to determine
+   * The returned visitor employs the provided function `children` to determine
    * the sub-elements (children) of each element during the traversal process.
    *
-   * @param f a function of type `X => Seq[X]` that specifies how to retrieve
+   * @param children a function of type `X => Seq[X]` that specifies how to retrieve
    *          the children of a given element of type `X` for the post-order traversal.
    * @tparam X the type of elements to be processed during the depth-first traversal.
    * @return a new instance of `DfsVisitor[X]` configured for post-order traversal
    *         with a `QueueJournal` to handle traversal state.
    */
-  def createPostQueue[X](f: X => Seq[X]): DfsVisitor[X] =
-    create(Post, QueueJournal.empty[X], f)
+  def createPostQueue[X](children: X => Seq[X]): DfsVisitor[X] =
+    create(Post, QueueJournal.empty[X], children)
 
   /**
    * Creates a `DfsVisitor` instance that uses `Pre`-ordering and a `ListJournal` for traversal state.
@@ -128,27 +128,27 @@ object DfsVisitor {
    * function to generate the children (sub-elements) for each visited element
    * and utilizes a `ListJournal` to manage the traversal state.
    *
-   * @param f a function of type `X => Seq[X]` that takes an element of type `X` and returns
+   * @param children a function of type `X => Seq[X]` that takes an element of type `X` and returns
    *          a sequence of child elements. This function is used to derive the recursive
    *          structure that the visitor will traverse.
    * @return a `DfsVisitor` instance configured for pre-order traversal with a `ListJournal`.
    * @tparam X the type of the elements to be processed during the recursive traversal.
    */
-  def createPreStack[X](f: X => Seq[X]): DfsVisitor[X] =
-    create(Pre, ListJournal.empty[X], f)
+  def createPreStack[X](children: X => Seq[X]): DfsVisitor[X] =
+    create(Pre, ListJournal.empty[X], children)
 
   /**
    * Creates a depth-first traversal visitor that uses a post-order traversal strategy
    * and employs a stack structure (`ListJournal`) for maintaining the state during recursion.
    *
-   * @param f a function of type `X => Seq[X]` which, given an element of type `X`,
+   * @param children a function of type `X => Seq[X]` which, given an element of type `X`,
    *          produces a sequence of its child elements for recursive traversal.
    * @tparam X the type of elements being visited and processed recursively.
    * @return an instance of `DfsVisitor[X]` configured for post-order traversal
    *         using a stack-based journal (`ListJournal`).
    */
-  def createPostStack[X](f: X => Seq[X]): DfsVisitor[X] =
-    create(Post, ListJournal.empty[X], f)
+  def createPostStack[X](children: X => Seq[X]): DfsVisitor[X] =
+    create(Post, ListJournal.empty[X], children)
 
   /**
    * Performs a recursive traversal with specific handling for "In" messages.
@@ -176,17 +176,20 @@ object DfsVisitor {
  * A case class for managing depth-first traversal using the Visitor design pattern based on a key-value pair.
  *
  * `DfsVisitorMapped` combines a custom traversal strategy with visitor behavior,
- * allowing for recursive traversal of elements (`K`) while applying transformations (`f`)
+ * allowing for recursive traversal of elements (`K`) while applying transformations (`fulfill`)
  * to produce associated values (`V`). The traversal is guided by the map of `Message` to `Appendable`
  * and the `children` function that specifies the structure to navigate.
  *
  * @param map      a mapping from `Message` instances to `Appendable[(K, V)]`, defining how messages are handled.
- * @param f        a function that transforms an element of type `K` into a value of type `V`.
+ * @param fulfill  a function that takes an element of type `K` and returns an appropriate value of type `V`
  * @param children a function that takes an element of type `K` and returns a sequence of its child elements to traverse.
  * @tparam K the type of the keys or elements being traversed.
  * @tparam V the type of the associated values produced during the traversal process.
  */
-case class DfsVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[K]) extends AbstractDfsVisitorMapped[K, K, V](map, f, children) with Dfs[K, DfsVisitorMapped[K, V]] {
+case class DfsVisitorMapped[K, V]
+(map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[K]) extends
+  AbstractVisitorMappedWithChildren[K, K, V](map, fulfill, children)
+  with Dfs[K, DfsVisitorMapped[K, V]] {
   /**
    * Performs a depth-first traversal starting from the provided key `k`.
    * This method applies visitor operations in a specific sequence: pre-visit, self-visit, recursive traversal, and post-visit.
@@ -247,13 +250,13 @@ object DfsVisitorMapped {
    * Creates a new instance of `DfsVisitorMapped` to manage depth-first traversal using a visitor pattern.
    *
    * @param message  the `Message` instance representing the context or phase of the traversal
-   * @param journal  the `Appendable` structure for recording visited elements as pairs, each of type `(K, V)`
-   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param journal  the `Appendable` structure for recording visited elements as pairs, each having type `(K, V)`
+   * @param fulfill  a function that takes an element of type `K` and returns an appropriate value of type `V`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new instance of `DfsVisitorMapped[K, V]` configured with the specified message, appendable structure, and functions
    */
-  def create[K, V](message: Message, journal: AbstractMapJournal[K, V], f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
-    new DfsVisitorMapped(Map(message -> journal), f, children)
+  def create[K, V](message: Message, journal: AbstractMapJournal[K, V], fulfill: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    new DfsVisitorMapped(Map(message -> journal), fulfill, children)
 
   /**
    * Creates a `DfsVisitorMapped` instance configured for depth-first traversal using a pre-visit phase
@@ -263,23 +266,23 @@ object DfsVisitorMapped {
    * to manage visited elements during the traversal process. The functions provided define the mapping
    * of an element to a value and how the children of each element are determined for recursive traversal.
    *
-   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param fulfill a function that takes an element of type `K` and returns an appropriate value of type `V`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new `DfsVisitorMapped[K, V]` instance configured for pre-order traversal using a queue
    */
-  def createPreMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
-    create(Pre, MapJournal.empty, f, children)
+  def createPreMapJournal[K, V](fulfill: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Pre, MapJournal.empty, fulfill, children)
 
   /**
    * Creates a depth-first search (DFS) visitor with a post-order traversal strategy
    * using a queue as the journal to record visited elements.
    *
-   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param fulfill a function that takes an element of type `K` and returns an appropriate value of type `V`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new `DfsVisitorMapped[K, V]` instance configured for post-order traversal using a queue
    */
-  def createPostMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
-    create(Post, MapJournal.empty, f, children)
+  def createPostMapJournal[K, V](fulfill: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Post, MapJournal.empty, fulfill, children)
 
   /**
    * Creates a new `DfsVisitorMapped` instance configured with a pre-order stack-based traversal strategy.
@@ -289,12 +292,12 @@ object DfsVisitorMapped {
    * The provided functions define how each element is mapped to an associated value and the children
    * of each element to traverse recursively.
    *
-   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param fulfill a function that takes an element of type `K` and returns an appropriate value of type `V`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new `DfsVisitorMapped[K, V]` instance configured for pre-order stack-based depth-first traversal
    */
-  def createPreFunctionMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
-    create(Pre, FunctionMapJournal.empty(f), f, children)
+  def createPreFunctionMapJournal[K, V](fulfill: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Pre, FunctionMapJournal.empty(fulfill), fulfill, children)
 
   /**
    * Creates a `DfsVisitorMapped` instance configured for depth-first traversal using a post-visit stack-based strategy.
@@ -303,12 +306,12 @@ object DfsVisitorMapped {
    * transformation and child extraction functions. It is tailored for managing depth-first traversal
    * where the post-visit operation is applied after visiting all the child elements of a node.
    *
-   * @param f        a function that maps an element of type `K` to its associated value of type `V`
+   * @param fulfill a function that takes an element of type `K` and returns an appropriate value of type `V`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new instance of `DfsVisitorMapped[K, V]` configured with the post-visit traversal strategy
    */
-  def createPostFunctionMapJournal[K, V](f: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
-    create(Post, FunctionMapJournal.empty(f), f, children)
+  def createPostFunctionMapJournal[K, V](fulfill: K => V, children: K => Seq[K]): DfsVisitorMapped[K, V] =
+    create(Post, FunctionMapJournal.empty(fulfill), fulfill, children)
 
   /**
    * Performs recursive operations on a key-value pair with a depth-first search (DFS) visitor,
@@ -329,19 +332,27 @@ object DfsVisitorMapped {
 }
 
 /**
- * A specialized depth-first visitor with "ComeFrom" semantics, allowing the caller to:
- * (1) recurse on the `K` type by finding a sequence of `V` elements;
- * (2) extracting a `K` from each `V`;
- * (3) visiting any journals by passing in a `V` value.
+ * A specialized visitor class that implements depth-first search (DFS) traversal while maintaining
+ * the state of the traversal using a map of messages to corresponding appendable data structures.
  *
- * In graph terms, we can use this to build a connection tree where K would be a vertex, V would be a connection.
+ * This class extends the behavior of `AbstractVisitorMappedWithChildren` and `Dfs`, enabling traversal
+ * of hierarchical or graph-based data structures. It processes elements and their associated dependencies
+ * recursively, applying pre-visit, in-visit, self-visit, and post-visit phases during traversal.
  *
- * @param map a mapping from `Message` to an `Appendable` structure that stores key-context pairs `(K, Option[V])`.
- * @param f   a function defining the children of each element of type `K` for recursive traversal.
- * @tparam K the type of elements to be visited and processed during traversal.
- * @tparam V the value type that will be associated with each element of type `K`.
+ * The traversal process uses key-value pairs where keys represent the primary elements and optional values
+ * represent associated data to be processed. This class supports updates to the visitor state and provides
+ * flexible configuration of child element lookups and dependency resolution.
+ *
+ * @tparam K the type representing the primary elements to be traversed
+ * @tparam V the type representing the associated data for elements in the traversal
+ * @constructor Creates a new instance of `DfsOriginVisitor` with the specified map, children function,
+ *              and unmap function.
+ * @param map      a mapping from `Message` to `Appendable[(K, Option[V])]`, representing the current
+ *                 state of the visitor and its associated data
+ * @param children a function that takes an element of type `K` and returns its sequence of child elements of type `V`
+ * @param unmap    a function that "unmaps" a value of type `V` to an appropriate element of type `K`
  */
-case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], f: K => Seq[V], h: V => K) extends AbstractDfsVisitorMapped[K, V, Option[V]](map, _ => None, f) with Dfs[K, DfsOriginVisitor[K, V]] {
+case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]], children: K => Seq[V], unmap: V => K) extends AbstractVisitorMappedWithChildren[K, V, Option[V]](map, _ => None, children) with Dfs[K, DfsOriginVisitor[K, V]] {
 
   /**
    * Processes an element of type `K` with an optional value of type `V` using a depth-first traversal strategy.
@@ -354,7 +365,7 @@ case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]],
    *         the provided element and its dependencies.
    */
   def dfsOrigin(k: K, vo: Option[V]): DfsOriginVisitor[K, V] = {
-    val kv: (K, Option[V]) = (k, vo)
+    val kv: (K, Option[V]) = k -> vo
 
     def performRecursion(xs: Seq[(K, Option[V])], visitor: DfsOriginVisitor[K, V]) =
       if (xs.length <= 2 && map.contains(In))
@@ -363,7 +374,7 @@ case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]],
         xs.foldLeft[DfsOriginVisitor[K, V]](visitor)((accum, z) => accum.dfsOrigin.tupled(z))
 
     // First do a pre-visit, then a "SelfVisit", next perform the recursion, finally do a post-visit
-    performRecursion(f(k) map (z => (h(z), Some(z))), visit(Pre)(kv).visit(SelfVisit)(kv)).visit(Post)(kv)
+    performRecursion(children(k) map (z => (unmap(z), Some(z))), visit(Pre)(kv).visit(SelfVisit)(kv)).visit(Post)(kv)
   }
 
   /**
@@ -415,7 +426,7 @@ object DfsOriginVisitor {
    * Creates a new instance of `DfsVisitorMapped` to manage depth-first traversal using a visitor pattern.
    *
    * @param message  the `Message` instance representing the context or phase of the traversal
-   * @param journal  the `Appendable` structure for recording visited elements as pairs, each of type `(K, V)`
+   * @param journal  the `Appendable` structure for recording visited elements as pairs, each having type `(K, V)`
    * @param children a function that takes an element of type `K` and returns its sequence of child elements to traverse
    * @return a new instance of `DfsVisitorMapped[K, V]` configured with the specified message, appendable structure, and functions
    */

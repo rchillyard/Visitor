@@ -16,7 +16,7 @@ class PQSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "append/take 1" in {
-    val pq: PQ[Int] = MinPQ[Int]().append(1)
+    val pq: PQLike[Int] = MinPQ[Int]().append(1)
     pq.isEmpty shouldBe false
     val (x, pqDash) = pq.take
     pqDash.isEmpty shouldBe true
@@ -24,7 +24,7 @@ class PQSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "append/take 2" in {
-    val pq: PQ[Int] = MinPQ[Int]().append(1).append(2)
+    val pq: PQLike[Int] = MinPQ.empty[Int].append(1).append(2)
     pq.isEmpty shouldBe false
     val (x1, pqDash) = pq.take
     pqDash.isEmpty shouldBe false
@@ -35,7 +35,7 @@ class PQSpec extends AnyFlatSpec with should.Matchers {
     pqDash2.isEmpty shouldBe true
   }
 
-  behavior of "MaxPQ"
+  behavior of "PQ"
 
   it should "isEmpty" in {
     MaxPQ[Int]().isEmpty shouldBe true
@@ -46,7 +46,7 @@ class PQSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "append/take 1" in {
-    val pq: PQ[Int] = MaxPQ[Int]().append(1)
+    val pq: PQLike[Int] = MaxPQ[Int]().append(1)
     pq.isEmpty shouldBe false
     val (x, pqDash) = pq.take
     pqDash.isEmpty shouldBe true
@@ -54,7 +54,7 @@ class PQSpec extends AnyFlatSpec with should.Matchers {
   }
 
   it should "append/take 2" in {
-    val pq: PQ[Int] = MaxPQ[Int]().append(1).append(2)
+    val pq: PQLike[Int] = MaxPQ[Int]().append(1).append(2)
     pq.isEmpty shouldBe false
     val (x1, pqDash) = pq.take
     pqDash.isEmpty shouldBe false

@@ -192,7 +192,6 @@ object SimpleVisitor {
    */
   def createPostStack[X]: SimpleVisitor[X] =
     create(Post, ListJournal.empty[X])
-
 }
 
 /**
@@ -207,7 +206,9 @@ object SimpleVisitor {
  * @param mapAppendables a map associating `Message` instances with their corresponding `Appendable` objects.
  *                       This map defines the initial state of the visitor.
  */
-abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendable[X]]) extends AbstractVisitor[X] {
+abstract class AbstractMultiVisitor[X]
+(val mapAppendables: Map[Message, Appendable[X]]) extends
+  AbstractVisitor[X] {
 
   /**
    * Retrieves an optional `Appendable[X]` associated with the specified `Message`.
@@ -293,7 +294,9 @@ abstract class AbstractMultiVisitor[X](val mapAppendables: Map[Message, Appendab
  * @param map a map associating `Message` instances with their corresponding `Appendable` objects
  *            containing elements of type `(K, V)`. This defines the initial state of the visitor.
  */
-abstract class AbstractVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]]) extends AbstractMultiVisitor[(K, V)](map) {
+abstract class AbstractVisitorMapped[K, V]
+(map: Map[Message, Appendable[(K, V)]]) extends
+  AbstractMultiVisitor[(K, V)](map) {
 
   /**
    * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor`.
@@ -318,29 +321,35 @@ abstract class AbstractVisitorMapped[K, V](map: Map[Message, Appendable[(K, V)]]
 }
 
 /**
- * Abstract implementation of a visitor that maps a key-value pair with additional
- * functionality for hierarchical traversal and mapping within a visitor pattern.
+ * Abstract class that extends `AbstractVisitorMapped` and provides additional functionality
+ * for mapping keys to values with children elements.
  *
- * This class extends `AbstractMultiVisitor` with a generic mapping strategy defined by
- * a function `f` that transforms keys of type `K` into values of type `V`, and another
- * function `children` that determines the hierarchical structure by returning a sequence
- * of child keys for a given key. The visitor provides processing mechanisms in conjunction
- * with `Message` and `Appendable` types to handle the specified map of `Message` to `Appendable` instances.
+ * This class enhances the base functionality of `AbstractVisitorMapped` by allowing 
+ * the mapping of keys of type `K` to values of type `V` while also establishing a relationship 
+ * with children elements, where children are derived from a key of type `K`.
  *
- * @tparam K the type of the keys in the hierarchical relationship.
- * @tparam V the type of the values derived from the keys through the function `f`.
- * @param map      a mapping from `Message` instances to `Appendable` objects, defining the state handled by this visitor.
- * @param f        a function to derive a value of type `V` from a key of type `K`.
- * @param children a function that returns a sequence of child keys given a key of type `K`.
+ * Typical use cases for this class include scenarios where hierarchical data needs to be processed 
+ * or traversed, and the mapping of each key can generate a corresponding value along with potentially 
+ * associated child elements.
+ *
+ * @tparam K the type of the key
+ * @tparam C the type of children associated with a key
+ * @tparam V the type of the value derived from the key
+ * @param map      a `Map` associating `Message` instances with their corresponding 
+ *                 `Appendable` objects containing key-value pairs having type `(K, V)`
+ * @param fulfill  a function that maps a key of type `K` to a corresponding value of type `V`
+ * @param children a function that generates a sequence of children of type `C` for a given key of type `K`
  */
-abstract class AbstractDfsVisitorMapped[K, C, V](map: Map[Message, Appendable[(K, V)]], f: K => V, children: K => Seq[C]) extends AbstractVisitorMapped[K, V](map) {
+abstract class AbstractVisitorMappedWithChildren[K, C, V]
+(map: Map[Message, Appendable[(K, V)]], fulfill: K => V, children: K => Seq[C]) extends
+  AbstractVisitorMapped[K, V](map) {
   /**
-   * Creates a key-value pair by applying the function `f` to a given key of type `K`.
+   * Creates a key-value pair by applying the function `fulfill` to a given key of type `K`.
    *
    * @param k the key of type `K` from which the pair is derived
-   * @return a tuple `(K, V)` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `f` to `k`
+   * @return a tuple `(K, V)` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `fulfill` to `k`
    */
-  def keyValuePair(k: K): (K, V) = (k, f(k))
+  def keyValuePair(k: K): (K, V) = k -> fulfill(k)
 }
 
 /**
@@ -406,6 +415,8 @@ object MultiVisitor {
 /**
  * A case class extending `AbstractVisitorMapped` for managing `Message` to `Appendable[(K, V)]` mappings
  * within the context of the Visitor pattern.
+ *
+ * TESTME this is not used currently.
  *
  * This class provides additional methods for updating and processing the internal mappings, allowing
  * it to serve as a mutable visitor that accommodates changes in state as it processes messages.
