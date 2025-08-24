@@ -94,21 +94,21 @@ class DfsVisitorSpec extends AnyFlatSpec with Matchers {
   behavior of "DfsVisitorMapped"
 
   it should "dfs pre-order with traversal type" in {
-    val function: Int => String = x => x.toString
+    val function: Int => Option[String] = x => Some(x.toString)
     // Test a recursive pre-order traversal of the tree, starting at the root.
-    val entry: (Message, FunctionMapJournal[Int, String]) = Pre -> FunctionMapJournal.empty[Int, String](function)
+    val entry: (Message, FunctionMapJournal[Int, Option[String]]) = Pre -> FunctionMapJournal.empty[Int, Option[String]](function)
     Using(DfsVisitorMapped[Int, String](Map(entry), function, f)) {
       visitor =>
         // NOTE that we do not return the journal as an Iterable because a Map will essentially return the entries in random order.
         val visited = visitor.dfs(10)
-        val mapJournals: Iterable[AbstractMapJournal[Int, String]] = visited.mapJournals
+        val mapJournals: Iterable[AbstractMapJournal[Int, Option[String]]] = visited.mapJournals
         mapJournals.headOption.asInstanceOf[Option[FunctionMapJournal[Int, String]]]
     } match {
       case Success(Some(journal)) =>
-        journal.get(10) shouldBe Some("10")
-        journal.get(15) shouldBe Some("15")
-        journal.get(13) shouldBe Some("13")
-        journal.get(2) shouldBe Some("2")
+        journal.get(10) shouldBe Some(Some("10"))
+        journal.get(15) shouldBe Some(Some("15"))
+        journal.get(13) shouldBe Some(Some("13"))
+        journal.get(2) shouldBe Some(Some("2"))
       case Success(journal) =>
         fail(s"Expected MapJournal, got $journal")
       case Failure(exception) =>

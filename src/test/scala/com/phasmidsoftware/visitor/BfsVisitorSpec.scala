@@ -35,4 +35,22 @@ class BfsVisitorSpec extends AnyFlatSpec with Matchers {
              } yield entry
     } shouldBe Success(Queue(10, 5, 13, 2, 6, 11, 15, 1, 3))
   }
+
+  it should "bfs minPQ with Queue" in {
+    Using(BfsVisitor.createByMinPriorityWithQueue[Int](f, _ => false)) {
+      visitor =>
+        for {journal <- visitor.bfs(10)._1.iterableJournals
+             entry <- journal
+             } yield entry
+    } shouldBe Success(Queue(10, 5, 2, 1, 3, 6, 13, 11, 15))
+  }
+
+  it should "bfs maxPQ with Queue" in {
+    Using(BfsVisitor.createByMaxPriorityWithQueue[Int](f, _ => false)) {
+      visitor =>
+        for {journal <- visitor.bfs(10)._1.iterableJournals
+             entry <- journal
+             } yield entry
+    } shouldBe Success(Queue(10, 13, 15, 11, 5, 6, 2, 3, 1))
+  }
 }
