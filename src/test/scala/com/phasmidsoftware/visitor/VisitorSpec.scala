@@ -33,4 +33,12 @@ class VisitorSpec extends AnyFlatSpec with should.Matchers {
     visitor0.appendables.size shouldBe 1
   }
 
+  it should "visit Post with logging" in {
+    val visitor0 = SimpleVisitor.createPostQueue[String]
+    Logging.setLogging(true)
+    val visitor1 = visitor0.visit(Post)("Hello").visit(Pre)("How are You?").visit(Post)("Goodbye")
+    val journal: QueueJournal[String] = visitor1.appendable.asInstanceOf[QueueJournal[String]]
+    journal.iterator.toList shouldBe List("Hello", "Goodbye")
+  }
+
 }
