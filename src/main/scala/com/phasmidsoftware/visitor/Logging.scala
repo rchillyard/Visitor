@@ -47,15 +47,45 @@ object Logging {
    * @param w the logging prefix to be used when generating log entries
    */
   implicit class Loggable(w: String) {
+
+    /**
+     * Logs the provided value with the specified logging prefix and returns the original value.
+     * Logging occurs only if the logging context is active.
+     *
+     * @param x the value to be logged; the type is generic and can be any type X
+     * @return the original value passed as input
+     */
     def !![X](x: X): X =
       logIt(w)(x)
 
+    /**
+     * Logs an `Option` value if logging is enabled and returns the original value.
+     *
+     * @param xo an `Option` containing the value to be logged; if `xo` is `Some(value)`,
+     *           the value is logged, otherwise no action is performed.
+     * @return the original `Option` value passed as input.
+     */
     def !![X](xo: Option[X]): Option[X] =
       logIt(w)(xo)
 
+    /**
+     * Logs a `Try` value using the logging prefix `w` and returns the original value.
+     * Logging occurs only if enabled within the logging context.
+     *
+     * @param xy the `Try` instance containing the value to be logged
+     * @return the same `Try` instance passed as input
+     */
     def !![X](xy: Try[X]): Try[X] =
       logIt(w)(xy)
 
+    /**
+     * Logs and returns the provided sequence of values.
+     * The sequence is logged with the prefix associated with the implicit `Loggable` context.
+     * Logging occurs only if logging is enabled in the current context.
+     *
+     * @param xy the sequence of values to be logged and returned
+     * @return the original sequence of values after logging
+     */
     def !![X](xy: Seq[X]): Seq[X] =
       logIt(w)(xy)
   }
