@@ -28,6 +28,8 @@ class VisitorSpec extends AnyFlatSpec with Matchers {
      *         the updated `Visitor` instance (type `Visitor[V, Z]`) after the visitation
      */
     def visit[Z](visitor: Visitor[Person, Z])(v: Person): Visitor[Person, Z] = visitor.visit(v)
+    
+    def evaluate[Z](v: Person): Option[Z] = None
   }
   
   class PrintVisitor[V] extends Visitor[V, Unit] {
@@ -39,16 +41,27 @@ class VisitorSpec extends AnyFlatSpec with Matchers {
      * This method allows for processing of an entity of type `V` through the Visitor pattern,
      * enabling operations defined in the `Visitor` implementation to be applied to the entity.
      *
-     * @param v         the instance of type `V` to be visited
+     * @param k         the instance of type `V` to be visited
      * @param visitable the implicit evidence of the `Visitable` context for type `V`
      *                  that provides traversal and visitation behavior
      * @return a tuple containing the result of the visitation process of type `Z`
      *         and the updated `Visitor` instance
      */
-    def visit(v: V)(using visitable: Visitable[V]): Visitor[V, Unit] = {
-      println(s"visiting $v")
+    def visit(k: V)(using visitable: Visitable[V]): Visitor[V, Unit] = {
+      println(s"visiting $k")
       this
     }
+
+    /**
+     * Checks whether the visitor is in an open state.
+     *
+     * This method represents the state of the visitor, indicating whether
+     * it is open for processing or interaction. The specific definition of
+     * "open" may vary depending on the implementation context.
+     *
+     * @return true if the visitor is in an open state, false otherwise
+     */
+    def open: Boolean = true
 
     /**
      * Retrieves the result of the visitor's state after visiting.
@@ -58,7 +71,7 @@ class VisitorSpec extends AnyFlatSpec with Matchers {
      *
      * @return the internal or resulting state of the visitor of type `Z`
      */
-    def visited: Unit = ()
+    def visited: (V, Unit) = ???
   }
 
   it should "visit" in {

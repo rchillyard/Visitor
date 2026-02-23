@@ -3,6 +3,7 @@ package newvisitor
 import com.phasmidsoftware.visitor.Message
 
 import scala.collection.immutable.Queue
+import scala.reflect.ClassTag
 
 /**
  * A trait representing a type that can be visited using the Visitor design pattern.
@@ -16,17 +17,13 @@ import scala.collection.immutable.Queue
 trait Visitable[V] {
 
   /**
-   * Visits a given object of type `V` using the specified `Visitor` and returns the resulting `Visitor` instance.
+   * Evaluates the provided element of type `V` and returns a tuple containing the 
+   * input element and an optional value of type `Z`.
    *
-   * This method delegates the visitation logic to the provided `Visitor`, enabling type-safe and customizable
-   * processing of the object `v` as part of the Visitor pattern. The visitor may modify its internal state 
-   * or perform actions based on the visited object's context.
-   *
-   * @param visitor the `Visitor` instance of type `Visitor[V, Z]` used to visit and process the object
-   * @param v       the object of type `V` to be visited
-   * @return the updated `Visitor[V, Z]` instance after processing the object `v`
+   * @param v the element of type `V` to be evaluated
+   * @return a tuple consisting of the input element `V` and an optional result of type `Z`
    */
-  def visit[Z](visitor: Visitor[V, Z])(v: V): Visitor[V, Z]
+  def evaluate[Z](v: V): (V, Option[Z])
 }
 
 /**
@@ -68,7 +65,7 @@ trait Revisitable[V] extends Visitable[V] {
  * @tparam H the type representing the hierarchical structure to be visited
  * @tparam V the type representing the elements within the hierarchical structure
  */
-trait HierarchicalVisitable[H, V](using Revisitable[V]) {
+trait HierarchicalVisitable[H, V] {
 
   /**
    * Retrieves an iterator over the child elements of a hierarchical structure.
@@ -86,6 +83,20 @@ trait HierarchicalVisitable[H, V](using Revisitable[V]) {
 }
 
 /**
+ * A trait representing a hierarchical structure that can be visited and traversed.
+ *
+ * The `HierarchicalVisitable` trait defines an abstraction for structures where elements
+ * of type `V` can be iterated over within a parent context of type `H`. It provides a
+ * mechanism for accessing child elements while leveraging the visitor pattern through the
+ * implicit `Visitable` evidence. It also supports revisitation functionality through the
+ * implicit `Revisitable[V]`.
+ *
+ * @tparam H the type representing the hierarchical structure to be visited
+ * @tparam V the type representing the elements within the hierarchical structure
+ */
+trait HierarchicalRevisitableVisitable[H, V](using Revisitable[V]) extends HierarchicalVisitable[H, V]
+
+/**
  * A trait representing an iterable collection that supports visitation of its elements.
  *
  * `VisitableIterable` extends the `HierarchicalVisitable` trait, providing functionality
@@ -96,23 +107,29 @@ trait HierarchicalVisitable[H, V](using Revisitable[V]) {
  * @tparam A the type of elements contained in the iterable collection
  */
 trait VisitableIterable[A] extends HierarchicalVisitable[Iterable[A], A] {
+  
   /**
-   * Retrieves an iterator over the elements of a given iterable.
+   * CONSIDER does this belong more properly in Visitor?
+   * 
+   * Processes the elements of the given iterable using the provided `Visitable` context
+   * and returns an iterable of tuples, where each tuple contains the original element
+   * and an optional computed result.
    *
-   * This method provides access to the elements of type `A` contained in the provided
-   * iterable, enabling iteration through them while leveraging implicit evidence of
-   * the `Visitable` context.
+   * This method first retrieves the elements of the iterable using the `children` method.
+   * It then applies the `evaluate` method of the implicit `Visitable` instance to each
+   * element to produce the final iterable of tuples.
    *
-   * @param h         the iterable of type `Iterable[A]` whose elements are to be retrieved
-   * @param visitable the implicit `Visitable[A]` that provides context for visiting and
-   *                  processing the elements
-   * @return an iterator over the elements of type `A` within the given iterable
+   * @param ai the iterable of elements of type `A` to be processed
+   * @param av the implicit `Visitable[A]` instance that provides the evaluation logic
+   * @return an iterable of tuples, each containing an element of type `A` and an optional
+   *         result of type `Z`
    */
-  def children(h: Iterable[A])(using visitable: Visitable[A]): Iterator[A] = h.iterator
+  def journal[Z](ai: Iterable[A])(using av: Visitable[A]): Iterable[(A, Option[Z])] = 
+    children(ai).toSeq map av.evaluate[Z]
 }
 
 /**
- * Companion object for the `Visitable` trait. It provides specialized implementations of visitable behavior.
+ * Companion object for the `Visitable` trait. It provides specialized implementations of av behavior.
  *
  * This object includes predefined implementations of the `Visitable` trait for specific types, ensuring consistency and reusability.
  */
@@ -136,6 +153,19 @@ object Visitable {
        */
       def visit[Z](visitor: Visitor[String, Z])(v: String): Visitor[String, Z] =
         visitor.visit(v)
+
+      /**
+       * Attempts to process the given value of type `V` and return an optional result of type `Z`.
+       *
+       * This method provides a mechanism to optionally transform or extract a value from the input
+       * based on the implementation details, returning `None` if the operation is not applicable
+       * or fails to produce a result.
+       *
+       * @param v the input value of type `V` to be processed
+       * @return an `Option` containing a result of type `Z` if the transformation or extraction is successful, or `None` otherwise
+       */
+      def evaluate[Z](v: String): Option[Z] = None
     }
     implicit object VisitableString extends VisitableString
+    
 }

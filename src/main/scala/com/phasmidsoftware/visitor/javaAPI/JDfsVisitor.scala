@@ -20,7 +20,7 @@ import scala.jdk.CollectionConverters.{CollectionHasAsScala, IterableHasAsJava}
 class JDfsVisitor[X](val visitor: DfsVisitor[X]) extends AutoCloseable {
 
   /**
-   * Executes a Depth-First Search (DFS) starting from the specified element `k`.
+   * Executes a Depth-First Search (DFS) starting from the specified element `h`.
    * The traversal follows a recursive strategy, where each visited element may invoke
    * updates to the visiting state encapsulated in type `R`.
    *

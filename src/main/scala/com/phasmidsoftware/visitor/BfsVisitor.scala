@@ -317,7 +317,7 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
   with GoalOriented[K] {
 
   /**
-   * Performs a breadth-first search (BFS) starting with the given key `k`.
+   * Performs a breadth-first search (BFS) starting with the given key `h`.
    *
    * @param k the starting key of type `K` to begin the BFS traversal
    * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal
@@ -370,16 +370,16 @@ abstract class AbstractQueueableVisitorMapped[Q[_], K, V]
       (unitQueue(q), Some(k))
     case Some((k, q)) =>
       // XXX first, we update the queue of this visitor.
-      // XXX then, because we are taking the `k` value out of the queue, we make a post-visit based on `k -> fulfill(k)`.
+      // XXX then, because we are taking the `h` value out of the queue, we make a post-visit based on `h -> fulfill(h)`.
       val visitor = unitQueue(q).visit(Post)(k -> fulfill(None)(k))
-      // XXX for each child of `k`, we make a pre-visit and add the child to this visitor's queue
+      // XXX for each child of `h`, we make a pre-visit and add the child to this visitor's queue
       processChildren(k, visitor).inner
   }
 
   /**
-   * Processes the children of a given key `k` in the context of the visitor pattern.
+   * Processes the children of a given key `h` in the context of the visitor pattern.
    *
-   * This method iterates over the children of the provided key `k` and applies the visitor to each child.
+   * This method iterates over the children of the provided key `h` and applies the visitor to each child.
    * During the iteration, it performs a visit operation and manages an updated queue for breadth-first traversal.
    *
    * @param k       the key of type `K` whose children are to be processed
@@ -424,7 +424,7 @@ case class BfsQueueVisitorMapped[K, V]
 (queue: Queue[K], map: Map[Message, Appendable[(K, Option[V])]], fulfill: Option[K] => K => Option[V], children: K => Seq[K], goal: K => Boolean) extends
   AbstractQueueableVisitorMapped(queue, map, fulfill, children, goal) {
   /**
-   * Performs a breadth-first search (BFS) starting with the given key `k`.
+   * Performs a breadth-first search (BFS) starting with the given key `h`.
    *
    * @param k the starting key of type `K` to begin the BFS traversal
    * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal
@@ -496,7 +496,7 @@ case class BfsPQVisitorMapped[K: Ordering, V]
 (queue: PQ[K], map: Map[Message, Appendable[(K, Option[V])]], fulfill: Option[K] => K => Option[V], children: K => Seq[K], goal: K => Boolean) extends
   AbstractQueueableVisitorMapped(queue, map, fulfill, children, goal) {
   /**
-   * Performs a breadth-first search (BFS) starting from the given key `k` and returns the updated visitor instance
+   * Performs a breadth-first search (BFS) starting from the given key `h` and returns the updated visitor instance
    * along with an optional key associated with the traversal.
    *
    * This method overrides the base implementation of `bfs`, specializing the visitor type to `BfsPQVisitorMapped[K, V]`.

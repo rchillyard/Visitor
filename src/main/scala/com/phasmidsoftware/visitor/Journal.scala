@@ -299,7 +299,7 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
     f(key)
 
   /**
-   * Appends a new entry to the journal by applying the stored function `f` to the given key `k`.
+   * Appends a new entry to the journal by applying the stored function `f` to the given key `h`.
    * The resulting key-value pair is then appended to the internal map, producing a new instance
    * of `FunctionMapJournal` that reflects the updated state.
    *

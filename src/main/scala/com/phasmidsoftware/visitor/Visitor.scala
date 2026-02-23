@@ -347,7 +347,7 @@ abstract class AbstractVisitorMappedWithChildren[K, C, V]
    * Creates a key-value pair by applying the function `fulfill` to a given key of type `K`.
    *
    * @param k the key of type `K` from which the pair is derived
-   * @return a tuple `(K, Option[V])` where the first element is the key `k` and the second element is the corresponding value obtained by applying the function `fulfill` to `k`
+   * @return a tuple `(K, Option[V])` where the first element is the key `h` and the second element is the corresponding value obtained by applying the function `fulfill` to `h`
    */
   def keyValuePair(k: K): (K, Option[V]) = k -> fulfill(None)(k)
 }

@@ -30,7 +30,7 @@ trait Strategy[K, R <: Visitor[_]]
 trait Dfs[K, R <: Visitor[_]] extends Strategy[K, R] {
 
   /**
-   * Executes a Depth-First Search (DFS) starting from the specified element `k`.
+   * Executes a Depth-First Search (DFS) starting from the specified element `h`.
    * The traversal follows a recursive strategy, where each visited element may invoke
    * updates to the visiting state encapsulated in type `R`.
    *
@@ -53,7 +53,7 @@ trait Dfs[K, R <: Visitor[_]] extends Strategy[K, R] {
  */
 trait Bfs[K, R <: Visitor[_]] extends Strategy[K, R] {
   /**
-   * Performs a breadth-first search (BFS) starting with the given key `k`.
+   * Performs a breadth-first search (BFS) starting with the given key `h`.
    *
    * @param k the starting key of type `K` to begin the BFS traversal
    * @return a result of type `R` which is a subtype of `Visitor[_]`, representing the outcome of the BFS traversal

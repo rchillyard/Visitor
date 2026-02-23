@@ -191,7 +191,7 @@ case class DfsVisitorMapped[K, V]
   AbstractVisitorMappedWithChildren[K, K, V](map, _ => fulfill, children)
   with Dfs[K, DfsVisitorMapped[K, V]] {
   /**
-   * Performs a depth-first traversal starting from the provided key `k`.
+   * Performs a depth-first traversal starting from the provided key `h`.
    * This method applies visitor operations in a specific sequence: pre-visit, self-visit, recursive traversal, and post-visit.
    *
    * Depending on the conditions of the children of the key, the traversal may apply special in-visit logic if there are exactly two children.
@@ -362,7 +362,7 @@ case class DfsOriginVisitor[K, V](map: Map[Message, Appendable[(K, Option[V])]],
    * during the traversal and updates the state of the `DfsOriginVisitor`.
    *
    * @param k  the element of type `K` to be processed during the traversal.
-   * @param vo an optional value of type `V` associated with the element `k`.
+   * @param vo an optional value of type `V` associated with the element `h`.
    * @return a new instance of `DfsOriginVisitor[K, V]` containing the updated state after processing
    *         the provided element and its dependencies.
    */
