@@ -64,22 +64,16 @@ private case class SetVisitedSet[V](visited: Set[V]) extends VisitedSet[V]:
   */
 trait Frontier[F[_]]:
   def empty[T]: F[T]
-
   def offer[T](f: F[T])(t: T): F[T]
-
   def take[T](f: F[T]): (T, F[T])
-
   def isEmpty[T](f: F[T]): Boolean
 
-/** BFS frontier: FIFO Queue. */
-given Frontier[Queue] with
-  def empty[T]: Queue[T] = Queue.empty
+  /** If true, offerAll reverses the list before offering (needed for LIFO stacks). */
+  def reverseOnOffer: Boolean = false
 
-  def offer[T](f: Queue[T])(t: T): Queue[T] = f.enqueue(t)
-
-  def take[T](f: Queue[T]): (T, Queue[T]) = f.dequeue
-
-  def isEmpty[T](f: Queue[T]): Boolean = f.isEmpty
+  def offerAll[T](f: F[T])(ts: List[T]): F[T] =
+    val ordered = if reverseOnOffer then ts.reverse else ts
+    ordered.foldLeft(f)((acc: F[T], t: T) => offer(acc)(t))
 
 /** DFS frontier: LIFO Stack (represented as a List). */
 type Stack[T] = List[T]
@@ -92,6 +86,18 @@ given Frontier[Stack] with
   def take[T](f: Stack[T]): (T, Stack[T]) = (f.head, f.tail)
 
   def isEmpty[T](f: Stack[T]): Boolean = f.isEmpty
+
+  override def reverseOnOffer: Boolean = true
+
+/** BFS frontier: FIFO Queue. */
+given Frontier[Queue] with
+  def empty[T]: Queue[T] = Queue.empty
+
+  def offer[T](f: Queue[T])(t: T): Queue[T] = f.enqueue(t)
+
+  def take[T](f: Queue[T]): (T, Queue[T]) = f.dequeue
+
+  def isEmpty[T](f: Queue[T]): Boolean = f.isEmpty
 
 /**
   * Priority-queue frontier: best-first / Dijkstra-style traversal.
@@ -240,12 +246,12 @@ object Traversal:
         else
           val newVisited = visited.markVisited(node)
           val newVisitor = vis.visit(node)
-          val newFrontier = nbrs.neighbours(node) // node: V, nbrs: Neighbours[V,V] ✓
-            .filterNot(newVisited.isVisited)
-            .foldLeft[F[V]](rest)((acc: F[V], v: V) => fr.offer(acc)(v))
+          val newFrontier = fr.offerAll(rest)(
+            nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+          )
           loop(newFrontier, newVisitor, newVisited)
 
-    val seedFrontier = nbrs.neighbours(start).foldLeft[F[V]](initial)((acc: F[V], v: V) => fr.offer(acc)(v))
+    val seedFrontier = fr.offerAll(initial)(nbrs.neighbours(start).toList)
     loop(seedFrontier, visitor.visit(start), vs.markVisited(start))
 
 
@@ -291,13 +297,12 @@ object Traversal:
         else
           val newVisited = visited.markVisited(node)
           val newVisitor = vis.visit(node)
-          val newFrontier = graphNbrs.neighbours(node)
-            .filterNot(newVisited.isVisited)
-            .foldLeft[F[V]](rest)((acc: F[V], v: V) => fr.offer(acc)(v))
+          val newFrontier = fr.offerAll(rest)(
+            graphNbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+          )
           loop(newFrontier, newVisitor, newVisited)
 
-    val seedFrontier = rootNbrs.neighbours(start)
-      .foldLeft[F[V]](initial)((acc: F[V], v: V) => fr.offer(acc)(v))
+    val seedFrontier = fr.offerAll(initial)(rootNbrs.neighbours(start).toList)
     loop(seedFrontier, visitor, vs)
 
   // ----------------------------------------------------------
@@ -343,6 +348,18 @@ object Traversal:
 
     traverse[V, R, J, PrioQueue](start, visitor)
 
+  /** Max-priority / best-first traversal. Largest element dequeued first. */
+  def bestFirstMax[V: Ordering, R, J <: Appendable[(V, Option[R])]](
+                                                                     start: V,
+                                                                     visitor: Visitor[V, R, J]
+                                                                   )(using
+                                                                     nbrs: GraphNeighbours[V],
+                                                                     ev: Evaluable[V, R],
+                                                                     vs: VisitedSet[V]
+                                                                   ): Visitor[V, R, J] =
+    given PrioQueue[V] = PrioQueue.emptyMax[V]
+
+    traverse[V, R, J, PrioQueue](start, visitor)
 /** American English alias for [[Neighbours]] */
 type Neighbors[H, V] = Neighbours[H, V]
 

@@ -86,5 +86,11 @@ case class PrioQueue[T] private(private val heap: BinaryHeap[T]):
 
   def head: T = heap.head
 
+// Add to PrioQueue companion object:
+
 object PrioQueue:
+  /** Min-priority queue — smallest element dequeued first. */
   def empty[T: Ordering]: PrioQueue[T] = PrioQueue(BinaryHeap.empty[T])
+
+  /** Max-priority queue — largest element dequeued first. */
+  def emptyMax[T: Ordering]: PrioQueue[T] = PrioQueue(BinaryHeap.empty[T](using Ordering[T].reverse))
