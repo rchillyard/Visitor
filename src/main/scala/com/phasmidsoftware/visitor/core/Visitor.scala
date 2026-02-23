@@ -1,6 +1,6 @@
 package com.phasmidsoftware.visitor.core
 
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 
 // ============================================================
 // Core typeclasses
@@ -104,17 +104,6 @@ given Frontier[Stack] with
   * in the frontier at the same priority). For weighted graphs you'd
   * typically wrap nodes as (priority, node) tuples.
   */
-// Captures Ordering at construction — no leakage into Frontier[F[_]]
-case class PrioQueue[T] private(private val set: SortedSet[T]):
-  def offer(t: T): PrioQueue[T] = copy(set + t)
-
-  def take: (T, PrioQueue[T]) = (set.head, copy(set.tail))
-
-  def isEmpty: Boolean = set.isEmpty
-
-object PrioQueue:
-  def empty[T: Ordering]: PrioQueue[T] = PrioQueue(SortedSet.empty[T])
-
 given Frontier[PrioQueue] with
   def empty[T]: PrioQueue[T] =
     throw new UnsupportedOperationException("Use PrioQueue.empty[T] directly")
@@ -354,36 +343,8 @@ object Traversal:
 
     traverse[V, R, J, PrioQueue](start, visitor)
 
-// ============================================================
-// Design notes (non-compiling commentary)
-// ============================================================
-//
-// 1. H vs V in traverse:
-//    The `asInstanceOf` casts in `traverse` are a known rough edge.
-//    Two clean options:
-//      a) Add a separate `traverseH` that seeds the frontier from H
-//         but visits V nodes — keeping H and V distinct throughout.
-//      b) Require H =:= V for the homogeneous-graph case and provide
-//         a separate `treeTraversal` for the heterogeneous case.
-//    The convenience methods (bfs, dfs, bestFirst) already assume H=V,
-//    which covers most graph use cases cleanly.
-//
-// 2. VisitedSet threading:
-//    Currently threaded as loop state (purely functional).
-//    Could alternatively be a given of a mutable Set if you decide
-//    the traversal itself doesn't need to be pure.
-//
-// 3. PrioQueue and Ordering:
-//    The Frontier[PrioQueue] given requires Ordering[T] to construct
-//    a SortedSet. The cleanest Scala 3 solution is to make PrioQueue
-//    a newtype wrapper that captures the Ordering at construction time,
-//    or to pass the ordering explicitly to `bestFirst`.
-//
-// 4. FunctionMapJournal and other journals from the old package:
-//    They plug in as J with zero changes — they already satisfy Appendable.
-//
-// 5. Trees (H ≠ V):
-//    For Tree[A] where H = Tree[A] and V = A, define:
-//      given Neighbours[Tree[A], A] with
-//        def neighbours(h: Tree[A]): Iterator[A] = h.children.iterator
-//    and call traverse[Tree[A], A, R, J, F] directly.
+/** American English alias for [[Neighbours]] */
+type Neighbors[H, V] = Neighbours[H, V]
+
+/** American English alias for [[GraphNeighbours]] */
+type GraphNeighbors[V] = GraphNeighbours[V]

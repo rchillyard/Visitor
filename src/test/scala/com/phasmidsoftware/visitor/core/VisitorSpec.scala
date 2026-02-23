@@ -3,7 +3,7 @@ package com.phasmidsoftware.visitor.core
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
-import scala.collection.immutable.{Queue, SortedSet}
+import scala.collection.immutable.Queue
 
 /**
   * Test graph/tree structures used across multiple tests.
@@ -138,11 +138,8 @@ class FrontierSpec extends AnyFlatSpec with Matchers:
     fr.isEmpty(fr.empty[Int]) shouldBe true
     fr.isEmpty(fr.offer(fr.empty[Int])(42)) shouldBe false
 
-  "Frontier[PrioQueue] (best-first)" should "offer and take in ascending priority order" in :
+  "Frontier[PrioQueue] (best-first)" should "dequeue elements in ascending order (min-first)" in :
     val fr = summon[Frontier[PrioQueue]]
-
-    given Ordering[Int] = Ordering.Int
-
     val pq0 = PrioQueue.empty[Int]
     val pq1 = fr.offer(fr.offer(fr.offer(pq0)(3))(1))(2)
     val (a, pq2) = fr.take(pq1)
