@@ -1,3 +1,4 @@
+
 # Visitor
 
 ![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.phasmidsoftware/visitor_3/badge.svg?color=blue)
@@ -24,6 +25,7 @@ This is achieved entirely through typeclasses rather than inheritance hierarchie
 The library is built from five orthogonal typeclasses:
 
 ### `Evaluable[V, R]`
+
 Answers: *what do we want to know about a node?*
 
 ```scala
@@ -35,6 +37,7 @@ Domain knowledge lives here.
 The traversal engine is entirely ignorant of it.
 
 ### `Neighbours[H, V]`
+
 Answers: *how do we find adjacent nodes?*
 
 ```scala
@@ -48,6 +51,7 @@ For trees, `H` and `V` can differ (e.g. `H = Tree[A]`, `V = A`).
 American English aliases `Neighbors` and `GraphNeighbors` are also provided.
 
 ### `VisitedSet[V]`
+
 Answers: *have we been here before?*
 
 ```scala
@@ -60,6 +64,7 @@ Immutable and purely functional.
 A default `given` instance backed by an immutable `Set` is provided automatically.
 
 ### `Frontier[F[_]]`
+
 Answers: *in what order do we explore?*
 
 ```scala
@@ -80,6 +85,7 @@ Three `given` instances are provided:
 | `Frontier[PrioQueue]` | Binary min-heap | Best-first / Dijkstra-style |
 
 ### `Visitor[V, R, J]`
+
 Answers: *where do the results go?*
 
 ```scala
