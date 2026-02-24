@@ -67,10 +67,8 @@ trait Frontier[F[_]]:
   def offer[T](f: F[T])(t: T): F[T]
   def take[T](f: F[T]): (T, F[T])
   def isEmpty[T](f: F[T]): Boolean
-
   /** If true, offerAll reverses the list before offering (needed for LIFO stacks). */
   def reverseOnOffer: Boolean = false
-
   def offerAll[T](f: F[T])(ts: List[T]): F[T] =
     val ordered = if reverseOnOffer then ts.reverse else ts
     ordered.foldLeft(f)((acc: F[T], t: T) => offer(acc)(t))
@@ -80,7 +78,6 @@ type Stack[T] = List[T]
 
 given Frontier[Stack] with
   def empty[T]: Stack[T] = Nil
-
   def offer[T](f: Stack[T])(t: T): Stack[T] = t :: f
 
   def take[T](f: Stack[T]): (T, Stack[T]) = (f.head, f.tail)
@@ -194,6 +191,15 @@ object JournaledVisitor:
 // ============================================================
 
 /**
+  * Controls whether DFS records a node before or after processing its children.
+  *
+  *  - Pre:  node is recorded before its children are expanded (default)
+  *  - Post: node is recorded after all its descendants (useful for topological sort)
+  */
+enum DfsOrder:
+  case Pre, Post
+
+/**
   * The traversal engine. Knows only about Frontier, Neighbours, Evaluable,
   * VisitedSet, and Visitor. Zero domain knowledge.
   *
@@ -204,11 +210,9 @@ object JournaledVisitor:
   */
 object Traversal:
 
-  //  private def offerTo[F[_], T](fr: Frontier[F])(f: F[T])(t: T): F[T] = fr.offer(f)(t)
-
   /**
     * Traverses a (homogeneous) graph structure starting from a given node, visiting nodes iteratively
-    * and accumulating results into a visitor. The traversal is controlled by the 
+    * and accumulating results into a visitor. The traversal is controlled by the
     * concepts of a frontier, visited nodes, and neighbours of nodes.
     *
     * NOTE: Homogeneous graph traversal — H and V are the same type.
@@ -227,7 +231,7 @@ object Traversal:
                                                              start: V,
                                                              visitor: Visitor[V, R, J]
                                                            )(using
-                                                             nbrs: Neighbours[V, V], // H = V explicitly
+                                                             nbrs: Neighbours[V, V],
                                                              ev: Evaluable[V, R],
                                                              vs: VisitedSet[V],
                                                              fr: Frontier[F],
@@ -259,7 +263,7 @@ object Traversal:
     * Traverses a tree-like structure starting from a given root node, visiting nodes
     * as specified by the provided `Visitor`. The traversal is driven by the concepts
     * of a frontier (e.g., queue or stack), visited nodes, and neighbours of nodes.
-    * NOTE that traverseTree doesn't visit start itself (no Evaluable[H, R] in scope), so visitor and vs are passed unseedeed to loop — 
+    * NOTE that traverseTree doesn't visit start itself (no Evaluable[H, R] in scope), so visitor and vs are passed unseedeed to loop —
     * unlike traverse where we call visitor.visit(start) and vs.markVisited(start) before entering the loop.
     *
     * @param start     The root node where the traversal begins.
@@ -322,18 +326,60 @@ object Traversal:
 
     traverse[V, R, J, Queue](start, visitor)
 
-  /** Depth-first search. */
+  /**
+    * Depth-first search with configurable pre- or post-order recording.
+    *
+    * The internal stack holds `Either[V, V]` frames:
+    *   - `Left(v)`  means "expand v — push its children and a record frame"
+    *   - `Right(v)` means "record v in the visitor now"
+    *
+    * Pre-order:  record before expanding  → push Right(v), then Left(children)
+    * so Right(v) is on top and visited first.
+    * Post-order: record after expanding   → push children as Left, then Right(v)
+    * so children are expanded before v is recorded.
+    *
+    * @param order DfsOrder.Pre (default) or DfsOrder.Post
+    */
   def dfs[V, R, J <: Appendable[(V, Option[R])]](
                                                   start: V,
-                                                  visitor: Visitor[V, R, J]
+                                                  visitor: Visitor[V, R, J],
+                                                  order: DfsOrder = DfsOrder.Pre
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
                                                   ev: Evaluable[V, R],
                                                   vs: VisitedSet[V]
                                                 ): Visitor[V, R, J] =
-    given Stack[V] = List.empty
 
-    traverse[V, R, J, Stack](start, visitor)
+    type Frame = Either[V, V]
+
+    @annotation.tailrec
+    def loop(
+              stack: List[Frame],
+              vis: Visitor[V, R, J],
+              visited: VisitedSet[V]
+            ): Visitor[V, R, J] =
+      stack match
+        case Nil => vis
+
+        // Record frame: visit the node (already marked visited when expanded)
+        case Right(node) :: rest =>
+          loop(rest, vis.visit(node), visited)
+
+        // Expand frame: if already visited skip; otherwise mark and push frames
+        case Left(node) :: rest =>
+          if visited.isVisited(node) then loop(rest, vis, visited)
+          else
+            val newVisited = visited.markVisited(node)
+            val children = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            val childFrames = children.map(Left(_)) // no .reverse
+            val newStack = order match
+              case DfsOrder.Pre =>
+                Right(node) :: (childFrames ::: rest)
+              case DfsOrder.Post =>
+                childFrames ::: (Right(node) :: rest)
+            loop(newStack, vis, newVisited)
+
+    loop(List(Left(start)), visitor, vs)
 
   /** Best-first / priority-queue traversal. Requires Ordering[V] in scope. */
   def bestFirst[V: Ordering, R, J <: Appendable[(V, Option[R])]](

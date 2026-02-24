@@ -234,6 +234,7 @@ class BfsSpec extends AnyFlatSpec with Matchers:
 class DfsSpec extends AnyFlatSpec with Matchers:
 
   import TestGraph.given
+  import com.phasmidsoftware.visitor.core.DfsOrder.Post
 
   "Traversal.dfs" should "visit all reachable nodes from node 1" in :
     val visitor = JournaledVisitor.withListJournal[Int, Int]
@@ -256,6 +257,18 @@ class DfsSpec extends AnyFlatSpec with Matchers:
     val visitor = JournaledVisitor.withListJournal[Int, Int]
     val result = Traversal.dfs(5, visitor)
     result.result.map(_._1).toList shouldBe List(5)
+
+  it should "traverse in post-order (queue journal)" in :
+    import TreeFixture.given
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.dfs(10, visitor, Post)
+    result.result.map(_._1).toList shouldBe List(1, 3, 2, 6, 5, 11, 15, 13, 10)
+
+  it should "traverse in post-order (list journal)" in :
+    import TreeFixture.given
+    val visitor = JournaledVisitor.withListJournal[Int, Int]
+    val result = Traversal.dfs(10, visitor, Post)
+    result.result.map(_._1).toList shouldBe List(10, 13, 15, 11, 5, 6, 2, 3, 1)
 
 // ============================================================
 // Traversal — bestFirst tests
