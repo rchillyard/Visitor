@@ -176,6 +176,7 @@ val result = Traversal.bfs(start, visitor, goal = _ == 4)
 ```
 
 **Semantics:**
+
 - The goal node is always recorded in the journal before traversal halts.
 - The goal node's neighbours are never expanded.
 - If the start node satisfies the goal, traversal stops immediately with just the start node recorded.
