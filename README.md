@@ -4,8 +4,8 @@ A purely functional, typeclass-driven graph and tree traversal library for Scala
 
 ## Core Idea
 
-The central design principle is a strict separation of concerns. 
-Traversal algorithms (BFS, DFS, best-first) know nothing about the domain — they only know that a data structure has neighbours. 
+The central design principle is a strict separation of concerns.
+Traversal algorithms (BFS, DFS, best-first) know nothing about the domain — they only know that a data structure has neighbours.
 Everything derived from visiting a node is captured in a `Visitor`, which accumulates results immutably into a `Journal`.
 
 This is achieved entirely through typeclasses rather than inheritance hierarchies, making the library highly composable and easy to extend.
@@ -22,7 +22,7 @@ trait Evaluable[V, R]:
   def evaluate(v: V): Option[R]
 ```
 
-Domain knowledge lives here. 
+Domain knowledge lives here.
 The traversal engine is entirely ignorant of it.
 
 ### `Neighbours[H, V]`
@@ -33,8 +33,8 @@ trait Neighbours[H, V]:
   def neighbours(h: H): Iterator[V]
 ```
 
-`H` is the structure type (e.g. a graph, a tree root), `V` is the node type. 
-For homogeneous graphs use the alias `GraphNeighbours[V] = Neighbours[V, V]`. 
+`H` is the structure type (e.g. a graph, a tree root), `V` is the node type.
+For homogeneous graphs use the alias `GraphNeighbours[V] = Neighbours[V, V]`.
 For trees, `H` and `V` can differ (e.g. `H = Tree[A]`, `V = A`).
 American English aliases `Neighbors` and `GraphNeighbors` are also provided.
 
@@ -47,7 +47,7 @@ trait VisitedSet[V]:
   def markVisited(v: V): VisitedSet[V]
 ```
 
-Immutable and purely functional. 
+Immutable and purely functional.
 A default `given` instance backed by an immutable `Set` is provided automatically.
 
 ### `Frontier[F[_]]`
@@ -61,7 +61,7 @@ trait Frontier[F[_]]:
   def isEmpty[T](f: F[T]): Boolean
 ```
 
-This is the key to getting BFS, DFS, and best-first traversal from a single algorithm. 
+This is the key to getting BFS, DFS, and best-first traversal from a single algorithm.
 Three `given` instances are provided:
 
 | Instance | Type | Traversal order |
@@ -84,22 +84,29 @@ The canonical implementation is `JournaledVisitor`, which appends `(node, Option
 
 ## Traversal Engine
 
-`Traversal` is the single traversal engine. 
-Its internal `loop` is a tail-recursive function that is shared across all traversal strategies — the only difference is the `Frontier` instance in scope.
+`Traversal` is the single traversal engine. `bfs`, `bestFirst`, and `bestFirstMax` share a common tail-recursive `loop` parameterised over the `Frontier` type. `dfs` and `traverseTree` use their own tail-recursive loop based on an `Either`-tagged stack, which supports both pre- and post-order recording. All methods are purely functional with no `var`s.
 
 ```scala
 object Traversal:
-  def bfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J], goal: V => Boolean = _ => false)
+  def bfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
+      goal: V => Boolean = _ => false)
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def dfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
+  def dfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
+      order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def bestFirst[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
+  def bestFirst[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
+      goal: V => Boolean = _ => false)
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])], F[_]](start: H, visitor: Visitor[V, R, J])
-      (using Neighbours[H, V], Neighbours[V, V], Evaluable[V, R], VisitedSet[V], Frontier[F], F[V]): Visitor[V, R, J]
+  def bestFirstMax[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
+      goal: V => Boolean = _ => false)
+      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+
+  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])]](start: H, visitor: Visitor[V, R, J],
+      order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
+      (using Neighbours[H, V], Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 ```
 
 ## Journals
@@ -166,18 +173,18 @@ val result = Traversal.bfs(start, visitor, goal = _ == 4)
 - If the start node satisfies the goal, traversal stops immediately with just the start node recorded.
 - If the goal is never met, the full graph is traversed (equivalent to `goal = _ => false`, the default).
 
-This works uniformly across `bfs`, `dfs`, `bestFirst`, and `bestFirstMax`. Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
+This works uniformly across `bfs`, `dfs`, `bestFirst`, `bestFirstMax`, and `traverseTree`. Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
 
 ## Priority Queue
 
-The `PrioQueue[T]` type is backed by an immutable binary min-heap (`BinaryHeap`). 
-It captures `Ordering[T]` at construction time, so the `Frontier[PrioQueue]` instance remains fully polymorphic. 
+The `PrioQueue[T]` type is backed by an immutable binary min-heap (`BinaryHeap`).
+It captures `Ordering[T]` at construction time, so the `Frontier[PrioQueue]` instance remains fully polymorphic.
 For weighted graph traversal, wrap your nodes as `(priority, node)` tuples with an appropriate `Ordering`.
 
 ## Immutability
 
-Everything is immutable. Visiting a node yields a new `Visitor`. 
-Marking a node visited yields a new `VisitedSet`. 
+Everything is immutable. Visiting a node yields a new `Visitor`.
+Marking a node visited yields a new `VisitedSet`.
 The traversal loop threads all state explicitly — there are no `var`s anywhere in the traversal engine.
 
 ## Revision History
@@ -189,3 +196,4 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 0.0.3   | Added `FunctionMapJournal` |
 | 1.0.0   | Complete redesign: typeclass-driven architecture, `Frontier` abstraction, binary heap priority queue, Scala 3 throughout |
 | 1.1.0   | Added `DfsOrder` (pre/post-order DFS), `bestFirstMax`, American English type aliases |
+| 1.2.0   | Added `goal` predicate for early termination across all traversal methods; `traverseTree` now uses `Either`-stack supporting `DfsOrder` (no longer requires `Frontier[F]`) |

@@ -94,9 +94,16 @@ object Traversal:
     * as specified by the provided `Visitor`.
     *
     * NOTE: traverseTree does not visit the root `start` itself (there is no
-    * `Evaluable[H, R]` in scope for `H`), so `visitor` and `vs` are passed
-    * unseeded to the loop — unlike `traverse` where `visitor.visit(start)` and
-    * `vs.markVisited(start)` are called before entering the loop.
+    * `Evaluable[H, R]` in scope for `H`), so the visitor is unseeded before
+    * the loop begins — unlike `traverse` where `visitor.visit(start)` is called first.
+    *
+    * The `order` parameter controls pre- or post-order recording, using the same
+    * `Either`-tagged stack mechanism as `dfs`:
+    *   - `Left(v)`  — expand node: mark visited, push children and a record frame
+    *   - `Right(v)` — record node: call `visitor.visit(v)`
+    *
+    * The seed step uses `rootNbrs` (H → V) to get the initial children from the root.
+    * All subsequent steps use `graphNbrs` (V → V).
     *
     * Traversal stops after recording the first `V` node for which `goal(node)`
     * returns true. The goal node is recorded in the journal but its neighbours
@@ -104,51 +111,59 @@ object Traversal:
     *
     * @param start     The root node where the traversal begins.
     * @param visitor   An instance of `Visitor` that accumulates results during the traversal.
+    * @param order     DfsOrder.Pre (default) or DfsOrder.Post.
     * @param goal      A predicate that, when true for a visited node, halts the traversal
     *                  after recording that node. Defaults to never stopping early.
     * @param rootNbrs  A typeclass instance providing neighbour nodes for the root structure.
     * @param graphNbrs A typeclass instance providing neighbour nodes for the graph structure.
     * @param ev        A typeclass representing how to evaluate a node and extract its result.
     * @param vs        A typeclass representing a set of visited nodes to prevent revisits.
-    * @param fr        A typeclass representing the frontier data structure used for traversal.
-    * @param initial   The initial empty frontier structure.
     * @return A `Visitor` instance containing the accumulated results of the traversal.
     */
-  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])], F[_]](
-                                                                    start: H,
-                                                                    visitor: Visitor[V, R, J],
-                                                                    goal: V => Boolean = (_: V) => false
-                                                                  )(using
-                                                                    rootNbrs: Neighbours[H, V],
-                                                                    graphNbrs: Neighbours[V, V],
-                                                                    ev: Evaluable[V, R],
-                                                                    vs: VisitedSet[V],
-                                                                    fr: Frontier[F],
-                                                                    initial: F[V]
-                                                                  ): Visitor[V, R, J] =
+  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])]](
+                                                              start: H,
+                                                              visitor: Visitor[V, R, J],
+                                                              order: DfsOrder = DfsOrder.Pre,
+                                                              goal: V => Boolean = (_: V) => false
+                                                            )(using
+                                                              rootNbrs: Neighbours[H, V],
+                                                              graphNbrs: Neighbours[V, V],
+                                                              ev: Evaluable[V, R],
+                                                              vs: VisitedSet[V]
+                                                            ): Visitor[V, R, J] =
+
+    type Frame = Either[V, V]
 
     @annotation.tailrec
     def loop(
-              frontier: F[V],
+              stack: List[Frame],
               vis: Visitor[V, R, J],
               visited: VisitedSet[V]
             ): Visitor[V, R, J] =
-      if fr.isEmpty(frontier) then vis
-      else
-        val (node, rest) = fr.take(frontier)
-        if visited.isVisited(node) then loop(rest, vis, visited)
-        else
-          val newVisited = visited.markVisited(node)
+      stack match
+        case Nil => vis
+
+        // Record frame: visit the node, then check goal
+        case Right(node) :: rest =>
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
-          else
-            val newFrontier = fr.offerAll(rest)(
-              graphNbrs.neighbours(node).filterNot(newVisited.isVisited).toList
-            )
-            loop(newFrontier, newVisitor, newVisited)
+          else loop(rest, newVisitor, visited)
 
-    val seedFrontier = fr.offerAll(initial)(rootNbrs.neighbours(start).toList)
-    loop(seedFrontier, visitor, vs)
+        // Expand frame: if already visited skip; otherwise mark and push frames
+        case Left(node) :: rest =>
+          if visited.isVisited(node) then loop(rest, vis, visited)
+          else
+            val newVisited = visited.markVisited(node)
+            val children = graphNbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            val childFrames = children.map(Left(_))
+            val newStack = order match
+              case DfsOrder.Pre => Right(node) :: (childFrames ::: rest)
+              case DfsOrder.Post => childFrames ::: (Right(node) :: rest)
+            loop(newStack, vis, newVisited)
+
+    // Seed from root using rootNbrs (H → V), then hand off to the Either-stack loop
+    val seedFrames: List[Frame] = rootNbrs.neighbours(start).map(Left(_)).toList
+    loop(seedFrames, visitor, vs)
 
   // ----------------------------------------------------------
   // Convenience entry points

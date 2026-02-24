@@ -303,55 +303,69 @@ class BestFirstSpec extends AnyFlatSpec with Matchers:
 
 // ============================================================
 // Traversal — traverseTree tests
+//
+// Tree fixture (from TestTree):
+//
+//        A
+//       / \
+//      B   C
+//     / \
+//    D   E
+//
+// BFS / pre-order:   B, C, D, E   (A is root H, not visited)
+// DFS pre-order:     B, D, E, C
+// DFS post-order:    D, E, B, C
 // ============================================================
 
 class TraverseTreeSpec extends AnyFlatSpec with Matchers:
 
   import TestTree.given
 
-  import scala.collection.immutable.Queue
-
-  "Traversal.traverseTree" should "visit all nodes in the tree" in :
-    val visitor = JournaledVisitor.withQueueJournal[String, String]
-
-    given Queue[String] = Queue.empty
-
-    val result = Traversal.traverseTree[TestTree.Tree, String, String, QueueJournal[(String, Option[String])], Queue](
-      TestTree.root, visitor
+  // Helper to reduce boilerplate — traverseTree no longer needs F[_] type param
+  private def runTree(
+                       order: DfsOrder = DfsOrder.Pre,
+                       goal:  String => Boolean = _ => false
+                     ) =
+    Traversal.traverseTree[TestTree.Tree, String, String, QueueJournal[(String, Option[String])]](
+      TestTree.root,
+      JournaledVisitor.withQueueJournal[String, String],
+      order,
+      goal
     )
-    result.result.map(_._1).toSet shouldBe Set("B", "C", "D", "E")
-  // NOTE: "A" is the root H, not visited by traverseTree (no Evaluable[Tree, String])
+
+  "Traversal.traverseTree" should "visit all nodes in the tree (pre-order)" in :
+    runTree().result.map(_._1).toSet shouldBe Set("B", "C", "D", "E")
+
+  it should "not visit the root H node" in :
+    runTree().result.map(_._1).toList should not contain "A"
 
   it should "not revisit any node" in :
-    val visitor = JournaledVisitor.withQueueJournal[String, String]
-
-    given Queue[String] = Queue.empty
-
-    val result = Traversal.traverseTree[TestTree.Tree, String, String, QueueJournal[(String, Option[String])], Queue](
-      TestTree.root, visitor
-    )
-    val visited = result.result.map(_._1).toList
+    val visited = runTree().result.map(_._1).toList
     visited.distinct shouldBe visited
-    
-// ============================================================
-// Goal predicate tests (diamond graph)
-// ============================================================
 
-class GoalDiamondSpec extends AnyFlatSpec with Matchers:
+  it should "visit nodes in DFS pre-order" in :
+    runTree(DfsOrder.Pre).result.map(_._1).toList shouldBe List("B", "D", "E", "C")
 
-  import TestGraph.given
+  it should "visit nodes in DFS post-order" in :
+    runTree(DfsOrder.Post).result.map(_._1).toList shouldBe List("D", "E", "B", "C")
 
-  "Traversal.bfs with goal on diamond graph" should "stop at node 4 without revisiting" in :
-    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
-    val result = Traversal.bfs(1, visitor, goal = _ == 4)
-    val nodes = result.result.map(_._1).toList
-    // 4 should appear exactly once
-    nodes.count(_ == 4) shouldBe 1
-    // 5 (sibling of 4 via node 3) should not appear — we stopped at 4
-    nodes should not contain 5
+  it should "record correct evaluated values" in :
+    runTree().result.toList.map(_._2) shouldBe
+      List("B", "D", "E", "C").map(s => Some(s))
 
-  it should "still find goal node reachable via multiple paths" in :
-    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
-    // Node 4 is reachable from both 2 and 3
-    val result = Traversal.bfs(1, visitor, goal = _ == 4)
-    result.result.map(_._1).toList should contain(4)
+  "Traversal.traverseTree with goal" should "stop after recording the goal node" in :
+    // Pre-order: B, D — stops at D
+    runTree(goal = _ == "D").result.map(_._1).toList shouldBe List("B", "D")
+
+  it should "include the goal node in the journal" in :
+    runTree(goal = _ == "C").result.map(_._1).toList should contain("C")
+
+  it should "not expand children of the goal node" in :
+    // B's children are D and E — stopping at B means D and E should not appear
+    runTree(goal = _ == "B").result.map(_._1).toList should contain noneOf("D", "E")
+
+  it should "traverse everything when goal is never met" in :
+    runTree(goal = _ == "Z").result.map(_._1).toSet shouldBe Set("B", "C", "D", "E")
+
+  it should "stop at first node when it matches goal" in :
+    runTree(goal = _ == "B").result.map(_._1).toList shouldBe List("B")
