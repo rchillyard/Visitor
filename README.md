@@ -1,5 +1,14 @@
 # Visitor
 
+![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.phasmidsoftware/visitor_3/badge.svg?color=blue)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e898359ab5574493b4e607aa8267e9fc)](https://app.codacy.com/gh/rchillyard/Visitor/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/rchillyard/Visitor/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/rchillyard/Visitor/tree/main)
+![GitHub Top Languages](https://img.shields.io/github/languages/top/rchillyard/Visitor)
+![GitHub](https://img.shields.io/github/license/rchillyard/Visitor)
+![GitHub last commit](https://img.shields.io/github/last-commit/rchillyard/Visitor)
+![GitHub issues](https://img.shields.io/github/issues-raw/rchillyard/Visitor)
+![GitHub issues by-label](https://img.shields.io/github/issues/rchillyard/Visitor/bug)
+
 A purely functional, typeclass-driven graph and tree traversal library for Scala 3.
 
 ## Core Idea
@@ -84,29 +93,22 @@ The canonical implementation is `JournaledVisitor`, which appends `(node, Option
 
 ## Traversal Engine
 
-`Traversal` is the single traversal engine. `bfs`, `bestFirst`, and `bestFirstMax` share a common tail-recursive `loop` parameterised over the `Frontier` type. `dfs` and `traverseTree` use their own tail-recursive loop based on an `Either`-tagged stack, which supports both pre- and post-order recording. All methods are purely functional with no `var`s.
+`Traversal` is the single traversal engine.
+Its internal `loop` is a tail-recursive function that is shared across all traversal strategies — the only difference is the `Frontier` instance in scope.
 
 ```scala
 object Traversal:
-  def bfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
-      goal: V => Boolean = _ => false)
+  def bfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J], goal: V => Boolean = _ => false)
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def dfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
-      order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
+  def dfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def bestFirst[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
-      goal: V => Boolean = _ => false)
+  def bestFirst[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def bestFirstMax[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
-      goal: V => Boolean = _ => false)
-      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
-
-  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])]](start: H, visitor: Visitor[V, R, J],
-      order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
-      (using Neighbours[H, V], Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])], F[_]](start: H, visitor: Visitor[V, R, J])
+      (using Neighbours[H, V], Neighbours[V, V], Evaluable[V, R], VisitedSet[V], Frontier[F], F[V]): Visitor[V, R, J]
 ```
 
 ## Journals
@@ -173,7 +175,7 @@ val result = Traversal.bfs(start, visitor, goal = _ == 4)
 - If the start node satisfies the goal, traversal stops immediately with just the start node recorded.
 - If the goal is never met, the full graph is traversed (equivalent to `goal = _ => false`, the default).
 
-This works uniformly across `bfs`, `dfs`, `bestFirst`, `bestFirstMax`, and `traverseTree`. Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
+This works uniformly across `bfs`, `dfs`, `bestFirst`, and `bestFirstMax`. Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
 
 ## Priority Queue
 

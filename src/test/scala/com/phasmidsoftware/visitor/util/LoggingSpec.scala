@@ -12,7 +12,7 @@ class LoggingSpec extends AnyFlatSpec {
   it should "!! 1" in {
     setLogging(true)
     val sb = new StringBuilder()
-    setLogFunction(s => sb.append(s).append("\n"))
+    setLogFunction(s => sb.append(s).append("\n"): Unit)
 
     ("Hello" !! 1) shouldBe 1
     sb.toString shouldBe "Hello: 1\n"
@@ -21,7 +21,7 @@ class LoggingSpec extends AnyFlatSpec {
   it should "!! Option(1)" in {
     setLogging(true)
     val sb = new StringBuilder()
-    setLogFunction(s => sb.append(s).append("\n"))
+    setLogFunction(s => sb.append(s).append("\n"): Unit)
 
     ("Hello" !! Some(1)) shouldBe Some(1)
     sb.toString shouldBe "Hello: Some(1)\n"
@@ -30,7 +30,7 @@ class LoggingSpec extends AnyFlatSpec {
   it should "!! Seq(1,2,3)" in {
     setLogging(true)
     val sb = new StringBuilder()
-    setLogFunction(s => sb.append(s).append("\n"))
+    setLogFunction(s => sb.append(s).append("\n"): Unit)
 
     val numbers = Seq(1, 2, 3)
     ("Hello" !! numbers) shouldBe numbers
