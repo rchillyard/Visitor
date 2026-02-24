@@ -27,15 +27,21 @@ enum DfsOrder:
 object Traversal:
 
   /**
-    * Traverses a (homogeneous) graph structure starting from a given node, visiting nodes iteratively
-    * and accumulating results into a visitor. The traversal is controlled by the
-    * concepts of a frontier, visited nodes, and neighbours of nodes.
+    * Traverses a (homogeneous) graph structure starting from a given node, visiting nodes
+    * iteratively and accumulating results into a visitor.
     *
-    * NOTE: Homogeneous graph traversal — H and V are the same type.
-    * The =:= witness lets the compiler accept V where H is expected.
+    * The start node is always visited and recorded first, before any goal check or
+    * frontier expansion. If `goal(start)` is true, traversal stops immediately after
+    * recording the start node — no neighbours are expanded.
+    *
+    * For all subsequent nodes, traversal stops after recording the first node for which
+    * `goal(node)` returns true — that node is recorded in the journal but its neighbours
+    * are not expanded.
     *
     * @param start   The starting node where the traversal begins.
     * @param visitor An instance of `Visitor` that collects results during traversal.
+    * @param goal    A predicate that, when true for a visited node, halts the traversal
+    *                after recording that node. Defaults to never stopping early.
     * @param nbrs    A typeclass instance providing the neighbours for each node in the graph.
     * @param ev      A typeclass instance defining how to extract results from each node.
     * @param vs      A typeclass instance representing the set of visited nodes to prevent revisiting.
@@ -45,7 +51,8 @@ object Traversal:
     */
   def traverse[V, R, J <: Appendable[(V, Option[R])], F[_]](
                                                              start: V,
-                                                             visitor: Visitor[V, R, J]
+                                                             visitor: Visitor[V, R, J],
+                                                             goal: V => Boolean = (_: V) => false
                                                            )(using
                                                              nbrs: Neighbours[V, V],
                                                              ev: Evaluable[V, R],
@@ -53,6 +60,7 @@ object Traversal:
                                                              fr: Frontier[F],
                                                              initial: F[V]
                                                            ): Visitor[V, R, J] =
+
     @annotation.tailrec
     def loop(
               frontier: F[V],
@@ -66,24 +74,38 @@ object Traversal:
         else
           val newVisited = visited.markVisited(node)
           val newVisitor = vis.visit(node)
-          val newFrontier = fr.offerAll(rest)(
-            nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
-          )
-          loop(newFrontier, newVisitor, newVisited)
+          if goal(node) then newVisitor
+          else
+            val newFrontier = fr.offerAll(rest)(
+              nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            )
+            loop(newFrontier, newVisitor, newVisited)
 
-    val seedFrontier = fr.offerAll(initial)(nbrs.neighbours(start).toList)
-    loop(seedFrontier, visitor.visit(start), vs.markVisited(start))
-
+    // Visit start first, then check goal before entering the loop.
+    // This ensures goal(start) stops traversal immediately with just the start node recorded.
+    val startVisitor = visitor.visit(start)
+    if goal(start) then startVisitor
+    else
+      val seedFrontier = fr.offerAll(initial)(nbrs.neighbours(start).toList)
+      loop(seedFrontier, startVisitor, vs.markVisited(start))
 
   /**
     * Traverses a tree-like structure starting from a given root node, visiting nodes
-    * as specified by the provided `Visitor`. The traversal is driven by the concepts
-    * of a frontier (e.g., queue or stack), visited nodes, and neighbours of nodes.
-    * NOTE that traverseTree doesn't visit start itself (no Evaluable[H, R] in scope), so visitor and vs are passed unseedeed to loop —
-    * unlike traverse where we call visitor.visit(start) and vs.markVisited(start) before entering the loop.
+    * as specified by the provided `Visitor`.
+    *
+    * NOTE: traverseTree does not visit the root `start` itself (there is no
+    * `Evaluable[H, R]` in scope for `H`), so `visitor` and `vs` are passed
+    * unseeded to the loop — unlike `traverse` where `visitor.visit(start)` and
+    * `vs.markVisited(start)` are called before entering the loop.
+    *
+    * Traversal stops after recording the first `V` node for which `goal(node)`
+    * returns true. The goal node is recorded in the journal but its neighbours
+    * are not expanded.
     *
     * @param start     The root node where the traversal begins.
     * @param visitor   An instance of `Visitor` that accumulates results during the traversal.
+    * @param goal      A predicate that, when true for a visited node, halts the traversal
+    *                  after recording that node. Defaults to never stopping early.
     * @param rootNbrs  A typeclass instance providing neighbour nodes for the root structure.
     * @param graphNbrs A typeclass instance providing neighbour nodes for the graph structure.
     * @param ev        A typeclass representing how to evaluate a node and extract its result.
@@ -94,7 +116,8 @@ object Traversal:
     */
   def traverseTree[H, V, R, J <: Appendable[(V, Option[R])], F[_]](
                                                                     start: H,
-                                                                    visitor: Visitor[V, R, J]
+                                                                    visitor: Visitor[V, R, J],
+                                                                    goal: V => Boolean = (_: V) => false
                                                                   )(using
                                                                     rootNbrs: Neighbours[H, V],
                                                                     graphNbrs: Neighbours[V, V],
@@ -117,10 +140,12 @@ object Traversal:
         else
           val newVisited = visited.markVisited(node)
           val newVisitor = vis.visit(node)
-          val newFrontier = fr.offerAll(rest)(
-            graphNbrs.neighbours(node).filterNot(newVisited.isVisited).toList
-          )
-          loop(newFrontier, newVisitor, newVisited)
+          if goal(node) then newVisitor
+          else
+            val newFrontier = fr.offerAll(rest)(
+              graphNbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            )
+            loop(newFrontier, newVisitor, newVisited)
 
     val seedFrontier = fr.offerAll(initial)(rootNbrs.neighbours(start).toList)
     loop(seedFrontier, visitor, vs)
@@ -129,10 +154,20 @@ object Traversal:
   // Convenience entry points
   // ----------------------------------------------------------
 
-  /** Breadth-first search. */
+  /**
+    * Breadth-first search.
+    *
+    * The start node is always recorded first. If `goal(start)` is true, traversal
+    * stops immediately with just the start node in the journal.
+    * For all other nodes, traversal stops after recording the first node satisfying `goal`.
+    * The goal node is always recorded before traversal halts.
+    *
+    * @param goal optional early-termination predicate. Defaults to never stopping early.
+    */
   def bfs[V, R, J <: Appendable[(V, Option[R])]](
                                                   start: V,
-                                                  visitor: Visitor[V, R, J]
+                                                  visitor: Visitor[V, R, J],
+                                                  goal: V => Boolean = (_: V) => false
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
                                                   ev: Evaluable[V, R],
@@ -140,7 +175,7 @@ object Traversal:
                                                 ): Visitor[V, R, J] =
     given Queue[V] = Queue.empty
 
-    traverse[V, R, J, Queue](start, visitor)
+    traverse[V, R, J, Queue](start, visitor, goal)
 
   /**
     * Depth-first search with configurable pre- or post-order recording.
@@ -149,17 +184,21 @@ object Traversal:
     *   - `Left(v)`  means "expand v — push its children and a record frame"
     *   - `Right(v)` means "record v in the visitor now"
     *
-    * Pre-order:  record before expanding  → push Right(v), then Left(children)
-    * so Right(v) is on top and visited first.
-    * Post-order: record after expanding   → push children as Left, then Right(v)
-    * so children are expanded before v is recorded.
+    * Pre-order:  record before expanding → Right(v) on top, visited first.
+    * Post-order: record after expanding  → children expanded before v is recorded.
+    *
+    * The goal predicate is checked on `Right` (record) frames — i.e. after a node
+    * is visited. Traversal halts after recording the first node satisfying `goal`;
+    * its remaining siblings and their subtrees are not visited.
     *
     * @param order DfsOrder.Pre (default) or DfsOrder.Post
+    * @param goal  optional early-termination predicate. Defaults to never stopping early.
     */
   def dfs[V, R, J <: Appendable[(V, Option[R])]](
                                                   start: V,
                                                   visitor: Visitor[V, R, J],
-                                                  order: DfsOrder = DfsOrder.Pre
+                                                  order: DfsOrder = DfsOrder.Pre,
+                                                  goal: V => Boolean = (_: V) => false
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
                                                   ev: Evaluable[V, R],
@@ -177,9 +216,11 @@ object Traversal:
       stack match
         case Nil => vis
 
-        // Record frame: visit the node (already marked visited when expanded)
+        // Record frame: visit the node, then check goal
         case Right(node) :: rest =>
-          loop(rest, vis.visit(node), visited)
+          val newVisitor = vis.visit(node)
+          if goal(node) then newVisitor
+          else loop(rest, newVisitor, visited)
 
         // Expand frame: if already visited skip; otherwise mark and push frames
         case Left(node) :: rest =>
@@ -187,33 +228,51 @@ object Traversal:
           else
             val newVisited = visited.markVisited(node)
             val children = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
-            val childFrames = children.map(Left(_)) // no .reverse
+            val childFrames = children.map(Left(_))
             val newStack = order match
-              case DfsOrder.Pre =>
-                Right(node) :: (childFrames ::: rest)
-              case DfsOrder.Post =>
-                childFrames ::: (Right(node) :: rest)
+              case DfsOrder.Pre => Right(node) :: (childFrames ::: rest)
+              case DfsOrder.Post => childFrames ::: (Right(node) :: rest)
             loop(newStack, vis, newVisited)
 
     loop(List(Left(start)), visitor, vs)
 
-  /** Best-first / priority-queue traversal. Requires Ordering[V] in scope. */
+  /**
+    * Best-first / min-priority-queue traversal. Smallest element dequeued first.
+    * Requires Ordering[V] in scope.
+    *
+    * The start node is always recorded first. If `goal(start)` is true, traversal
+    * stops immediately. For all other nodes, traversal stops after recording the
+    * first node satisfying `goal`.
+    *
+    * @param goal optional early-termination predicate. Defaults to never stopping early.
+    */
   def bestFirst[V: Ordering, R, J <: Appendable[(V, Option[R])]](
                                                                   start: V,
-                                                                  visitor: Visitor[V, R, J]
+                                                                  visitor: Visitor[V, R, J],
+                                                                  goal: V => Boolean = (_: V) => false
                                                                 )(using
                                                                   nbrs: GraphNeighbours[V],
                                                                   ev: Evaluable[V, R],
                                                                   vs: VisitedSet[V]
                                                                 ): Visitor[V, R, J] =
-    given PrioQueue[V] = PrioQueue.empty[V] // Ordering[V] is in scope via : Ordering
+    given PrioQueue[V] = PrioQueue.empty[V]
 
-    traverse[V, R, J, PrioQueue](start, visitor)
+    traverse[V, R, J, PrioQueue](start, visitor, goal)
 
-  /** Max-priority / best-first traversal. Largest element dequeued first. */
+  /**
+    * Best-first / max-priority-queue traversal. Largest element dequeued first.
+    * Requires Ordering[V] in scope.
+    *
+    * The start node is always recorded first. If `goal(start)` is true, traversal
+    * stops immediately. For all other nodes, traversal stops after recording the
+    * first node satisfying `goal`.
+    *
+    * @param goal optional early-termination predicate. Defaults to never stopping early.
+    */
   def bestFirstMax[V: Ordering, R, J <: Appendable[(V, Option[R])]](
                                                                      start: V,
-                                                                     visitor: Visitor[V, R, J]
+                                                                     visitor: Visitor[V, R, J],
+                                                                     goal: V => Boolean = (_: V) => false
                                                                    )(using
                                                                      nbrs: GraphNeighbours[V],
                                                                      ev: Evaluable[V, R],
@@ -221,5 +280,4 @@ object Traversal:
                                                                    ): Visitor[V, R, J] =
     given PrioQueue[V] = PrioQueue.emptyMax[V]
 
-    traverse[V, R, J, PrioQueue](start, visitor)
-    
+    traverse[V, R, J, PrioQueue](start, visitor, goal)

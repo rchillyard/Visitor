@@ -332,3 +332,26 @@ class TraverseTreeSpec extends AnyFlatSpec with Matchers:
     )
     val visited = result.result.map(_._1).toList
     visited.distinct shouldBe visited
+    
+// ============================================================
+// Goal predicate tests (diamond graph)
+// ============================================================
+
+class GoalDiamondSpec extends AnyFlatSpec with Matchers:
+
+  import TestGraph.given
+
+  "Traversal.bfs with goal on diamond graph" should "stop at node 4 without revisiting" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.bfs(1, visitor, goal = _ == 4)
+    val nodes = result.result.map(_._1).toList
+    // 4 should appear exactly once
+    nodes.count(_ == 4) shouldBe 1
+    // 5 (sibling of 4 via node 3) should not appear — we stopped at 4
+    nodes should not contain 5
+
+  it should "still find goal node reachable via multiple paths" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    // Node 4 is reachable from both 2 and 3
+    val result = Traversal.bfs(1, visitor, goal = _ == 4)
+    result.result.map(_._1).toList should contain(4)

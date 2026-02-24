@@ -221,3 +221,60 @@ class MapJournalTranslatedSpec extends AnyFlatSpec with Matchers:
     val j = FunctionMapJournal.empty[String, String](identity)
     j.get("a") shouldBe None
     j.append("a" -> "a").get("a") shouldBe Some("a")
+
+// ============================================================
+// Goal predicate tests
+// ============================================================
+
+class GoalPredicateSpec extends AnyFlatSpec with Matchers:
+
+  import TreeFixture.given
+
+  "Traversal.bfs with goal" should "stop after recording the goal node" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    // BFS from 10, stop when we reach 6
+    val result = Traversal.bfs(10, visitor, goal = _ == 6)
+    // Level order: 10, then 5 and 13, then 2 and 6 — stops at 6
+    result.result.map(_._1).toList shouldBe List(10, 5, 13, 2, 6)
+
+  it should "include the goal node in the journal" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.bfs(10, visitor, goal = _ == 13)
+    result.result.map(_._1).toList should contain(13)
+
+  it should "not expand children of the goal node" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.bfs(10, visitor, goal = _ == 13)
+    // 11 and 15 are children of 13 — should not appear
+    result.result.map(_._1).toList should contain noneOf(11, 15)
+
+  it should "traverse the whole graph when goal is never met" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.bfs(10, visitor, goal = _ == 99)
+    result.result.map(_._1).toSet shouldBe Set(10, 5, 13, 2, 6, 11, 15, 1, 3)
+
+  it should "stop immediately when start node matches goal" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.bfs(10, visitor, goal = _ == 10)
+    result.result.map(_._1).toList shouldBe List(10)
+
+  "Traversal.dfs with goal" should "stop after recording the goal node" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    // DFS pre-order from 10, stop when we reach 3
+    val result = Traversal.dfs(10, visitor, goal = _ == 3)
+    // Pre-order: 10, 5, 2, 1, 3 — stops at 3
+    result.result.map(_._1).toList shouldBe List(10, 5, 2, 1, 3)
+
+  it should "not expand children of the goal node" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    val result = Traversal.dfs(10, visitor, goal = _ == 5)
+    // 5's children are 2 and 6 — should not appear
+    result.result.map(_._1).toList should contain noneOf(2, 6)
+
+  "Traversal.bestFirst with goal" should "stop after recording the goal node" in :
+    val visitor = JournaledVisitor.withQueueJournal[Int, Int]
+    // bestFirst from 10, stop when we reach 5
+    val result = Traversal.bestFirst(10, visitor, goal = _ == 5)
+    result.result.map(_._1).toList should contain(5)
+    // Should not have visited children of 5 (2 and 6)
+    result.result.map(_._1).toList should contain noneOf(2, 6)

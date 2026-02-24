@@ -59,7 +59,6 @@ trait Frontier[F[_]]:
   def offer[T](f: F[T])(t: T): F[T]
   def take[T](f: F[T]): (T, F[T])
   def isEmpty[T](f: F[T]): Boolean
-  def offerAll[T](f: F[T])(ts: List[T]): F[T]
 ```
 
 This is the key to getting BFS, DFS, and best-first traversal from a single algorithm. 
@@ -86,47 +85,22 @@ The canonical implementation is `JournaledVisitor`, which appends `(node, Option
 ## Traversal Engine
 
 `Traversal` is the single traversal engine. 
-BFS, best-first, and `traverseTree` share a common tail-recursive `loop` parameterised over the `Frontier` type. 
-DFS uses its own tail-recursive loop based on an `Either`-tagged stack, which supports both pre- and post-order recording.
+Its internal `loop` is a tail-recursive function that is shared across all traversal strategies — the only difference is the `Frontier` instance in scope.
 
 ```scala
 object Traversal:
-  def bfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
+  def bfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J], goal: V => Boolean = _ => false)
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def dfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J],
-      order: DfsOrder = DfsOrder.Pre)
+  def dfs[V, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
   def bestFirst[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
       (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
 
-  def bestFirstMax[V : Ordering, R, J <: Appendable[(V, Option[R])]](start: V, visitor: Visitor[V, R, J])
-      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
-
   def traverseTree[H, V, R, J <: Appendable[(V, Option[R])], F[_]](start: H, visitor: Visitor[V, R, J])
       (using Neighbours[H, V], Neighbours[V, V], Evaluable[V, R], VisitedSet[V], Frontier[F], F[V]): Visitor[V, R, J]
 ```
-
-## DFS Ordering
-
-DFS supports two recording orders, controlled by the `DfsOrder` enum:
-
-```scala
-enum DfsOrder:
-  case Pre, Post
-```
-
-| Order | Meaning | Typical use |
-|---|---|---|
-| `DfsOrder.Pre` (default) | Node recorded before its children are expanded | Tree printing, copying |
-| `DfsOrder.Post` | Node recorded after all its descendants | Topological sort, dependency ordering |
-
-The implementation uses an `Either[V, V]`-tagged stack internally:
-- `Left(v)` — expand node: mark visited, push children and a record frame
-- `Right(v)` — record node: call `visitor.visit(v)`
-
-This avoids any recursion while still capturing the natural unwinding behaviour needed for post-order.
 
 ## Journals
 
@@ -134,9 +108,6 @@ A `Journal` is an immutable, appendable log of visited results. Two implementati
 
 - `ListJournal[X]` — prepends elements; most recently visited node is at the head
 - `QueueJournal[X]` — enqueues elements; preserves visit order (FIFO)
-
-Note that `ListJournal` reverses the visit order in its output, which can be useful (e.g. post-order DFS with a `ListJournal` yields reverse post-order directly). 
-Use `QueueJournal` when you want results in the order they were visited.
 
 The `FunctionMapJournal` and `MapJournal` from the companion package also satisfy `Appendable` and can be used directly as journals.
 
@@ -170,25 +141,44 @@ val dfsPreResult  = Traversal.dfs(1, visitor)
 val dfsPostResult = Traversal.dfs(1, visitor, DfsOrder.Post)
 val bestResult    = Traversal.bestFirst(1, visitor)
 
+// Goal-directed search: stop when node 4 is found
+val goalResult = Traversal.bfs(1, visitor, goal = _ == 4)
+
 // 4. Inspect results
 bfsResult.result.map(_._1).toList     // nodes in BFS order
 dfsPreResult.result.map(_._1).toList  // nodes in DFS pre-order
 dfsPostResult.result.map(_._1).toList // nodes in DFS post-order (topological sort)
+goalResult.result.map(_._1).toList    // nodes visited up to and including node 4
 ```
+
+## Goal Predicate
+
+All traversal methods accept an optional `goal: V => Boolean` parameter for early termination:
+
+```scala
+// Stop as soon as node 4 is reached
+val result = Traversal.bfs(start, visitor, goal = _ == 4)
+```
+
+**Semantics:**
+- The goal node is always recorded in the journal before traversal halts.
+- The goal node's neighbours are never expanded.
+- If the start node satisfies the goal, traversal stops immediately with just the start node recorded.
+- If the goal is never met, the full graph is traversed (equivalent to `goal = _ => false`, the default).
+
+This works uniformly across `bfs`, `dfs`, `bestFirst`, and `bestFirstMax`. Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
 
 ## Priority Queue
 
 The `PrioQueue[T]` type is backed by an immutable binary min-heap (`BinaryHeap`). 
 It captures `Ordering[T]` at construction time, so the `Frontier[PrioQueue]` instance remains fully polymorphic. 
-Use `PrioQueue.empty[T]` for min-priority (smallest first) and `PrioQueue.emptyMax[T]` for max-priority (largest first). 
 For weighted graph traversal, wrap your nodes as `(priority, node)` tuples with an appropriate `Ordering`.
 
 ## Immutability
 
-Everything is immutable. 
-Visiting a node yields a new `Visitor`. 
+Everything is immutable. Visiting a node yields a new `Visitor`. 
 Marking a node visited yields a new `VisitedSet`. 
-The traversal loops thread all state explicitly — there are no `var`s anywhere in the traversal engine.
+The traversal loop threads all state explicitly — there are no `var`s anywhere in the traversal engine.
 
 ## Revision History
 
