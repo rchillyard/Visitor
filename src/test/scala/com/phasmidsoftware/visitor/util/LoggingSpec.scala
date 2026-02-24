@@ -1,4 +1,4 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.util
 
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers.*
@@ -7,7 +7,7 @@ class LoggingSpec extends AnyFlatSpec {
 
   behavior of "Logging"
 
-  import Logging.*
+  import com.phasmidsoftware.visitor.util.Logging.*
 
   it should "!! 1" in {
     setLogging(true)

@@ -1,5 +1,6 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.misc
 
+import com.phasmidsoftware.visitor.misc.QueueJournal
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 

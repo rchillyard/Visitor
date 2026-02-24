@@ -56,6 +56,13 @@ private case class BinaryHeap[T](data: Vector[T])(using ord: Ordering[T]):
     if smallest2 == i then v
     else siftDown(v.updated(i, v(smallest2)).updated(smallest2, v(i)), smallest2)
 
+/**
+  * Factory methods for creating instances of the BinaryHeap.
+  *
+  * A BinaryHeap is a priority queue data structure that maintains the heap
+  * property, enabling efficient insertion and removal of elements based 
+  * on their priority.
+  */
 object BinaryHeap:
   def empty[T: Ordering]: BinaryHeap[T] = BinaryHeap(Vector.empty)
 
@@ -86,8 +93,9 @@ case class PrioQueue[T] private(private val heap: BinaryHeap[T]):
 
   def head: T = heap.head
 
-// Add to PrioQueue companion object:
-
+/**
+  * Provides factory methods for creating instances of `PrioQueue` with different priority orderings.
+  */
 object PrioQueue:
   /** Min-priority queue — smallest element dequeued first. */
   def empty[T: Ordering]: PrioQueue[T] = PrioQueue(BinaryHeap.empty[T])

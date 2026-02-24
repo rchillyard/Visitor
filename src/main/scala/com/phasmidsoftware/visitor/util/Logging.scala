@@ -1,5 +1,6 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.util
 
+import com.phasmidsoftware.visitor.core.Visitor
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.util.Try
@@ -90,7 +91,7 @@ object Logging {
       logIt(w)(xy)
   }
 
-  private val logger: Logger = LoggerFactory.getLogger(classOf[Visitor[_]])
+  private val logger: Logger = LoggerFactory.getLogger(classOf[Visitor[?, ?, ?]])
 
   /**
    * Logs a message along with the provided value if logging is enabled and returns the value.

@@ -1,4 +1,4 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.util
 
 import scala.Option.when
 

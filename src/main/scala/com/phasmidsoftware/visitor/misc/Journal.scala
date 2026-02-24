@@ -1,31 +1,8 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.misc
+
+import com.phasmidsoftware.visitor.core.Journal
 
 import scala.collection.immutable.Queue
-
-/**
- * A trait representing a journal that maintains and manages entries of type `X`.
- *
- * A `Journal` extends the `Appendable` trait, enabling the appending of elements
- * to create a new instance while retaining existing entries. It also provides
- * functionality to close the journal, performing any necessary cleanup or finalization.
- *
- * This trait can be used as a base for implementations that deal with logging, recording,
- * or managing sequences of data entries, while ensuring immutability or controlled updates.
- *
- * @tparam X the type of entries managed by this journal
- */
-trait Journal[X] extends Appendable[X] {
-
-  /**
-   * Closes the journal, performing any necessary cleanup or finalization operations.
-   *
-   * This method may be overridden by subclasses to implement custom close behavior.
-   *
-   * @return Unit (no specific value is returned)
-   */
-  def close(): Unit = {
-  }
-}
 
 /**
  * A trait that represents an iterable journal, combining the functionalities of both the `Journal`
@@ -85,6 +62,8 @@ case class ListJournal[X](list: List[X]) extends IterableJournal[X] {
    */
   def iterator: Iterator[X] =
     list.iterator
+
+  def close(): Unit = ()
 }
 
 /**
@@ -128,6 +107,8 @@ case class QueueJournal[X](queue: Queue[X]) extends IterableJournal[X] {
    */
   def iterator: Iterator[X] =
     queue.iterator
+
+  def close(): Unit = ()
 }
 
 /**
@@ -255,6 +236,8 @@ case class MapJournal[K, V](map: Map[K, V]) extends AbstractMapJournal[K, V](map
    */
   def unit(xs: Map[K, V]): MapJournal[K, V] =
     MapJournal(xs)
+
+  def close(): Unit = ()
 }
 
 /**
@@ -317,6 +300,8 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
    */
   def unit(xs: Map[K, V]): AbstractMapJournal[K, V] =
     FunctionMapJournal(xs)(f)
+
+  def close(): Unit = ()
 }
 
 /**

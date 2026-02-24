@@ -1,6 +1,6 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.util
 
-import com.phasmidsoftware.visitor.FP.whenever
+import com.phasmidsoftware.visitor.util.FP.whenever
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 

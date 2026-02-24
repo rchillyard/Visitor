@@ -1,29 +1,6 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.misc
 
 import java.io.*
-
-/**
- * A generic trait representing a collection or structure that supports appending elements of type `X`.
- *
- * `Appendable` provides an abstraction for objects that can be extended with additional elements,
- * returning a new instance that includes the appended element while keeping existing contents unchanged.
- *
- * This can be useful in cases where immutability of the original object is desired while adding new elements
- * to produce a new, enriched instance.
- *
- * @tparam X the type of elements that can be appended to the `Appendable`
- */
-trait Appendable[X] extends AutoCloseable {
-
-  /**
-   * Appends the specified element to this `Appendable` object, returning a new instance
-   * of the `Appendable` with the element included.
-   *
-   * @param x the element to be appended
-   * @return a new `Appendable[X]` instance containing the existing elements and the newly appended element
-   */
-  def append(x: X): Appendable[X]
-}
 
 /**
  * `AppendableWriter` is a case class that wraps a `Writer` instance, enabling string
@@ -39,7 +16,7 @@ trait Appendable[X] extends AutoCloseable {
  * @param writer    the underlying `Writer` instance to which strings are appended
  * @param closeable an optional `AutoCloseable` resource that will be closed along with the writer
  */
-case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends Appendable[String] {
+case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends com.phasmidsoftware.visitor.core.Appendable[String] {
 
   /**
    * Appends the specified string to this `AppendableWriter` instance.
@@ -49,7 +26,7 @@ case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) ex
    * @param x the string to be appended to the `AppendableWriter`
    * @return the current `AppendableWriter` instance with the appended string
    */
-  def append(x: String): Appendable[String] = {
+  def append(x: String): com.phasmidsoftware.visitor.core.Appendable[String] = {
     writer.append(x)
     this
   }
@@ -132,44 +109,4 @@ object AppendableWriter {
    */
   def apply(): AppendableWriter =
     new AppendableWriter(new StringWriter())(None)
-}
-
-/**
- * The `HasAppendables` trait defines an abstraction for entities that manage a collection of `Appendable` instances.
- *
- * This trait provides methods to access and interact with the associated `Appendable` and `Journal` elements,
- * allowing filtering and additional operations on these appendable entities.
- *
- * @tparam X the type of elements managed by the appendables
- */
-trait HasAppendables[X] {
-
-  /**
-   * Retrieves the collection of `Appendable[X]` instances associated with this `AbstractVisitor`.
-   *
-   * The method provides access to all the appendable entities that the visitor interacts with.
-   * This can be useful for iterating over, modifying, or closing the appendables as a group.
-   *
-   * @return an `Iterable` containing the appendable elements of type `Appendable[X]` associated with this visitor
-   */
-  def appendables: Iterable[Appendable[X]]
-
-  /**
-   * Retrieves an iterable collection of all `Journal[X]` instances from this `Visitor` that are Iterable.
-   *
-   * This method filters the iterable collection of `Appendable[X]` instances, returning only those
-   * that are of type `Journal[X]`. It performs a type check on each `Appendable[X]` and selectively
-   * includes those that match the `Journal[X]` type.
-   *
-   * @return an `Iterable` containing all `Journal[X]` instances managed by this `Visitor`
-   */
-  def iterableJournals: Iterable[IterableJournal[X]] =
-    for {
-      appendable <- appendables
-      xjo: Option[IterableJournal[X]] = appendable match {
-        case x: IterableJournal[X] => Some(x);
-        case _ => None
-      }
-      journal <- xjo
-    } yield journal
 }

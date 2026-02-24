@@ -1,8 +1,8 @@
-package com.phasmidsoftware.visitor
+package com.phasmidsoftware.visitor.misc
 
+import com.phasmidsoftware.visitor.misc.{FunctionMapJournal, MapJournal}
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
-import org.scalatest.matchers.should.Matchers.shouldBe
 
 class MapJournalSpec extends AnyFlatSpec with should.Matchers {
 
