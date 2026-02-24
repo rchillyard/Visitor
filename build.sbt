@@ -1,20 +1,81 @@
+// Visitor project build file.
 
 organization := "com.phasmidsoftware"
 
-version := "0.1.3-SNAPSHOT"
+version := "1.2.0"
 
-ThisBuild / scalaVersion := "3.3.0"
+val scalaVersionNumber  = "3.7.4"
+val scalaTestVersion    = "3.2.19"
+val logbackVersion      = "1.5.32"
+val slf4jVersion        = "2.0.17"
+
+ThisBuild / scalaVersion := scalaVersionNumber
+
+// ============================================================================
+// COMPILER OPTIONS
+// ============================================================================
+
+val commonScalacOptions = Seq(
+  "-encoding", "UTF-8",
+  "-unchecked",
+  "-deprecation",
+  "-feature"
+)
+
+val scala3Options = Seq(
+  // "-Xfatal-warnings",         // Turn warnings into errors (uncomment to enable)
+  "-Wvalue-discard",              // Error on discarded non-Unit values
+  "-Wnonunit-statement",          // Error when non-Unit expressions used as statements
+  "-explain",                     // Detailed error explanations
+  "-Wunused:imports",             // Catch unused imports
+  "-Wunused:privates",            // Catch unused private members
+  "-Wunused:locals",              // Catch unused local definitions
+  "-Wconf:msg=Couldn't resolve a member:s" // Suppress linker warnings in doc generation
+)
+
+// ScalaTest assertions return Assertion (not Unit), so -Wnonunit-statement
+// would fire on every multi-assertion test. Filter it out for test compilation.
+val scala3TestSettings = Seq(
+  Test / scalacOptions := scalacOptions.value.filterNot(_ == "-Wnonunit-statement")
+)
+
+// ============================================================================
+// MODULE DEFINITION
+// ============================================================================
 
 lazy val root = (project in file("."))
   .settings(
-    name := "visitor"
+    name         := "visitor",
+    scalaVersion := scalaVersionNumber,
+    scalacOptions ++= commonScalacOptions ++ scala3Options,
+
+    libraryDependencies ++= Seq(
+      "org.slf4j"       %  "slf4j-api"         % slf4jVersion,
+      "ch.qos.logback"  %  "logback-classic"    % logbackVersion  % Runtime,
+      "org.scalatest"   %% "scalatest"          % scalaTestVersion % Test,
+      "com.novocode"    %  "junit-interface"     % "0.11"          % Test  // NOTE: known vulnerability
+    )
   )
+  .settings(scala3TestSettings)
 
-val scalaTestVersion = "3.2.19"
+// ============================================================================
+// GLOBAL SETTINGS
+// ============================================================================
 
-libraryDependencies += "org.slf4j" % "slf4j-api" % "2.0.17"
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.5.18" % "runtime"
-libraryDependencies += "org.scalatest" %% "scalatest" % scalaTestVersion % "test"
-libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test" // NOTE vulnerability here
+Test / parallelExecution := false
 
+Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports")
 
+// ============================================================================
+// USAGE NOTES
+// ============================================================================
+// Compiler options mirror those used in the Number project for consistency.
+//
+// Key options:
+//   -Wvalue-discard      : catches silently discarded non-Unit values
+//   -Wnonunit-statement  : catches non-Unit expressions used as statements
+//                          (filtered out for test code — see scala3TestSettings)
+//   -Wunused:*           : catches unused imports, privates, locals
+//
+// To treat all warnings as errors, uncomment -Xfatal-warnings above.
+// ============================================================================
