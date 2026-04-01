@@ -49,13 +49,34 @@ trait VisitedSet[V]:
 
   def markVisited(v: V): VisitedSet[V]
 
-/** Default given: immutable Set-backed VisitedSet. */
+/** Default given: immutable Set-backed VisitedSet for plain node types. */
 given [V]: VisitedSet[V] = SetVisitedSet(Set.empty)
 
 private case class SetVisitedSet[V](visited: Set[V]) extends VisitedSet[V]:
   def isVisited(v: V): Boolean = visited.contains(v)
 
   def markVisited(v: V): VisitedSet[V] = copy(visited + v)
+
+/**
+  * A `VisitedSet` for `(E, V)` frontier tuples used in weighted traversals
+  * (Dijkstra, Prim). Visited-ness is tracked on the vertex `V` alone —
+  * the cost component `E` is ignored — so that stale (higher-cost) copies
+  * of the same vertex in the frontier are correctly recognised as already visited.
+  *
+  * This given has higher priority than the plain `VisitedSet[V]` given because
+  * it is more specific: it matches only `(E, V)` pairs, not arbitrary `V`.
+  * It is resolved automatically whenever `Traversal` is invoked with a tuple
+  * frontier element type.
+  *
+  * @tparam E the cost / edge-weight type
+  * @tparam V the vertex type
+  */
+given [E, V]: VisitedSet[(E, V)] = TupleVisitedSet(Set.empty)
+
+private case class TupleVisitedSet[E, V](visited: Set[V]) extends VisitedSet[(E, V)]:
+  def isVisited(ev: (E, V)): Boolean = visited.contains(ev._2)
+
+  def markVisited(ev: (E, V)): VisitedSet[(E, V)] = copy(visited + ev._2)
 
 // ============================================================
 // Frontier typeclasses: Queueable and Stackable
@@ -117,7 +138,7 @@ trait Frontier[F[_]]:
     */
   def offerAll[T](f: F[T])(ts: List[T]): F[T] =
     val ordered = if reverseOnOffer then ts.reverse else ts
-    ordered.foldLeft(f)((acc: F[T], t: T) => offer(acc)(t))
+    ordered.foldLeft(f)((acc, t) => offer(acc)(t))
 
 /** DFS frontier: LIFO Stack (represented as a List). */
 type Stack[T] = List[T]
@@ -144,25 +165,44 @@ given Frontier[Queue] with
   def isEmpty[T](f: Queue[T]): Boolean = f.isEmpty
 
 /**
-  * Priority-queue frontier: best-first / Dijkstra-style traversal.
-  * Requires an Ordering[T] at the point of use.
+  * Priority-queue frontier: best-first traversal using [[PrioQueue]].
   *
-  * Backed by an immutable SortedSet for simplicity; swap for a proper
-  * binary heap if performance matters.
+  * Duplicates are permitted. Used by `bestFirst` and `bestFirstMax`.
+  * `Ordering[T]` is captured at `PrioQueue` construction time.
   *
-  * NOTE: T must have an Ordering and must be unique (no duplicate nodes
-  * in the frontier at the same priority). For weighted graphs you'd
-  * typically wrap nodes as (priority, node) tuples.
+  * Supply `given PrioQueue[T] = PrioQueue.empty[T]` (or `emptyMax`) at the call site.
   */
 given Frontier[PrioQueue] with
   def empty[T]: PrioQueue[T] =
-    throw new UnsupportedOperationException("Use PrioQueue.empty[T] directly")
-
+    throw new UnsupportedOperationException(
+      "Supply an explicit `given PrioQueue[T] = PrioQueue.empty[T]` at the call site."
+    )
   def offer[T](f: PrioQueue[T])(t: T): PrioQueue[T] = f.offer(t)
 
   def take[T](f: PrioQueue[T]): (T, PrioQueue[T]) = f.take
 
   def isEmpty[T](f: PrioQueue[T]): Boolean = f.isEmpty
+
+/**
+  * Indexed priority-queue frontier: best-first traversal using [[IndexedPrioQueue]].
+  *
+  * Duplicates are not permitted — `offer` is a no-op if the element is already
+  * present. Supports `decreaseKey` via [[CostUpdate]]. Used by `bestFirstWeighted`
+  * (Dijkstra, Prim).
+  *
+  * Supply `given IndexedPrioQueue[T] = IndexedPrioQueue.empty[T]` at the call site.
+  */
+given Frontier[IndexedPrioQueue] with
+  def empty[T]: IndexedPrioQueue[T] =
+    throw new UnsupportedOperationException(
+      "Supply an explicit `given IndexedPrioQueue[T] = IndexedPrioQueue.empty[T]` at the call site."
+    )
+
+  def offer[T](f: IndexedPrioQueue[T])(t: T): IndexedPrioQueue[T] = f.offer(t)
+
+  def take[T](f: IndexedPrioQueue[T]): (T, IndexedPrioQueue[T]) = f.take
+
+  def isEmpty[T](f: IndexedPrioQueue[T]): Boolean = f.isEmpty
 
 // ============================================================
 // Visitor

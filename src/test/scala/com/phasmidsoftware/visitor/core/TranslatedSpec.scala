@@ -34,7 +34,7 @@ object TreeFixture:
 // BinaryHeap tests
 // ============================================================
 
-class BinaryHeapSpec extends AnyFlatSpec with Matchers:
+class OldBinaryHeapSpec extends AnyFlatSpec with Matchers:
 
   "BinaryHeap" should "be empty on construction" in :
     BinaryHeap.empty[Int].isEmpty shouldBe true
@@ -79,7 +79,7 @@ class BinaryHeapSpec extends AnyFlatSpec with Matchers:
 // PrioQueue (min and max) tests
 // ============================================================
 
-class PrioQueueSpec extends AnyFlatSpec with Matchers:
+class OldPrioQueueSpec extends AnyFlatSpec with Matchers:
 
   // --- Min ---
 
