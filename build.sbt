@@ -2,10 +2,10 @@
 
 organization := "com.phasmidsoftware"
 
-version := "1.2.0"
+version := "1.4.0"
 
 val scalaVersionNumber  = "3.7.4"
-val scalaTestVersion    = "3.2.19"
+val scalaTestVersion    = "3.2.20"
 val logbackVersion      = "1.5.32"
 val slf4jVersion        = "2.0.17"
 
@@ -51,9 +51,9 @@ lazy val root = (project in file("."))
 
     libraryDependencies ++= Seq(
       "org.slf4j"       %  "slf4j-api"         % slf4jVersion,
-      "ch.qos.logback"  %  "logback-classic"    % logbackVersion  % Runtime,
-      "org.scalatest"   %% "scalatest"          % scalaTestVersion % Test,
-      "com.novocode"    %  "junit-interface"     % "0.11"          % Test  // NOTE: known vulnerability
+      "ch.qos.logback"  %  "logback-classic"   % logbackVersion  % Runtime,
+      "org.scalatest"   %% "scalatest"         % scalaTestVersion % Test,
+      "com.novocode"    %  "junit-interface"    % "0.11"          % Test  // NOTE: known vulnerability
     )
   )
   .settings(scala3TestSettings)
