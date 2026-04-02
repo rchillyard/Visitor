@@ -83,9 +83,8 @@ object Traversal:
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else
-            val offered = fr.offerAll(rest)(
-              nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
-            )
+            val neighbourList = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            val offered = fr.offerAll(rest)(neighbourList)
             val newFrontier = cu.update(offered, node)
             loop(newFrontier, newVisitor, newVisited)
 
