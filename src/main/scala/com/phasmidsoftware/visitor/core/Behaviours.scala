@@ -3,6 +3,54 @@ package com.phasmidsoftware.visitor.core
 import scala.collection.immutable.Queue
 
 // ============================================================
+// Monoid typeclass
+// ============================================================
+
+/**
+  * Typeclass: an associative binary operation with an identity element.
+  *
+  * Mirrors the Cats `Monoid` typeclass but without the Cats dependency.
+  * The standard additive monoids for numeric types are provided as `given`
+  * instances below.
+  *
+  * Primary use in Visitor/Gryphon: weighted graph traversals (Dijkstra, Prim)
+  * need `identity` as the seed cost and `combine` for cost accumulation —
+  * without requiring the full arithmetic of `Numeric`.
+  *
+  * @tparam A the element type
+  */
+trait Monoid[A]:
+  /** The identity element: `combine(identity, x) == x` for all x. */
+  def identity: A
+
+  /** An associative binary operation. */
+  def combine(x: A, y: A): A
+
+/** Additive monoid for [[Int]]. */
+given Monoid[Int] with
+  def identity: Int = 0
+
+  def combine(x: Int, y: Int): Int = x + y
+
+/** Additive monoid for [[Long]]. */
+given Monoid[Long] with
+  def identity: Long = 0L
+
+  def combine(x: Long, y: Long): Long = x + y
+
+/** Additive monoid for [[Double]]. */
+given Monoid[Double] with
+  def identity: Double = 0.0
+
+  def combine(x: Double, y: Double): Double = x + y
+
+/** Additive monoid for [[Float]]. */
+given Monoid[Float] with
+  def identity: Float = 0.0f
+
+  def combine(x: Float, y: Float): Float = x + y
+
+// ============================================================
 // Core typeclasses for the various behaviours
 // ============================================================
 
@@ -46,7 +94,6 @@ type GraphNeighbors[V] = GraphNeighbours[V]
   */
 trait VisitedSet[V]:
   def isVisited(v: V): Boolean
-
   def markVisited(v: V): VisitedSet[V]
 
 /** Default given: immutable Set-backed VisitedSet for plain node types. */
@@ -54,7 +101,6 @@ given [V]: VisitedSet[V] = SetVisitedSet(Set.empty)
 
 private case class SetVisitedSet[V](visited: Set[V]) extends VisitedSet[V]:
   def isVisited(v: V): Boolean = visited.contains(v)
-
   def markVisited(v: V): VisitedSet[V] = copy(visited + v)
 
 /**
@@ -75,7 +121,6 @@ given [E, V]: VisitedSet[(E, V)] = TupleVisitedSet(Set.empty)
 
 private case class TupleVisitedSet[E, V](visited: Set[V]) extends VisitedSet[(E, V)]:
   def isVisited(ev: (E, V)): Boolean = visited.contains(ev._2)
-
   def markVisited(ev: (E, V)): VisitedSet[(E, V)] = copy(visited + ev._2)
 
 // ============================================================
@@ -90,52 +135,14 @@ private case class TupleVisitedSet[E, V](visited: Set[V]) extends VisitedSet[(E,
   * @tparam F the higher-kinded frontier container type
   */
 trait Frontier[F[_]]:
-  /**
-    * Creates an empty frontier container of type F.
-    *
-    * @return an empty instance of the frontier container F[T]
-    */
   def empty[T]: F[T]
-
-  /**
-    * Adds a given element to the frontier container, returning an updated instance of the container.
-    *
-    * @param f the frontier container of type F[T] to which the element will be added
-    * @param t the element of type T to add to the frontier container
-    * @return a new instance of the frontier container F[T] with the element added
-    */
   def offer[T](f: F[T])(t: T): F[T]
-
-  /**
-    * Removes an element from the frontier container and returns a tuple containing the removed element
-    * and the updated container with the element removed.
-    *
-    * @param f the frontier container of type F[T] to extract the element from
-    * @return a tuple where the first element is the extracted element of type T and the second element
-    *         is the updated frontier container of type F[T]
-    */
   def take[T](f: F[T]): (T, F[T])
-
-  /**
-    * Determines if the given frontier container is empty.
-    *
-    * @param f the frontier container of type F[T] to be checked
-    * @return true if the frontier container is empty, false otherwise
-    */
   def isEmpty[T](f: F[T]): Boolean
 
   /** If true, offerAll reverses the list before offering (needed for LIFO stacks). */
   def reverseOnOffer: Boolean = false
 
-  /**
-    * Adds all elements from the given list to the specified frontier container in the order
-    * determined by the `reverseOnOffer` flag. If `reverseOnOffer` is true, the list of elements
-    * is reversed before being added. Each element is added using the `offer` method.
-    *
-    * @param f  the frontier container of type F[T] to which the elements will be added
-    * @param ts the list of elements of type T to add to the frontier container
-    * @return a new instance of the frontier container F[T] with all the elements added
-    */
   def offerAll[T](f: F[T])(ts: List[T]): F[T] =
     val ordered = if reverseOnOffer then ts.reverse else ts
     ordered.foldLeft(f)((acc, t) => offer(acc)(t))
@@ -197,7 +204,6 @@ given Frontier[IndexedPrioQueue] with
     throw new UnsupportedOperationException(
       "Supply an explicit `given IndexedPrioQueue[T] = IndexedPrioQueue.empty[T]` at the call site."
     )
-
   def offer[T](f: IndexedPrioQueue[T])(t: T): IndexedPrioQueue[T] = f.offer(t)
 
   def take[T](f: IndexedPrioQueue[T]): (T, IndexedPrioQueue[T]) = f.take
@@ -220,11 +226,7 @@ given Frontier[IndexedPrioQueue] with
   */
 trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
   def journal: J
-
-  /** Visit a single node, appending the result to the journal. */
   def visit(v: V)(using ev: Evaluable[V, R]): Visitor[V, R, J]
-
-  /** Return the completed journal. */
   def result: J = journal
 
 /** Canonical immutable implementation. */
