@@ -17,7 +17,7 @@ enum DfsOrder:
 
 /**
   * The traversal engine. Knows only about Frontier, Neighbours, Evaluable,
-  * VisitedSet, and Visitor. Zero domain knowledge.
+  * VisitedSet, Visitor, and CostUpdate. Zero domain knowledge.
   *
   * The choice of frontier F determines the traversal order:
   * F = Queue     → BFS
@@ -29,6 +29,10 @@ object Traversal:
   /**
     * Traverses a (homogeneous) graph structure starting from a given node, visiting nodes
     * iteratively and accumulating results into a visitor.
+    *
+    * After each node's neighbours are offered to the frontier, `cu.update` is called
+    * to apply any priority improvements (e.g. `decreaseKey` in Dijkstra/Prim).
+    * For DFS and BFS the default no-op [[CostUpdate]] is resolved automatically.
     *
     * The start node is always visited and recorded first, before any goal check or
     * frontier expansion. If `goal(start)` is true, traversal stops immediately after
@@ -42,10 +46,12 @@ object Traversal:
     * @param visitor An instance of `Visitor` that collects results during traversal.
     * @param goal    A predicate that, when true for a visited node, halts the traversal
     *                after recording that node. Defaults to never stopping early.
-    * @param nbrs    A typeclass instance providing the neighbours for each node in the graph.
-    * @param ev      A typeclass instance defining how to extract results from each node.
-    * @param vs      A typeclass instance representing the set of visited nodes to prevent revisiting.
-    * @param fr      A typeclass instance representing the frontier structure used for traversal.
+    *
+    * @param nbrs    Typeclass providing the neighbours for each node.
+    * @param ev      Typeclass defining how to extract results from each node.
+    * @param vs      Typeclass representing the set of visited nodes to prevent revisiting.
+    * @param fr      Typeclass representing the frontier structure used for traversal.
+    * @param cu      Typeclass for post-settle priority updates (no-op for DFS/BFS).
     * @param initial The initial empty frontier structure for the traversal.
     * @return A `Visitor` instance containing the accumulated results after traversal completes.
     */
@@ -58,6 +64,7 @@ object Traversal:
                                                              ev: Evaluable[V, R],
                                                              vs: VisitedSet[V],
                                                              fr: Frontier[F],
+                                                             cu: CostUpdate[V, F],
                                                              initial: F[V]
                                                            ): Visitor[V, R, J] =
 
@@ -76,17 +83,16 @@ object Traversal:
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else
-            val newFrontier = fr.offerAll(rest)(
-              nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
-            )
+            val neighbourList = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            val offered = fr.offerAll(rest)(neighbourList)
+            val newFrontier = cu.update(offered, node)
             loop(newFrontier, newVisitor, newVisited)
 
-    // Visit start first, then check goal before entering the loop.
-    // This ensures goal(start) stops traversal immediately with just the start node recorded.
     val startVisitor = visitor.visit(start)
     if goal(start) then startVisitor
     else
-      val seedFrontier = fr.offerAll(initial)(nbrs.neighbours(start).toList)
+      val seedOffered = fr.offerAll(initial)(nbrs.neighbours(start).toList)
+      val seedFrontier = cu.update(seedOffered, start)
       loop(seedFrontier, startVisitor, vs.markVisited(start))
 
   /**
@@ -143,13 +149,11 @@ object Traversal:
       stack match
         case Nil => vis
 
-        // Record frame: visit the node, then check goal
         case Right(node) :: rest =>
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else loop(rest, newVisitor, visited)
 
-        // Expand frame: if already visited skip; otherwise mark and push frames
         case Left(node) :: rest =>
           if visited.isVisited(node) then loop(rest, vis, visited)
           else
@@ -161,7 +165,6 @@ object Traversal:
               case DfsOrder.Post => childFrames ::: (Right(node) :: rest)
             loop(newStack, vis, newVisited)
 
-    // Seed from root using rootNbrs (H → V), then hand off to the Either-stack loop
     val seedFrames: List[Frame] = rootNbrs.neighbours(start).map(Left(_)).toList
     loop(seedFrames, visitor, vs)
 
@@ -189,7 +192,6 @@ object Traversal:
                                                   vs: VisitedSet[V]
                                                 ): Visitor[V, R, J] =
     given Queue[V] = Queue.empty
-
     traverse[V, R, J, Queue](start, visitor, goal)
 
   /**
@@ -231,13 +233,11 @@ object Traversal:
       stack match
         case Nil => vis
 
-        // Record frame: visit the node, then check goal
         case Right(node) :: rest =>
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else loop(rest, newVisitor, visited)
 
-        // Expand frame: if already visited skip; otherwise mark and push frames
         case Left(node) :: rest =>
           if visited.isVisited(node) then loop(rest, vis, visited)
           else
@@ -255,10 +255,6 @@ object Traversal:
     * Best-first / min-priority-queue traversal. Smallest element dequeued first.
     * Requires Ordering[V] in scope.
     *
-    * The start node is always recorded first. If `goal(start)` is true, traversal
-    * stops immediately. For all other nodes, traversal stops after recording the
-    * first node satisfying `goal`.
-    *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
   def bestFirst[V: Ordering, R, J <: Appendable[(V, Option[R])]](
@@ -271,16 +267,11 @@ object Traversal:
                                                                   vs: VisitedSet[V]
                                                                 ): Visitor[V, R, J] =
     given PrioQueue[V] = PrioQueue.empty[V]
-
     traverse[V, R, J, PrioQueue](start, visitor, goal)
 
   /**
     * Best-first / max-priority-queue traversal. Largest element dequeued first.
     * Requires Ordering[V] in scope.
-    *
-    * The start node is always recorded first. If `goal(start)` is true, traversal
-    * stops immediately. For all other nodes, traversal stops after recording the
-    * first node satisfying `goal`.
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
@@ -294,5 +285,34 @@ object Traversal:
                                                                      vs: VisitedSet[V]
                                                                    ): Visitor[V, R, J] =
     given PrioQueue[V] = PrioQueue.emptyMax[V]
-
     traverse[V, R, J, PrioQueue](start, visitor, goal)
+
+  /**
+    * Best-first traversal with an explicit `CostUpdate` — for Dijkstra and Prim.
+    *
+    * The frontier element type `W` is typically `(E, V)` where `E` is the cost
+    * type and `V` is the vertex type. The caller supplies:
+    *   - `start`: the seed element, e.g. `(zero, startVertex)`
+    *   - a `given IndexedPrioQueue[W] = IndexedPrioQueue.empty[W]` (always empty;
+    *     `traverse` seeds the frontier from `start`'s neighbours)
+    *   - a `given CostUpdate[W, IndexedPrioQueue]` that calls `decreaseKey` after
+    *     each settle
+    *   - `Neighbours[W, W]` expanding `(cost, vertex)` to `(newCost, neighbour)` pairs
+    *
+    * This overload is the intended entry point for Gryphon's `DijkstraTraversal`
+    * and `PrimTraversal`.
+    *
+    * @param goal optional early-termination predicate.
+    */
+  def bestFirstWeighted[W: Ordering, R, J <: Appendable[(W, Option[R])]](
+                                                                          start: W,
+                                                                          visitor: Visitor[W, R, J],
+                                                                          goal: W => Boolean = (_: W) => false
+                                                                        )(using
+                                                                          nbrs: GraphNeighbours[W],
+                                                                          ev: Evaluable[W, R],
+                                                                          vs: VisitedSet[W],
+                                                                          cu: CostUpdate[W, IndexedPrioQueue],
+                                                                          initial: IndexedPrioQueue[W]
+                                                                        ): Visitor[W, R, J] =
+    traverse[W, R, J, IndexedPrioQueue](start, visitor, goal)
