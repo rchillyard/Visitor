@@ -23,6 +23,10 @@ enum DfsOrder:
   * F = Queue     → BFS
   * F = Stack     → DFS
   * F = PrioQueue → best-first (requires Ordering[V] in scope)
+  *
+  * NOTE that there are three independent traversal engines which should be maintained in parallel
+  * as much as possible. These are `traverse`, `traverseTree`, and `dfs`.
+  * For example, Tracer context parameters should be defined consistently across all three.
   */
 object Traversal:
 
@@ -46,13 +50,13 @@ object Traversal:
     * @param visitor An instance of `Visitor` that collects results during traversal.
     * @param goal    A predicate that, when true for a visited node, halts the traversal
     *                after recording that node. Defaults to never stopping early.
-    *
     * @param nbrs    Typeclass providing the neighbours for each node.
     * @param ev      Typeclass defining how to extract results from each node.
     * @param vs      Typeclass representing the set of visited nodes to prevent revisiting.
     * @param fr      Typeclass representing the frontier structure used for traversal.
     * @param cu      Typeclass for post-settle priority updates (no-op for DFS/BFS).
     * @param initial The initial empty frontier structure for the traversal.
+    * @param tracer  Typeclass for tracing the primary parametric type (`V`).
     * @return A `Visitor` instance containing the accumulated results after traversal completes.
     */
   def traverse[V, R, J <: Appendable[(V, Option[R])], F[_]](
@@ -65,8 +69,11 @@ object Traversal:
                                                              vs: VisitedSet[V],
                                                              fr: Frontier[F],
                                                              cu: CostUpdate[V, F],
-                                                             initial: F[V]
-                                                           ): Visitor[V, R, J] =
+                                                             initial: F[V],
+                                                             tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, R, J] =
+
+    tracer.trace(0, s"traverse: start=$start")
 
     @annotation.tailrec
     def loop(
@@ -80,10 +87,12 @@ object Traversal:
         if visited.isVisited(node) then loop(rest, vis, visited)
         else
           val newVisited = visited.markVisited(node)
+          tracer.trace(1, s"visiting: $node")
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else
             val neighbourList = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            tracer.trace(2, s"neighbours: $neighbourList")
             val offered = fr.offerAll(rest)(neighbourList)
             val newFrontier = cu.update(offered, node)
             loop(newFrontier, newVisitor, newVisited)
@@ -135,8 +144,11 @@ object Traversal:
                                                               rootNbrs: Neighbours[H, V],
                                                               graphNbrs: Neighbours[V, V],
                                                               ev: Evaluable[V, R],
-                                                              vs: VisitedSet[V]
-                                                            ): Visitor[V, R, J] =
+                                                              vs: VisitedSet[V],
+                                                              tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, R, J] =
+
+    tracer.trace(0, s"traverseTree ($order)")
 
     type Frame = Either[V, V]
 
@@ -150,6 +162,7 @@ object Traversal:
         case Nil => vis
 
         case Right(node) :: rest =>
+          tracer.trace(1, s"record: $node")
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else loop(rest, newVisitor, visited)
@@ -159,6 +172,7 @@ object Traversal:
           else
             val newVisited = visited.markVisited(node)
             val children = graphNbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            tracer.trace(1, s"expand: $node  children=$children")
             val childFrames = children.map(Left(_))
             val newStack = order match
               case DfsOrder.Pre => Right(node) :: (childFrames ::: rest)
@@ -189,8 +203,9 @@ object Traversal:
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
                                                   ev: Evaluable[V, R],
-                                                  vs: VisitedSet[V]
-                                                ): Visitor[V, R, J] =
+                                                  vs: VisitedSet[V],
+                                                  tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, R, J] =
     given Queue[V] = Queue.empty
     traverse[V, R, J, Queue](start, visitor, goal)
 
@@ -219,8 +234,11 @@ object Traversal:
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
                                                   ev: Evaluable[V, R],
-                                                  vs: VisitedSet[V]
-                                                ): Visitor[V, R, J] =
+                                                  vs: VisitedSet[V],
+                                                  tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, R, J] =
+
+    tracer.trace(0, s"dfs ($order): start=$start")
 
     type Frame = Either[V, V]
 
@@ -234,6 +252,7 @@ object Traversal:
         case Nil => vis
 
         case Right(node) :: rest =>
+          tracer.trace(1, s"record: $node")
           val newVisitor = vis.visit(node)
           if goal(node) then newVisitor
           else loop(rest, newVisitor, visited)
@@ -243,6 +262,7 @@ object Traversal:
           else
             val newVisited = visited.markVisited(node)
             val children = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
+            tracer.trace(1, s"expand: $node  children=$children")
             val childFrames = children.map(Left(_))
             val newStack = order match
               case DfsOrder.Pre => Right(node) :: (childFrames ::: rest)
@@ -264,8 +284,9 @@ object Traversal:
                                                                 )(using
                                                                   nbrs: GraphNeighbours[V],
                                                                   ev: Evaluable[V, R],
-                                                                  vs: VisitedSet[V]
-                                                                ): Visitor[V, R, J] =
+                                                                  vs: VisitedSet[V],
+                                                                  tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, R, J] =
     given PrioQueue[V] = PrioQueue.empty[V]
     traverse[V, R, J, PrioQueue](start, visitor, goal)
 
@@ -282,8 +303,9 @@ object Traversal:
                                                                    )(using
                                                                      nbrs: GraphNeighbours[V],
                                                                      ev: Evaluable[V, R],
-                                                                     vs: VisitedSet[V]
-                                                                   ): Visitor[V, R, J] =
+                                                                     vs: VisitedSet[V],
+                                                                     tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, R, J] =
     given PrioQueue[V] = PrioQueue.emptyMax[V]
     traverse[V, R, J, PrioQueue](start, visitor, goal)
 
@@ -313,6 +335,7 @@ object Traversal:
                                                                           ev: Evaluable[W, R],
                                                                           vs: VisitedSet[W],
                                                                           cu: CostUpdate[W, IndexedPrioQueue],
-                                                                          initial: IndexedPrioQueue[W]
-                                                                        ): Visitor[W, R, J] =
+                                                                          initial: IndexedPrioQueue[W],
+                                                                          tracer: Tracer[W] = Tracer.silent
+  ): Visitor[W, R, J] =
     traverse[W, R, J, IndexedPrioQueue](start, visitor, goal)
