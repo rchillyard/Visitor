@@ -2,7 +2,7 @@
 
 organization := "com.phasmidsoftware"
 
-version := "1.5.0-SNAPSHOT"
+version := "1.5.0"
 
 val scalaVersionNumber  = "3.7.4"
 val scalaTestVersion    = "3.2.20"
@@ -53,7 +53,9 @@ lazy val root = (project in file("."))
       "org.slf4j"       %  "slf4j-api"         % slf4jVersion,
       "ch.qos.logback"  %  "logback-classic"   % logbackVersion  % Runtime,
       "org.scalatest"   %% "scalatest"         % scalaTestVersion % Test,
-      "com.novocode"    %  "junit-interface"    % "0.11"          % Test  // NOTE: known vulnerability
+      "org.junit.jupiter" % "junit-jupiter-api"    % "5.10.2" % Test,
+      "org.junit.jupiter" % "junit-jupiter-engine" % "5.10.2" % Test,
+      "com.github.sbt"    % "junit-interface"      % "0.13.3" % Test
     )
   )
   .settings(scala3TestSettings)
@@ -65,6 +67,7 @@ lazy val root = (project in file("."))
 Test / parallelExecution := false
 
 Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports")
+Test / testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 
 // ============================================================================
 // USAGE NOTES

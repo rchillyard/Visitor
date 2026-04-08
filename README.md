@@ -284,13 +284,14 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 
 ## Revision History
 
-| Version | Notes |
-|---------|-------|
-| 0.0.1   | First version |
-| 0.0.2   | Added `AutoCloseable` to `Appendable` and `Visitor` |
-| 0.0.3   | Added `FunctionMapJournal` |
-| 1.0.0   | Complete redesign: typeclass-driven architecture, `Frontier` abstraction, binary heap priority queue, Scala 3 throughout |
-| 1.1.0   | Added `DfsOrder` (pre/post-order DFS), `bestFirstMax`, American English type aliases |
-| 1.2.0   | Added `goal` predicate for early termination across all traversal methods; `traverseTree` now uses `Either`-stack supporting `DfsOrder` |
+| Version | Notes                                                                                                                                                                                             |
+|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0.0.1   | First version                                                                                                                                                                                     |
+| 0.0.2   | Added `AutoCloseable` to `Appendable` and `Visitor`                                                                                                                                               |
+| 0.0.3   | Added `FunctionMapJournal`                                                                                                                                                                        |
+| 1.0.0   | Complete redesign: typeclass-driven architecture, `Frontier` abstraction, binary heap priority queue, Scala 3 throughout                                                                          |
+| 1.1.0   | Added `DfsOrder` (pre/post-order DFS), `bestFirstMax`, American English type aliases                                                                                                              |
+| 1.2.0   | Added `goal` predicate for early termination across all traversal methods; `traverseTree` now uses `Either`-stack supporting `DfsOrder`                                                           |
 | 1.3.0   | Three-type priority queue hierarchy (`BinaryHeap`, `PrioQueue`, `IndexedPrioQueue`); `CostUpdate[W, F[_]]` typeclass; `TupleVisitedSet[(E,V)]`; `bestFirstWeighted` entry point for Dijkstra/Prim |
-| 1.4.0   | `Monoid[A]` typeclass with `given` instances for `Int`, `Long`, `Double`, `Float`; replaces `Numeric` in weighted traversal context bounds |
+| 1.4.0   | `Monoid[A]` typeclass with `given` instances for `Int`, `Long`, `Double`, `Float`; replaces `Numeric` in weighted traversal context bounds                                                        |
+| 1.5.0   | Added Tracer; replaced com.novocode with junit.jupiter.xxx                                                                                                                                        |
