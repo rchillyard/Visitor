@@ -3,19 +3,54 @@ package com.phasmidsoftware.visitor.core
 import scala.collection.immutable.Queue
 
 // ============================================================
+// Zero typeclass
+// ============================================================
+
+/**
+  * Typeclass: a type with an identity element.
+  *
+  * `Zero[A]` is the minimal requirement for weighted graph traversals that
+  * need a seed cost but do not accumulate costs along a path — specifically
+  * Prim's MST algorithm. Prim needs `identity` to seed the frontier but
+  * never calls `combine`.
+  *
+  * `Monoid[A]` extends `Zero[A]` by adding `combine`, making `Zero` the
+  * honest supertype for the two-context-bound pattern `E: {Zero, Ordering}`.
+  *
+  * Any `given Monoid[A]` automatically satisfies `Zero[A]` through inheritance.
+  *
+  * @tparam A the element type
+  */
+trait Zero[A]:
+  /** The identity element. */
+  def identity: A
+
+given Zero[Int] with
+  def identity: Int = 0
+
+given Zero[Long] with
+  def identity: Long = 0L
+
+given Zero[Double] with
+  def identity: Double = 0.0
+
+given Zero[Float] with
+  def identity: Float = 0.0f
+
+
+// ============================================================
 // Monoid typeclass
 // ============================================================
 
 /**
   * Typeclass: an associative binary operation with an identity element.
   *
-  * Mirrors the Cats `Monoid` typeclass but without the Cats dependency.
-  * The standard additive monoids for numeric types are provided as `given`
-  * instances below.
+  * Extends [[Zero]] with `combine`. Mirrors the Cats `Monoid` typeclass
+  * but without the Cats dependency.
   *
-  * Primary use in Visitor/Gryphon: weighted graph traversals (Dijkstra, Prim)
-  * need `identity` as the seed cost and `combine` for cost accumulation —
-  * without requiring the full arithmetic of `Numeric`.
+  * Primary use in Visitor/Gryphon:
+  *   - Dijkstra needs both `identity` (seed cost) and `combine` (path cost accumulation).
+  *   - Prim needs only `identity` — use `Zero[E]` for Prim, `Monoid[E]` for Dijkstra.
   *
   * @tparam A the element type
   */
@@ -25,6 +60,9 @@ trait Monoid[A]:
 
   /** An associative binary operation. */
   def combine(x: A, y: A): A
+
+given [A: Monoid]: Zero[A] with
+  def identity: A = summon[Monoid[A]].identity
 
 /** Additive monoid for [[Int]]. */
 given Monoid[Int] with
