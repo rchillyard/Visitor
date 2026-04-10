@@ -3,8 +3,7 @@ package com.phasmidsoftware.visitor.core
 import scala.collection.immutable.Queue
 
 // ============================================================
-// Journal / Appendable (unchanged from old package but repeated
-// here for a self-contained skeleton)
+// Journal / Appendable
 // ============================================================
 
 /**
@@ -101,3 +100,47 @@ case class QueueJournal[X](q: Queue[X]) extends IterableJournal[X]:
   */
 object QueueJournal:
   def empty[X]: QueueJournal[X] = QueueJournal(Queue.empty)
+
+/**
+  * A journal that records the came-from relationship established during graph traversal.
+  *
+  * For each discovered vertex `v`, `map(v)` is the vertex from which `v` was first
+  * discovered — i.e. the vertex that was being visited when `v` was added to the
+  * frontier. The start vertex is absent from the map (it has no predecessor).
+  *
+  * This is sometimes called a "parent map" but "came-from" is more accurate: the
+  * relationship is an artifact of traversal order, not a structural property of the
+  * graph.
+  *
+  * Used in conjunction with [[JournaledVisitor]] when came-from tracking is requested
+  * via the `withQueueJournalAndCameFrom` or `withListJournalAndCameFrom` factory methods.
+  *
+  * @param map the underlying came-from map: vertex → the vertex that discovered it
+  * @tparam V the vertex type
+  */
+case class CameFromJournal[V](map: Map[V, V]) extends IterableJournal[(V, V)]:
+
+  def append(x: (V, V)): CameFromJournal[V] =
+    if map.contains(x._1) then this // already discovered — keep first
+    else copy(map + x)
+
+  def iterator: Iterator[(V, V)] = map.iterator
+
+  def close(): Unit = ()
+
+  /**
+    * Returns the vertex that discovered `v`, if any.
+    *
+    * @param v the query vertex.
+    * @return `Some(cameFrom)` if `v` was discovered during traversal, `None` for
+    *         the start vertex or vertices not reached.
+    */
+  def cameFrom(v: V): Option[V] = map.get(v)
+
+  /**
+    * Returns the came-from map as a plain `Map[V, V]`.
+    */
+  def asMap: Map[V, V] = map
+
+object CameFromJournal:
+  def empty[V]: CameFromJournal[V] = CameFromJournal(Map.empty)

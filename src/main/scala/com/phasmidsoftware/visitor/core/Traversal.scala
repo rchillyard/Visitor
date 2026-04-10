@@ -24,9 +24,12 @@ enum DfsOrder:
   * F = Stack     → DFS
   * F = PrioQueue → best-first (requires Ordering[V] in scope)
   *
-  * NOTE that there are three independent traversal engines which should be maintained in parallel
-  * as much as possible. These are `traverse`, `traverseTree`, and `dfs`.
-  * For example, Tracer context parameters should be defined consistently across all three.
+  * Two visitor events are fired during traversal:
+  *   - `visit(v)`             — when a vertex is settled (dequeued/popped)
+  *   - `discover(v, cameFrom)` — when a vertex is first seen as a neighbour
+  *
+  * NOTE that there are three independent traversal engines which should be maintained
+  * in parallel as much as possible: `traverse`, `traverseTree`, and `dfs`.
   */
 object Traversal:
 
@@ -45,6 +48,9 @@ object Traversal:
     * For all subsequent nodes, traversal stops after recording the first node for which
     * `goal(node)` returns true — that node is recorded in the journal but its neighbours
     * are not expanded.
+    *
+    * `discover(neighbour, node)` is called for each unvisited neighbour before it is
+    * offered to the frontier, recording the came-from relationship at discovery time.
     *
     * @param start   The starting node where the traversal begins.
     * @param visitor An instance of `Visitor` that collects results during traversal.
@@ -93,16 +99,21 @@ object Traversal:
           else
             val neighbourList = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
             tracer.trace(2, s"neighbours: $neighbourList")
+            // discover each unvisited neighbour before offering to frontier
+            val discoveredVisitor = neighbourList.foldLeft(newVisitor)((v, n) => v.discover(n, node))
             val offered = fr.offerAll(rest)(neighbourList)
             val newFrontier = cu.update(offered, node)
-            loop(newFrontier, newVisitor, newVisited)
+            loop(newFrontier, discoveredVisitor, newVisited)
 
     val startVisitor = visitor.visit(start)
     if goal(start) then startVisitor
     else
-      val seedOffered = fr.offerAll(initial)(nbrs.neighbours(start).toList)
+      val startNeighbours = nbrs.neighbours(start).toList
+      // discover start's neighbours before offering
+      val discoveredVisitor = startNeighbours.foldLeft(startVisitor)((v, n) => v.discover(n, start))
+      val seedOffered = fr.offerAll(initial)(startNeighbours)
       val seedFrontier = cu.update(seedOffered, start)
-      loop(seedFrontier, startVisitor, vs.markVisited(start))
+      loop(seedFrontier, discoveredVisitor, vs.markVisited(start))
 
   /**
     * Traverses a tree-like structure starting from a given root node, visiting nodes
@@ -123,6 +134,9 @@ object Traversal:
     * Traversal stops after recording the first `V` node for which `goal(node)`
     * returns true. The goal node is recorded in the journal but its neighbours
     * are not expanded.
+    *
+    * NOTE: `discover` is not called in `traverseTree` — the tree structure implies
+    * the came-from relationship is already known from the tree shape.
     *
     * @param start     The root node where the traversal begins.
     * @param visitor   An instance of `Visitor` that accumulates results during the traversal.
@@ -147,8 +161,6 @@ object Traversal:
                                                               vs: VisitedSet[V],
                                                               tracer: Tracer[V] = Tracer.silent
   ): Visitor[V, R, J] =
-
-    tracer.trace(0, s"traverseTree ($order)")
 
     type Frame = Either[V, V]
 
@@ -179,35 +191,9 @@ object Traversal:
               case DfsOrder.Post => childFrames ::: (Right(node) :: rest)
             loop(newStack, vis, newVisited)
 
-    val seedFrames: List[Frame] = rootNbrs.neighbours(start).map(Left(_)).toList
-    loop(seedFrames, visitor, vs)
-
-  // ----------------------------------------------------------
-  // Convenience entry points
-  // ----------------------------------------------------------
-
-  /**
-    * Breadth-first search.
-    *
-    * The start node is always recorded first. If `goal(start)` is true, traversal
-    * stops immediately with just the start node in the journal.
-    * For all other nodes, traversal stops after recording the first node satisfying `goal`.
-    * The goal node is always recorded before traversal halts.
-    *
-    * @param goal optional early-termination predicate. Defaults to never stopping early.
-    */
-  def bfs[V, R, J <: Appendable[(V, Option[R])]](
-                                                  start: V,
-                                                  visitor: Visitor[V, R, J],
-                                                  goal: V => Boolean = (_: V) => false
-                                                )(using
-                                                  nbrs: GraphNeighbours[V],
-                                                  ev: Evaluable[V, R],
-                                                  vs: VisitedSet[V],
-                                                  tracer: Tracer[V] = Tracer.silent
-  ): Visitor[V, R, J] =
-    given Queue[V] = Queue.empty
-    traverse[V, R, J, Queue](start, visitor, goal)
+    val rootChildren = rootNbrs.neighbours(start).toList
+    val rootFrames = rootChildren.map(Left(_))
+    loop(rootFrames, visitor, vs)
 
   /**
     * Depth-first search with configurable pre- or post-order recording.
@@ -218,6 +204,10 @@ object Traversal:
     *
     * Pre-order:  record before expanding → Right(v) on top, visited first.
     * Post-order: record after expanding  → children expanded before v is recorded.
+    *
+    * `discover(child, node)` is called for each unvisited child at expand time
+    * (the `Left(node)` branch), before the child frames are pushed to the stack.
+    * This records the came-from relationship at the point of discovery.
     *
     * The goal predicate is checked on `Right` (record) frames — i.e. after a node
     * is visited. Traversal halts after recording the first node satisfying `goal`;
@@ -263,14 +253,41 @@ object Traversal:
             val newVisited = visited.markVisited(node)
             val children = nbrs.neighbours(node).filterNot(newVisited.isVisited).toList
             tracer.trace(1, s"expand: $node  children=$children")
+            // discover each child before pushing to stack
+            val discoveredVis = children.foldLeft(vis)((v, child) => v.discover(child, node))
             val childFrames = children.map(Left(_))
             val newStack = order match
               case DfsOrder.Pre => Right(node) :: (childFrames ::: rest)
               case DfsOrder.Post => childFrames ::: (Right(node) :: rest)
-            loop(newStack, vis, newVisited)
+            loop(newStack, discoveredVis, newVisited)
 
-    loop(List(Left(start)), visitor, vs)
+    // discover start's children before beginning
+    val startChildren = nbrs.neighbours(start).toList
+    val discoveredVisitor = startChildren.foldLeft(visitor)((v, child) => v.discover(child, start))
+    loop(List(Left(start)), discoveredVisitor, vs)
 
+  /**
+    * Breadth-first search traversal.
+    *
+    * `discover(neighbour, node)` is called for each unvisited neighbour before
+    * it is offered to the frontier, recording the came-from relationship at
+    * discovery time.
+    *
+    * @param goal optional early-termination predicate. Defaults to never stopping early.
+    */
+  def bfs[V, R, J <: Appendable[(V, Option[R])]](
+                                                  start: V,
+                                                  visitor: Visitor[V, R, J],
+                                                  goal: V => Boolean = (_: V) => false
+                                                )(using
+                                                  nbrs: GraphNeighbours[V],
+                                                  ev: Evaluable[V, R],
+                                                  vs: VisitedSet[V],
+                                                  tracer: Tracer[V] = Tracer.silent
+                                                ): Visitor[V, R, J] =
+    given Queue[V] = Queue.empty
+
+    traverse[V, R, J, Queue](start, visitor, goal)
   /**
     * Best-first / min-priority-queue traversal. Smallest element dequeued first.
     * Requires Ordering[V] in scope.
@@ -321,8 +338,9 @@ object Traversal:
     *     each settle
     *   - `Neighbours[W, W]` expanding `(cost, vertex)` to `(newCost, neighbour)` pairs
     *
-    * This overload is the intended entry point for Gryphon's `DijkstraTraversal`
-    * and `PrimTraversal`.
+    * NOTE: `discover` is not called in `bestFirstWeighted` — the came-from
+    * relationship for weighted traversals is already tracked via the `pred` map
+    * inside `WeightedTraversal.CostUpdate`.
     *
     * @param goal optional early-termination predicate.
     */
