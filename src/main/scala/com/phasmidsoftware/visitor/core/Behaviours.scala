@@ -3,19 +3,54 @@ package com.phasmidsoftware.visitor.core
 import scala.collection.immutable.Queue
 
 // ============================================================
+// Zero typeclass
+// ============================================================
+
+/**
+  * Typeclass: a type with an identity element.
+  *
+  * `Zero[A]` is the minimal requirement for weighted graph traversals that
+  * need a seed cost but do not accumulate costs along a path — specifically
+  * Prim's MST algorithm. Prim needs `identity` to seed the frontier but
+  * never calls `combine`.
+  *
+  * `Monoid[A]` extends `Zero[A]` by adding `combine`, making `Zero` the
+  * honest supertype for the two-context-bound pattern `E: {Zero, Ordering}`.
+  *
+  * Any `given Monoid[A]` automatically satisfies `Zero[A]` through inheritance.
+  *
+  * @tparam A the element type
+  */
+trait Zero[A]:
+  /** The identity element. */
+  def identity: A
+
+given Zero[Int] with
+  def identity: Int = 0
+
+given Zero[Long] with
+  def identity: Long = 0L
+
+given Zero[Double] with
+  def identity: Double = 0.0
+
+given Zero[Float] with
+  def identity: Float = 0.0f
+
+
+// ============================================================
 // Monoid typeclass
 // ============================================================
 
 /**
   * Typeclass: an associative binary operation with an identity element.
   *
-  * Mirrors the Cats `Monoid` typeclass but without the Cats dependency.
-  * The standard additive monoids for numeric types are provided as `given`
-  * instances below.
+  * Extends [[Zero]] with `combine`. Mirrors the Cats `Monoid` typeclass
+  * but without the Cats dependency.
   *
-  * Primary use in Visitor/Gryphon: weighted graph traversals (Dijkstra, Prim)
-  * need `identity` as the seed cost and `combine` for cost accumulation —
-  * without requiring the full arithmetic of `Numeric`.
+  * Primary use in Visitor/Gryphon:
+  *   - Dijkstra needs both `identity` (seed cost) and `combine` (path cost accumulation).
+  *   - Prim needs only `identity` — use `Zero[E]` for Prim, `Monoid[E]` for Dijkstra.
   *
   * @tparam A the element type
   */
@@ -49,6 +84,10 @@ given Monoid[Float] with
   def identity: Float = 0.0f
 
   def combine(x: Float, y: Float): Float = x + y
+
+/** Any Monoid[A] automatically satisfies Zero[A]. */
+given [A: Monoid]: Zero[A] with
+  def identity: A = summon[Monoid[A]].identity
 
 // ============================================================
 // Core typeclasses for the various behaviours
@@ -135,21 +174,75 @@ private case class TupleVisitedSet[E, V](visited: Set[V]) extends VisitedSet[(E,
   * @tparam F the higher-kinded frontier container type
   */
 trait Frontier[F[_]]:
+  /**
+    * Returns an empty instance of the parameterized type wrapped in the context of the effect type `F`.
+    *
+    * @return An empty instance of `F[T]`.
+    */
   def empty[T]: F[T]
+
+  /**
+    * Applies a given value to a the frontier `f`.
+    *
+    * @param f The frontier of type `F[T]` that will receive the value.
+    * @param t The value of type `T` to be applied to the frontier `f`.
+    * @return A new frontier `F` that incorporates the provided value `t`.
+    */
   def offer[T](f: F[T])(t: T): F[T]
+
+  /**
+    * Extracts an element of type `T` from the frontier `F[T]` and returns a tuple,
+    * where the first element is the extracted value of type `T` and the second element
+    * is the remaining frontier of type `F[T]` after the extraction.
+    *
+    * @param f the input frontier of type `F[T]` from which an element is extracted
+    * @return a tuple containing the extracted element of type `T` and the remaining frontier of type `F[T]`
+    */
   def take[T](f: F[T]): (T, F[T])
+
+  /**
+    * Checks if the given frontier is empty.
+    *
+    * @param f the frontier to be checked for emptiness
+    * @return true if the frontier is empty, false otherwise
+    */
   def isEmpty[T](f: F[T]): Boolean
 
-  /** If true, offerAll reverses the list before offering (needed for LIFO stacks). */
+  /**
+    * Determines whether elements should be reversed upon being added to the frontier.
+    * This behavior is typically useful in certain traversal algorithms where the order 
+    * of elements affects the outcome, such as depth-first or breadth-first search.
+    *
+    * @return true if elements are reversed when offered to the frontier, false otherwise
+    */
   def reverseOnOffer: Boolean = false
 
+  /**
+    * Adds all elements from the given list to the provided frontier. The order in which the 
+    * elements are added depends on the value of `reverseOnOffer`. If `reverseOnOffer` is `true`, 
+    * the elements are added in reverse order; otherwise, they are added as-is.
+    *
+    * @param f  The initial frontier of type `F[T]` to which the elements will be added.
+    * @param ts A list of elements of type `T` to add to the frontier.
+    * @return A new frontier of type `F[T]` that includes all elements from the list `ts`, 
+    *         added in the specified order.
+    */
   def offerAll[T](f: F[T])(ts: List[T]): F[T] =
     val ordered = if reverseOnOffer then ts.reverse else ts
     ordered.foldLeft(f)((acc, t) => offer(acc)(t))
 
-/** DFS frontier: LIFO Stack (represented as a List). */
+/**
+  * A type alias representing a stack, implemented as a `List`.
+  *
+  * @tparam T the type of elements stored in the stack
+  */
 type Stack[T] = List[T]
 
+/**
+  * Implementation of the `Frontier` typeclass for a stack-based data structure.
+  * This implementation provides depth-first traversal behavior by leveraging 
+  * the characteristics of a stack (LIFO - Last In, First Out).
+  */
 given Frontier[Stack] with
   def empty[T]: Stack[T] = Nil
 
@@ -161,7 +254,17 @@ given Frontier[Stack] with
 
   override def reverseOnOffer: Boolean = true
 
-/** BFS frontier: FIFO Queue. */
+/**
+  * Implementation of the `Frontier` typeclass for the `Queue` data structure.
+  * This implementation provides a breadth-first search (BFS) traversal strategy
+  * due to the FIFO (First-In-First-Out) nature of `Queue`.
+  *
+  * Functions:
+  * - `empty` — Constructs an empty `Queue`.
+  * - `offer` — Enqueues an element into the `Queue`.
+  * - `take` — Dequeues an element from the `Queue`, returning the element and the resulting `Queue`.
+  * - `isEmpty` — Checks if the `Queue` is empty.
+  */
 given Frontier[Queue] with
   def empty[T]: Queue[T] = Queue.empty
 
@@ -211,33 +314,43 @@ given Frontier[IndexedPrioQueue] with
   def isEmpty[T](f: IndexedPrioQueue[T]): Boolean = f.isEmpty
 
 // ============================================================
-// Visitor
+// CostUpdate typeclass
 // ============================================================
 
 /**
-  * A Visitor accumulates (V, Option[R]) pairs into a journal J as it
-  * traverses a structure. It knows nothing about the structure itself —
-  * that knowledge lives in Neighbours. It knows nothing about what to
-  * extract from a node — that lives in Evaluable.
+  * Typeclass: after a node is settled (dequeued and marked visited) and its
+  * neighbours have been offered to the frontier, optionally update the
+  * priorities of frontier entries that have improved.
   *
-  * @tparam V the node type
-  * @tparam R the result type extracted from each node
-  * @tparam J the journal type (must be Appendable of (V, Option[R]))
+  * This typeclass exists to support `decreaseKey` in Dijkstra- and Prim-style
+  * traversals. It keeps all domain knowledge (cost maps, edge weights, the
+  * notion of "improvement") out of [[Traversal]] itself.
+  *
+  * For DFS and BFS the default no-op given is resolved automatically.
+  * For Dijkstra and Prim, the `GraphTraversal` implementation supplies a
+  * concrete `given CostUpdate[W, IndexedPrioQueue]` (where `W = (E, V)`) that
+  * closes over a secondary vertex→cost map and calls [[IndexedPrioQueue.decreaseKey]]
+  * for any neighbour whose cost has improved since it was first offered.
+  *
+  * @tparam W the frontier element type (e.g. `(E, V)` for weighted traversals,
+  *           or plain `V` for DFS / BFS)
+  * @tparam F the frontier container type (e.g. [[PrioQueue]], [[Stack]], Queue)
   */
-trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
-  def journal: J
-  def visit(v: V)(using ev: Evaluable[V, R]): Visitor[V, R, J]
-  def result: J = journal
+trait CostUpdate[W, F[_]]:
+  /**
+    * Given the current frontier and the node `w` that was just settled,
+    * return an updated frontier with any improved priorities applied.
+    *
+    * @param frontier the frontier after `w`'s neighbours have been offered
+    * @param w        the element that was just settled
+    * @return the frontier with any `decreaseKey` updates applied
+    */
+  def update(frontier: F[W], w: W): F[W]
 
-/** Canonical immutable implementation. */
-case class JournaledVisitor[V, R, J <: Appendable[(V, Option[R])]](journal: J)
-  extends Visitor[V, R, J]:
-  def visit(v: V)(using ev: Evaluable[V, R]): JournaledVisitor[V, R, J] =
-    copy(journal = journal.append(v -> ev.evaluate(v)).asInstanceOf[J])
-
-object JournaledVisitor:
-  def withListJournal[V, R]: JournaledVisitor[V, R, ListJournal[(V, Option[R])]] =
-    JournaledVisitor(ListJournal.empty)
-
-  def withQueueJournal[V, R]: JournaledVisitor[V, R, QueueJournal[(V, Option[R])]] =
-    JournaledVisitor(QueueJournal.empty)
+/**
+  * Default no-op implementation.
+  * Resolved automatically for DFS (`Stack`) and BFS (`Queue`) traversals,
+  * and for any weighted traversal that does not need re-keying.
+  */
+given [W, F[_]]: CostUpdate[W, F] with
+  def update(frontier: F[W], w: W): F[W] = frontier

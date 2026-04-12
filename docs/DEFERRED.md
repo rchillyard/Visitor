@@ -31,6 +31,12 @@ postponed for future attention.
    an ordering (`String` concatenation is a valid monoid with no natural ordering),
    and an ordering does not imply a monoid. The two context bounds `E: {Monoid, Ordering}`
    are the honest design. Recorded here in case the question resurfaces.
+   See also [Issue #9](https://github.com/rchillyard/Visitor/issues/9#issue-4240254773).
+6. **CameFrom pointers in the Visitor engine.** Adding a `CameFromJournal[V]` to
+  Visitor would allow `GraphTraversal.bfs` / `dfs` to delegate fully to the
+  Scala engine. This is a Visitor library change, not a Gryphon change.
+  See [Issue #10](https://github.com/rchillyard/Visitor/issues/10#issue-4240254800)
+
 
 ## Code / Architecture
 

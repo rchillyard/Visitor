@@ -369,3 +369,165 @@ class TraverseTreeSpec extends AnyFlatSpec with Matchers:
 
   it should "stop at first node when it matches goal" in :
     runTree(goal = _ == "B").result.map(_._1).toList shouldBe List("B")
+
+// ============================================================
+// CameFromJournal tests
+// ============================================================
+
+class CameFromJournalSpec extends AnyFlatSpec with Matchers:
+
+  "CameFromJournal" should "be empty initially" in :
+    val j = CameFromJournal.empty[Int]
+    j.asMap shouldBe Map.empty
+
+  it should "record a came-from relationship on append" in :
+    val j = CameFromJournal.empty[Int].append(2 -> 1)
+    j.cameFrom(2) shouldBe Some(1)
+
+  it should "record multiple came-from relationships" in :
+    val j = CameFromJournal.empty[Int]
+      .append(2 -> 1)
+      .append(3 -> 1)
+      .append(4 -> 2)
+    j.cameFrom(2) shouldBe Some(1)
+    j.cameFrom(3) shouldBe Some(1)
+    j.cameFrom(4) shouldBe Some(2)
+
+  it should "return None for vertices not in the map" in :
+    val j = CameFromJournal.empty[Int].append(2 -> 1)
+    j.cameFrom(99) shouldBe None
+
+  it should "be iterable over (discovered, cameFrom) pairs" in :
+    val j = CameFromJournal.empty[Int].append(2 -> 1).append(3 -> 1)
+    j.toSet shouldBe Set(2 -> 1, 3 -> 1)
+
+  it should "expose its contents as a plain Map" in :
+    val j = CameFromJournal.empty[Int].append(2 -> 1).append(4 -> 2)
+    j.asMap shouldBe Map(2 -> 1, 4 -> 2)
+
+// ============================================================
+// JournaledVisitor — discover tests
+// ============================================================
+
+class JournaledVisitorDiscoverSpec extends AnyFlatSpec with Matchers:
+
+  "JournaledVisitor without came-from journal" should "return None for cameFrom" in :
+    val v = JournaledVisitor.withQueueJournal[Int, Int]
+    v.cameFrom shouldBe None
+
+  it should "be a no-op when discover is called" in :
+    val v = JournaledVisitor.withQueueJournal[Int, Int]
+    val v2 = v.discover(2, 1)
+    v2.cameFrom shouldBe None
+
+  "JournaledVisitor with came-from journal" should "return Some(empty map) initially" in :
+    val v = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    v.cameFrom shouldBe Some(Map.empty)
+
+  it should "record discover calls in the came-from map" in :
+    val v = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val v2 = v.discover(2, 1).discover(3, 1).discover(4, 2)
+    v2.cameFrom shouldBe Some(Map(2 -> 1, 3 -> 1, 4 -> 2))
+
+  it should "not affect the visit journal when discover is called" in :
+    val v = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val v2 = v.discover(2, 1)
+    v2.result.toList shouldBe Nil
+
+// ============================================================
+// BFS came-from tests
+// ============================================================
+
+class BfsCameFromSpec extends AnyFlatSpec with Matchers:
+
+  import TestGraph.given
+
+  "Traversal.bfs with CameFromJournal" should "not include start vertex in came-from map" in :
+    val visitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val result = Traversal.bfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    result.cameFrom.get should not contain key(1)
+
+  it should "record all non-start vertices in came-from map" in :
+    val visitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val result = Traversal.bfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    result.cameFrom.get.keySet shouldBe Set(2, 3, 4, 5)
+
+  it should "record correct came-from for direct neighbours of start" in :
+    val visitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val result = Traversal.bfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    val cf = result.cameFrom.get
+    cf(2) shouldBe 1
+    cf(3) shouldBe 1
+
+  it should "record node 4 as discovered from either 2 or 3 (first BFS neighbour)" in :
+    val visitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val result = Traversal.bfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    result.cameFrom.get(4) shouldBe 2
+
+  it should "support path reconstruction from leaf to start" in :
+    val visitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val result = Traversal.bfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    val cf = result.cameFrom.get
+
+    def pathTo(target: Int): List[Int] =
+      def walk(v: Int, acc: List[Int]): List[Int] =
+        cf.get(v) match
+          case None => v :: acc // start vertex
+          case Some(from) => walk(from, v :: acc)
+
+      walk(target, Nil)
+
+    pathTo(4) shouldBe List(1, 2, 4)
+    pathTo(5) shouldBe List(1, 3, 5)
+    pathTo(2) shouldBe List(1, 2)
+
+// ============================================================
+// DFS came-from tests
+// ============================================================
+
+class DfsCameFromSpec extends AnyFlatSpec with Matchers:
+
+  import TestGraph.given
+
+  "Traversal.dfs with CameFromJournal" should "not include start vertex in came-from map" in :
+    val visitor = JournaledVisitor.withListJournalAndCameFrom[Int, Int]
+    val result = Traversal.dfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    result.cameFrom.get should not contain key(1)
+
+  it should "record all non-start vertices in came-from map" in :
+    val visitor = JournaledVisitor.withListJournalAndCameFrom[Int, Int]
+    val result = Traversal.dfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    result.cameFrom.get.keySet shouldBe Set(2, 3, 4, 5)
+
+  it should "record correct came-from for direct neighbours of start" in :
+    val visitor = JournaledVisitor.withListJournalAndCameFrom[Int, Int]
+    val result = Traversal.dfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    val cf = result.cameFrom.get
+    cf(2) shouldBe 1
+    cf(3) shouldBe 1
+
+  it should "support path reconstruction from leaf to start" in :
+    val visitor = JournaledVisitor.withListJournalAndCameFrom[Int, Int]
+    val result = Traversal.dfs(1, visitor).asInstanceOf[JournaledVisitor[Int, Int, ?]]
+    val cf = result.cameFrom.get
+
+    def pathTo(target: Int): List[Int] =
+      def walk(v: Int, acc: List[Int]): List[Int] =
+        cf.get(v) match
+          case None => v :: acc
+          case Some(from) => walk(from, v :: acc)
+
+      walk(target, Nil)
+
+    pathTo(2) shouldBe List(1, 2)
+    pathTo(3) shouldBe List(1, 3)
+    // DFS path to 4 goes through whichever branch was explored first
+    pathTo(4).head shouldBe 1
+    pathTo(4).last shouldBe 4
+
+  it should "agree with BFS on connectivity (same key set)" in :
+    val bfsVisitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+    val dfsVisitor = JournaledVisitor.withListJournalAndCameFrom[Int, Int]
+    val bfsCf = Traversal.bfs(1, bfsVisitor).asInstanceOf[JournaledVisitor[Int, Int, ?]].cameFrom.get
+    val dfsCf = Traversal.dfs(1, dfsVisitor).asInstanceOf[JournaledVisitor[Int, Int, ?]].cameFrom.get
+    bfsCf.keySet shouldBe dfsCf.keySet
