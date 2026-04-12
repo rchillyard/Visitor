@@ -288,6 +288,7 @@ object Traversal:
     given Queue[V] = Queue.empty
 
     traverse[V, R, J, Queue](start, visitor, goal)
+
   /**
     * Best-first / min-priority-queue traversal. Smallest element dequeued first.
     * Requires Ordering[V] in scope.
