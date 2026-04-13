@@ -21,7 +21,7 @@ This is achieved entirely through typeclasses rather than inheritance hierarchie
 
 ## Architecture
 
-The library is built from six orthogonal typeclasses:
+The library is built from seven orthogonal typeclasses:
 
 ### `Evaluable[V, R]`
 
@@ -107,33 +107,61 @@ For Dijkstra and Prim, the consuming library provides a `given CostUpdate[W, Ind
 that calls `decreaseKey` whenever a cheaper path to a frontier vertex is found.
 This keeps all domain knowledge out of `Traversal` itself.
 
+### `Zero[A]`
+
+Answers: *what is the identity cost?*
+
+```scala
+trait Zero[A]:
+  def identity: A
+```
+
+The minimal requirement for weighted traversals that need a seed cost but do not
+accumulate costs along a path — specifically Prim's MST algorithm. `given` instances
+are provided for `Int`, `Long`, `Double`, and `Float`.
+
+`Monoid[A]` extends `Zero[A]`, so any `given Monoid[A]` automatically satisfies
+`Zero[A]`. A derived `given [A: Monoid]: Zero[A]` is also provided for contexts
+where only `Monoid` is in scope.
+
 ### `Monoid[A]`
 
 Answers: *what is the identity cost, and how do costs combine?*
 
 ```scala
-trait Monoid[A]:
-  def identity: A
+trait Monoid[A] extends Zero[A]:
   def combine(x: A, y: A): A
 ```
 
-Mirrors the Cats `Monoid` typeclass without the Cats dependency.
-Used by weighted traversals (Dijkstra) to seed the frontier with the identity
-cost and accumulate costs along a path. `given` instances are provided for
-`Int`, `Long`, `Double`, and `Float`.
+Extends `Zero[A]` with an associative binary operation. Mirrors the Cats `Monoid`
+typeclass without the Cats dependency. Used by Dijkstra to accumulate path costs.
+`given` instances are provided for `Int`, `Long`, `Double`, and `Float`.
+
+The distinction between `Zero` and `Monoid` is intentional and pedagogically
+significant: Prim's MST algorithm compares edge weights but never combines them,
+so requiring `Monoid` for Prim would be dishonest. The correct context bound for
+weighted traversals is `E: {Zero, Ordering}` for Prim and `E: {Monoid, Ordering}`
+for Dijkstra.
 
 ### `Visitor[V, R, J]`
 
-Answers: *where do the results go?*
+Answers: *where do the results go, and how do we track came-from relationships?*
 
 ```scala
 trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
   def journal: J
   def visit(v: V)(using ev: Evaluable[V, R]): Visitor[V, R, J]
+  def discover(v: V, cameFrom: V): Visitor[V, R, J] = this  // default no-op
   def result: J
 ```
 
-The canonical implementation is `JournaledVisitor`, which appends `(node, Option[result])` pairs to a `Journal` on each visit.
+Two events are distinguished:
+- `visit(v)` — called when a vertex is *settled* (dequeued/popped and processed).
+- `discover(v, cameFrom)` — called when a vertex is first *discovered* as a neighbour
+  of `cameFrom`, before it is added to the frontier. Default is a no-op.
+
+The canonical implementation is `JournaledVisitor`. When constructed with a
+`CameFromJournal`, it overrides `discover` to record came-from relationships.
 
 ## Priority Queue Hierarchy
 
@@ -182,14 +210,51 @@ The caller supplies a `given CostUpdate[W, IndexedPrioQueue]` and `given Indexed
 
 ## Journals
 
-A `Journal` is an immutable, appendable log of visited results. Two implementations are provided:
+A `Journal` is an immutable, appendable log of visited results. Two standard
+implementations and one specialised implementation are provided:
 
-- `ListJournal[X]` — prepends elements; most recently visited node is at the head
-- `QueueJournal[X]` — enqueues elements; preserves visit order (FIFO)
+- `ListJournal[X]` — prepends elements; most recently visited node is at the head.
+- `QueueJournal[X]` — enqueues elements; preserves visit order (FIFO).
+- `CameFromJournal[V]` — records came-from relationships established during traversal.
 
 Note: `ListJournal` prepends, so post-order DFS results appear reversed. Use
 `QueueJournal` when visit order must be preserved, or reverse the `ListJournal`
 result after traversal.
+
+### `CameFromJournal[V]`
+
+Records the came-from relationship for each discovered vertex: `map(v)` is the
+vertex that was being visited when `v` was first added to the frontier. The start
+vertex is absent — it has no predecessor.
+
+```scala
+case class CameFromJournal[V](map: Map[V, V]):
+  def cameFrom(v: V): Option[V]  // None for start vertex or unreachable vertices
+  def asMap: Map[V, V]
+```
+
+First-discovery-wins semantics: if a vertex is reachable via multiple paths (as
+in BFS on a graph with cycles or multiple routes), only the first discovery is
+recorded. For BFS this guarantees the came-from vertex is always from the correct
+BFS level, giving the shortest-path predecessor.
+
+To enable came-from tracking, use the factory methods on `JournaledVisitor`:
+
+```scala
+// BFS with came-from tracking
+val visitor = JournaledVisitor.withQueueJournalAndCameFrom[V, R]
+
+// DFS with came-from tracking
+val visitor = JournaledVisitor.withListJournalAndCameFrom[V, R]
+```
+
+The result's came-from map is accessible via:
+
+```scala
+val result = Traversal.bfs(start, visitor)
+               .asInstanceOf[JournaledVisitor[V, R, ?]]
+result.cameFrom  // Option[Map[V, V]] — None if no CameFromJournal was supplied
+```
 
 ## Usage Example
 
@@ -229,6 +294,34 @@ bfsResult.result.map(_._1).toList     // nodes in BFS order
 dfsPreResult.result.map(_._1).toList  // nodes in DFS pre-order
 dfsPostResult.result.map(_._1).toList // nodes in DFS post-order (topological sort)
 goalResult.result.map(_._1).toList    // nodes visited up to and including node 4
+```
+
+## Came-From Example
+
+```scala
+import com.phasmidsoftware.visitor.core.*
+
+// Using the same adjacency and given instances as above
+
+// BFS with came-from tracking
+val visitor = JournaledVisitor.withQueueJournalAndCameFrom[Int, Int]
+val result  = Traversal.bfs(1, visitor)
+                .asInstanceOf[JournaledVisitor[Int, Int, ?]]
+
+val cf: Map[Int, Int] = result.cameFrom.get
+// cf == Map(2 -> 1, 3 -> 1, 4 -> 2, 5 -> 3)
+// Start vertex 1 is absent — it has no predecessor
+
+// Path reconstruction from vertex 5 back to start:
+def pathTo(target: Int): List[Int] =
+  def walk(v: Int, acc: List[Int]): List[Int] =
+    cf.get(v) match
+      case None       => v :: acc  // reached start vertex
+      case Some(from) => walk(from, v :: acc)
+  walk(target, Nil)
+
+pathTo(5)  // List(1, 3, 5)
+pathTo(4)  // List(1, 2, 4)
 ```
 
 ## Weighted Traversal Example
@@ -284,14 +377,15 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 
 ## Revision History
 
-| Version | Notes                                                                                                                                                                                             |
-|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0.0.1   | First version                                                                                                                                                                                     |
-| 0.0.2   | Added `AutoCloseable` to `Appendable` and `Visitor`                                                                                                                                               |
-| 0.0.3   | Added `FunctionMapJournal`                                                                                                                                                                        |
-| 1.0.0   | Complete redesign: typeclass-driven architecture, `Frontier` abstraction, binary heap priority queue, Scala 3 throughout                                                                          |
-| 1.1.0   | Added `DfsOrder` (pre/post-order DFS), `bestFirstMax`, American English type aliases                                                                                                              |
-| 1.2.0   | Added `goal` predicate for early termination across all traversal methods; `traverseTree` now uses `Either`-stack supporting `DfsOrder`                                                           |
+| Version | Notes |
+|---------|-------|
+| 0.0.1   | First version |
+| 0.0.2   | Added `AutoCloseable` to `Appendable` and `Visitor` |
+| 0.0.3   | Added `FunctionMapJournal` |
+| 1.0.0   | Complete redesign: typeclass-driven architecture, `Frontier` abstraction, binary heap priority queue, Scala 3 throughout |
+| 1.1.0   | Added `DfsOrder` (pre/post-order DFS), `bestFirstMax`, American English type aliases |
+| 1.2.0   | Added `goal` predicate for early termination across all traversal methods; `traverseTree` now uses `Either`-stack supporting `DfsOrder` |
 | 1.3.0   | Three-type priority queue hierarchy (`BinaryHeap`, `PrioQueue`, `IndexedPrioQueue`); `CostUpdate[W, F[_]]` typeclass; `TupleVisitedSet[(E,V)]`; `bestFirstWeighted` entry point for Dijkstra/Prim |
-| 1.4.0   | `Monoid[A]` typeclass with `given` instances for `Int`, `Long`, `Double`, `Float`; replaces `Numeric` in weighted traversal context bounds                                                        |
-| 1.5.0   | Added Tracer; replaced com.novocode with junit.jupiter.xxx                                                                                                                                        |
+| 1.4.0   | `Monoid[A]` typeclass with `given` instances for `Int`, `Long`, `Double`, `Float`; replaces `Numeric` in weighted traversal context bounds |
+| 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
+| 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` extends `Zero[A]`; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
