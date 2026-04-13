@@ -1,12 +1,17 @@
 package com.phasmidsoftware.visitor.core
 
-// ============================================================
-// Visitor
-// ============================================================
-
 /**
   * A Visitor accumulates `(V, Option[R])` pairs into a journal `J` as it
   * traverses a structure.
+  *
+  * Two members provide access to the accumulated journal:
+  *   - `journal` — the raw journal value of type `J`; used internally by
+  *     concrete implementations (e.g. `JournaledVisitor.copy(journal = ...)`)
+  *     where the specific `J` type must be visible for polymorphic copying.
+  *   - `result` — a public alias for `journal`, defaulting to `journal`; intended
+  *     as the external API for consumers of a completed traversal. A concrete
+  *     implementation could override `result` to apply post-processing (e.g.
+  *     reversing a `ListJournal`) without affecting the internal `journal`.
   *
   * Two events are distinguished:
   *   - `visit(v)` — called when a vertex is settled (dequeued/popped and processed).
@@ -25,23 +30,20 @@ trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
     * as a result of traversing a structure. The journal is an appendable
     * collection used for recording events during the traversal.
     *
-    * This appears to be used only by the `result` method, which returns the 
-    * accumulated data as a `List[(V, Option[R])]`.
-    *
     * @return the journal of type `J` containing the accumulated data.
     */
   def journal: J
 
   /**
-    * Visits a vertex `v`, evaluates it using the implicit `Evaluable` instance, 
-    * and records the result in the journal. The visitor is returned after the 
+    * Visits a vertex `v`, evaluates it using the implicit `Evaluable` instance,
+    * and records the result in the journal. The visitor is returned after the
     * operation with an updated state.
     *
     * @param v  the vertex to be visited.
     * @param ev the implicit `Evaluable` instance to extract a result of type `R`
     *           from the vertex `v`.
     *
-    * @return the updated `Visitor` after the vertex is processed, with its journal 
+    * @return the updated `Visitor` after the vertex is processed, with its journal
     *         containing the new `(v, Option[R])` entry.
     */
   def visit(v: V)(using ev: Evaluable[V, R]): Visitor[V, R, J]
@@ -57,10 +59,8 @@ trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
   def discover(v: V, cameFrom: V): Visitor[V, R, J] = this
 
   /**
-    * Retrieves the journal `J` that has been accumulated during the traversal
-    * of the structure.
-    *
-    * @return the journal containing the accumulated `(V, Option[R])` pairs.
+    * Public accessor for the traversal result. Defaults to `journal`.
+    * Override to apply post-processing before returning results to callers.
     */
   def result: J = journal
 

@@ -17,6 +17,13 @@ import scala.collection.immutable.Queue
   * @tparam X the type of elements that can be appended to the structure
   */
 trait Appendable[X] extends AutoCloseable:
+  /**
+    * Appends the specified element to this appendable structure and returns
+    * the instance itself, allowing for a fluent interface.
+    *
+    * @param x the element of type X to be appended
+    * @return the instance of the appendable structure with the new element appended
+    */
   def append(x: X): Appendable[X]
 
 /**
@@ -64,14 +71,18 @@ case class ListJournal[X](xs: List[X]) extends IterableJournal[X]:
   def close(): Unit = ()
 
 /**
-  * Companion object for the ListJournal class, providing utility methods for creating instances of ListJournal.
+  * Companion object for the `ListJournal` class, providing utility methods for creating instances of ListJournal.
   *
-  * The ListJournal object serves as a factory for creating empty instances of ListJournal.
-  * ListJournal is used to maintain a sequence of elements in prepend (LIFO) order.
-  *
-  * @tparam X the type of elements to be stored in the ListJournal
+  * The `ListJournal` object serves as a factory for creating empty instances of `ListJournal`.
+  * `ListJournal` is used to maintain a sequence of elements in prepend (LIFO) order.
   */
 object ListJournal:
+  /**
+    * Creates an empty instance of `ListJournal` containing no elements.
+    *
+    * @tparam X the type of elements to be stored in the `ListJournal`
+    * @return a `ListJournal` instance with an empty list backing the journal
+    */
   def empty[X]: ListJournal[X] = ListJournal(Nil)
 
 /**
@@ -142,5 +153,19 @@ case class CameFromJournal[V](map: Map[V, V]) extends IterableJournal[(V, V)]:
     */
   def asMap: Map[V, V] = map
 
+/**
+  * Companion object for the `CameFromJournal` class.
+  *
+  * Provides utility methods to work with the `CameFromJournal`, including
+  * initialization of an empty came-from journal.
+  */
 object CameFromJournal:
+  /**
+    * Creates an empty `CameFromJournal` instance.
+    *
+    * This represents a journal with no recorded came-from relationships,
+    * intended to be used as the starting point for tracking during graph traversal.
+    *
+    * @return an empty `CameFromJournal`, with an underlying empty map of type `Map[V, V]`.
+    */
   def empty[V]: CameFromJournal[V] = CameFromJournal(Map.empty)
