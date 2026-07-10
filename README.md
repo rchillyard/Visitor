@@ -11,6 +11,10 @@
 
 A purely functional, typeclass-driven graph and tree traversal library for Scala 3.
 
+## API Documentation
+
+Full Scaladoc is available via [javadoc.io](https://javadoc.io/doc/com.phasmidsoftware/visitor_3).
+
 ## Core Idea
 
 The central design principle is a strict separation of concerns.
