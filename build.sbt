@@ -4,7 +4,7 @@ organization := "com.phasmidsoftware"
 
 version := "1.6.0"
 
-val scalaVersionNumber  = "3.7.4"
+val scalaVersionNumber  = "3.9.0" // the current LTS
 val scalaTestVersion    = "3.2.20"
 val logbackVersion      = "1.5.32"
 val slf4jVersion        = "2.0.17"

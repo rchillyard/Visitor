@@ -49,11 +49,6 @@ jobs:
           name: Test
           command: cat /dev/null | sbt test
 
-      # The current Scala LTS: code compiled with an older 3.x must keep working on it
-      - run:
-          name: Test on Scala 3.9
-          command: cat /dev/null | sbt "++3.9.0!" test
-
       # Generate Scaladoc (catches doc warnings, and the docs are published to GitHub Pages)
       - run:
           name: Doc
