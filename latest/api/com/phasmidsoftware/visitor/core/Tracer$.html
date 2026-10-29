@@ -1,0 +1,259 @@
+<!DOCTYPE html><html data-pathToRoot="../../../../" data-rawLocation="com/phasmidsoftware/visitor/core/Tracer$" data-dynamicSideMenu="false"><head><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta><title>Tracer</title><link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.ico"></link><script type="text/javascript" src="../../../../scripts/theme.js"></script><script type="text/javascript" src="../../../../scripts/searchData.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scastieConfiguration.js" defer="true"></script><link rel="stylesheet" href="../../../../styles/theme/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/button/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/layout/bundle.css"></link><link rel="stylesheet" href="../../../../styles/dotty-icons.css"></link><link rel="stylesheet" href="../../../../styles/filter-bar.css"></link><link rel="stylesheet" href="../../../../styles/searchbar.css"></link><link rel="stylesheet" href="../../../../styles/social-links.css"></link><link rel="stylesheet" href="../../../../styles/versions-dropdown.css"></link><link rel="stylesheet" href="../../../../styles/content-contributors.css"></link><script type="text/javascript" src="../../../../hljs/highlight.pack.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/hljs-scala3.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/ux.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/component.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/utils.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterBar.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/DocumentableList.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Input.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterGroup.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Filter.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scaladoc-scalajs.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/contributors.js" defer="true"></script><script type="text/javascript" src="https://d3js.org/d3.v6.min.js" defer="true"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.2/dist/graphlib-dot.min.js" defer="true"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js" defer="true"></script><script type="text/javascript" src="https://scastie.scala-lang.org/embedded.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/data.js" defer="true"></script><script>var pathToRoot = "../../../../";</script></head><body><div id=""><div id="header" class="body-small"><div class="header-container-left"><a href="../../../../" class="logo-container"><span class="project-name h300">visitor</span></a><span onclick="dropdownHandler(event)" class="text-button with-arrow" id="dropdown-trigger"><a></a></span><div id="version-dropdown" class="dropdown-menu"></div></div><div class="header-container-right"><button id="search-toggle" class="icon-button"></button><span id="theme-toggle" class="icon-button"></span><span id="mobile-menu-toggle" class="icon-button hamburger"></span></div></div><div id="mobile-menu"><div class="mobile-menu-header body-small"><span class="mobile-menu-logo"><span class="project-name h300">visitor</span></span><button id="mobile-menu-close" class="icon-button close"></button></div><div class="mobile-menu-container body-medium"><input id="mobile-scaladoc-searchbar-input" class="scaladoc-searchbar-input" type="search" placeholder="Find anything"></input><span id="mobile-theme-toggle" class="mobile-menu-item mode"></span></div></div><span id="mobile-sidebar-toggle" class="floating-button"></span><div id="leftColumn" class="body-small"><div class="switcher-container"><a id="api-nav-button" class="switcher h100 selected" href="../../../../index.html">API</a></div><nav id="api-nav" class="side-menu"><div class="ni n0 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../../visitor.html"><span class="micon pa"></span><span>com.phasmidsoftware.visitor</span></a></span><div class="ni n1 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../core.html"><span class="micon pa"></span><span>core</span></a></span><div class="ni n2 "><span class="nh "><a href="Appendable.html"><span class="micon tr"></span><span>Appendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="CameFromJournal.html"><span class="micon cl"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="CameFromJournal$.html"><span class="micon ob"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="CostUpdate.html"><span class="micon tr"></span><span>CostUpdate</span></a></span></div><div class="ni n2 "><span class="nh "><a href="DfsOrder.html"><span class="micon en"></span><span>DfsOrder</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Evaluable.html"><span class="micon tr"></span><span>Evaluable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Frontier.html"><span class="micon tr"></span><span>Frontier</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IndexedPrioQueue$.html"><span class="micon ob"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IndexedPrioQueue.html"><span class="micon cl"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Journal.html"><span class="micon tr"></span><span>Journal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="JournaledVisitor$.html"><span class="micon ob"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="JournaledVisitor.html"><span class="micon cl"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Monoid.html"><span class="micon tr"></span><span>Monoid</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Neighbours.html"><span class="micon tr"></span><span>Neighbours</span></a></span></div><div class="ni n2 "><span class="nh "><a href="PrioQueue.html"><span class="micon cl"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="PrioQueue$.html"><span class="micon ob"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div><div class="ni n2 expanded"><span class="nh h100 selected"><a href="#"><span class="micon ob"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Tracer.html"><span class="micon tr"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Traversal$.html"><span class="micon ob"></span><span>Traversal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="VisitedSet.html"><span class="micon tr"></span><span>VisitedSet</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Visitor.html"><span class="micon tr"></span><span>Visitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Zero.html"><span class="micon tr"></span><span>Zero</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_IndexedPrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_PrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_Queue$.html"><span class="micon ob"></span><span>given_Frontier_Queue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_Stack$.html"><span class="micon ob"></span><span>given_Frontier_Stack</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Double$.html"><span class="micon ob"></span><span>given_Monoid_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Float$.html"><span class="micon ob"></span><span>given_Monoid_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Int$.html"><span class="micon ob"></span><span>given_Monoid_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Long$.html"><span class="micon ob"></span><span>given_Monoid_Long</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Double$.html"><span class="micon ob"></span><span>given_Zero_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Float$.html"><span class="micon ob"></span><span>given_Zero_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Int$.html"><span class="micon ob"></span><span>given_Zero_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Long$.html"><span class="micon ob"></span><span>given_Zero_Long</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../misc.html"><span class="micon pa"></span><span>misc</span></a></span><div class="ni n2 "><span class="nh "><a href="../misc/AbstractMapJournal.html"><span class="micon cl"></span><span>AbstractMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/AppendableWriter$.html"><span class="micon ob"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/AppendableWriter.html"><span class="micon cl"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/FunctionMapJournal.html"><span class="micon cl"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/FunctionMapJournal$.html"><span class="micon ob"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/FunctionMappedJournal.html"><span class="micon tr"></span><span>FunctionMappedJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/MapJournal.html"><span class="micon cl"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/MapJournal$.html"><span class="micon ob"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/NonAppendable.html"><span class="micon cl"></span><span>NonAppendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../util.html"><span class="micon pa"></span><span>util</span></a></span><div class="ni n2 "><span class="nh "><a href="../util/FP$.html"><span class="micon ob"></span><span>FP</span></a></span></div><div class="ni n2"><span class="nh "><button class="ar icon-button "></button><a href="../util/Logging$.html"><span class="micon ob"></span><span>Logging</span></a></span><div class="ni n3 "><span class="nh "><a href="../util/Logging$$Loggable.html"><span class="micon cl"></span><span>Loggable</span></a></span></div></div></div></div></nav></div><div id="footer" class="body-small"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div><div id="scaladoc-searchBar"></div><div id="main"><div class="breadcrumbs container"><a href="../../../../index.html">visitor</a>/<a href="../../visitor.html">com.phasmidsoftware.visitor</a>/<a href="../core.html">com.phasmidsoftware.visitor.core</a>/<a href="Tracer$.html">Tracer</a></div><div id="content" class="body-medium"><div><div class="cover-header">
+ <a href="Tracer.html"><span class="icon"><span class="micon ob"></span><span class="micon companion tr"></span></span></a>
+ <h1 class="h600 multi">Tracer</h1>
+</div>
+<div class="fqname body-large">
+ <span>com.phasmidsoftware.visitor.core.Tracer</span>
+</div>
+<div class="companion-badge body-small">
+ <span>See the<span class="micon tr"></span><a href="Tracer.html">Tracer</a> companion trait</span>
+</div>
+<div class="main-signature mono-small-block">
+ <div class="signature">
+  <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="Tracer$.html" t="n" class="documentableName ">Tracer</a>
+ </div>
+</div>
+<div class="cover">
+ <div class="doc"></div>
+ <section id="attributes">
+  <h2 class="h500">Attributes</h2>
+  <dl class="attributes">
+   <dt class="body-small">Companion</dt>
+   <dd class="body-medium">
+    <a href="Tracer.html">trait</a>
+   </dd>
+   <dt class="body-small">Graph</dt>
+   <dd class="body-medium">
+    <div id="inheritance-diagram" class="diagram-class showGraph">
+     <button type="button" class="label-only-button" onclick="zoomOut()">Reset zoom</button><button type="button" class="label-only-button" onclick="hideGraph()">Hide graph</button><button type="button" class="label-only-button" onclick="showGraph()">Show graph</button>
+     <svg id="graph"></svg>
+     <script type="text/dot" id="dot"> digraph g {
+ node0 [id=node0, label="<span style=\"color: #FFFFFF;\">object <a href=\"Tracer$.html\" t=\"n\">Tracer</a></span>", class="object vertex"];
+node1 [id=node1, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Object</span></span>", class="class vertex"];
+node2 [id=node2, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Any</span></span>", class="class vertex"];
+node3 [id=node3, label="<span style=\"color: #FFFFFF;\">trait <span data-unresolved-link=\"\" t=\"n\">Matchable</span></span>", class="trait vertex"];
+
+
+ node0 -> node1;
+node1 -> node2;
+node1 -> node3;
+node3 -> node2;
+
+}
+</script>
+    </div>
+   </dd>
+   <dt class="body-small">Supertypes</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block supertypes">
+     <div>
+      class <span data-unresolved-link="" t="n">Object</span>
+     </div>
+     <div>
+      trait <span data-unresolved-link="" t="n">Matchable</span>
+     </div>
+     <div>
+      class <span data-unresolved-link="" t="n">Any</span>
+     </div>
+     <span></span>
+    </div>
+   </dd>
+   <dt class="body-small">Self type</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block supertypes">
+     <span></span>
+     <div>
+      <a href="Tracer$.html" t="n">Tracer</a>.<span t="k">type</span>
+     </div>
+    </div>
+   </dd>
+  </dl>
+ </section>
+</div>
+<section id="members-list">
+ <h2 class="h500">Members list</h2>
+ <div class="documentableFilter">
+  <div class="filtersContainer"></div>
+  <input class="filterableInput" placeholder="Filter by any phrase" data-test-id="filterBarInput" type="search"><button class="clearButton label-only-button" data-test-id="filterBarClearButton">Clear all</button>
+ </div>
+ <div class="membersList expand">
+  <div class="tabs">
+   <div class="contents">
+    <section id="Value-members">
+     <div data-togglable="Value members" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Value members" class="h400">Value members</h3>
+      </div>
+      <section id="Concrete-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Concrete methods</h4>
+        </div>
+        <div class="documentableElement" id="collectionMsg-fdb">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Tracer$.html#collectionMsg-fdb" t="n" class="documentableName ">collectionMsg</a>[<span t="k"></span><span data-unresolved-link="" t="t">A</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">c</span>: <span data-unresolved-link="" t="t">Iterable</span>[<span data-unresolved-link="" t="t">A</span>]): (<span data-unresolved-link="" t="t">String</span>, <span data-unresolved-link="" t="t">String</span>)
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Convenience helper for the common case where <code>brief</code> is a collection size and <code>detail</code> is the collection elements.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Convenience helper for the common case where <code>brief</code> is a collection size and <code>detail</code> is the collection elements.</p>
+              <div class="snippet mono-small-block">
+               <pre><code class="language-"><span line-number="1" class=""><span class="tooltip-container"></span><span class="hideable"> </span>val (b, d) = Tracer.collectionMsg(vertices)
+</span><span line-number="2" class=""><span class="tooltip-container"></span><span class="hideable"> </span>tracer.trace(1, b, d)
+</span></code></pre>
+               <div class="buttons"></div>
+              </div>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="summary-fffffea6">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Tracer$.html#summary-fffffea6" t="n" class="documentableName ">summary</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">out</span>: <span data-unresolved-link="" t="t">PrintStream</span> = ...): <a href="Tracer.html" t="t">Tracer</a>[<span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A summary tracer that emits only top-level (depth 0) messages, using <code>brief</code> only — <code>detail</code> is never evaluated.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A summary tracer that emits only top-level (depth 0) messages, using <code>brief</code> only — <code>detail</code> is never evaluated.</p>
+              <p>Useful for a first look: students see only the major phases of the algorithm without the per-vertex noise.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">out</dt>
+              <dd class="body-medium">
+               <p>the stream to write to; defaults to <code>System.out</code>.</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="verbose-c4b">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Tracer$.html#verbose-c4b" t="n" class="documentableName ">verbose</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">maxDepth</span>: <span data-unresolved-link="" t="t">Int</span> = ..., <span t="k"></span><span data-unresolved-link="" t="n">out</span>: <span data-unresolved-link="" t="t">PrintStream</span> = ...): <a href="Tracer.html" t="t">Tracer</a>[<span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A verbose tracer that indents output by two spaces per depth level and emits <code>detail</code> when non-empty, falling back to <code>brief</code> otherwise.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A verbose tracer that indents output by two spaces per depth level and emits <code>detail</code> when non-empty, falling back to <code>brief</code> otherwise.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the vertex type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">maxDepth</dt>
+              <dd class="body-medium">
+               <p>only messages at or below this depth are emitted; defaults to <code>Int.MaxValue</code> (emit everything).</p>
+              </dd>
+              <dt class="body-small">out</dt>
+              <dd class="body-medium">
+               <p>the stream to write to; defaults to <code>System.out</code>. Pass a custom <code>PrintStream</code> in tests to capture output without touching global state.</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+    <section id="Givens">
+     <div data-togglable="Givens" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Givens" class="h400">Givens</h3>
+      </div>
+      <section id="Givens">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Givens</h4>
+        </div>
+        <div class="documentableElement" id="silent-ad4">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="Tracer$.html#silent-ad4" t="n" class="documentableName ">silent</a>: [<span t="k"></span><span data-unresolved-link="" t="t">V</span>]<span t="k"> =&gt; </span><span data-unresolved-link="" t="t">silent</span>[<span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>The silent (no-op) tracer. Resolved automatically as the default <code>given</code> so that all algorithms compile and run without any explicit tracer in scope. Neither <code>brief</code> nor <code>detail</code> is evaluated.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>The silent (no-op) tracer. Resolved automatically as the default <code>given</code> so that all algorithms compile and run without any explicit tracer in scope. Neither <code>brief</code> nor <code>detail</code> is evaluated.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+   </div>
+  </div>
+ </div>
+</section></div><div id="toc" class="body-small"><div id="toc-container"><span class="toc-title h200">In this article</span><nav class="toc-nav"><ul class="toc-list"><li><a href="#attributes">Attributes</a></li><li><a href="#members-list">Members list</a><ul><li><a href="#Value-members">Value members</a><ul><li><a href="#Concrete-methods">Concrete methods</a></li></ul></li><li><a href="#Givens">Givens</a><ul><li><a href="#Givens">Givens</a></li></ul></li></ul></li></ul></nav></div></div></div><div id="footer" class="body-small mobile-footer"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div></div></div></body></html>

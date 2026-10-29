@@ -1,0 +1,269 @@
+<!DOCTYPE html><html data-pathToRoot="../../../../" data-rawLocation="com/phasmidsoftware/visitor/misc/AppendableWriter$" data-dynamicSideMenu="false"><head><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta><title>AppendableWriter</title><link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.ico"></link><script type="text/javascript" src="../../../../scripts/theme.js"></script><script type="text/javascript" src="../../../../scripts/searchData.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scastieConfiguration.js" defer="true"></script><link rel="stylesheet" href="../../../../styles/theme/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/button/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/layout/bundle.css"></link><link rel="stylesheet" href="../../../../styles/dotty-icons.css"></link><link rel="stylesheet" href="../../../../styles/filter-bar.css"></link><link rel="stylesheet" href="../../../../styles/searchbar.css"></link><link rel="stylesheet" href="../../../../styles/social-links.css"></link><link rel="stylesheet" href="../../../../styles/versions-dropdown.css"></link><link rel="stylesheet" href="../../../../styles/content-contributors.css"></link><script type="text/javascript" src="../../../../hljs/highlight.pack.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/hljs-scala3.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/ux.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/component.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/utils.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterBar.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/DocumentableList.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Input.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterGroup.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Filter.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scaladoc-scalajs.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/contributors.js" defer="true"></script><script type="text/javascript" src="https://d3js.org/d3.v6.min.js" defer="true"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.2/dist/graphlib-dot.min.js" defer="true"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js" defer="true"></script><script type="text/javascript" src="https://scastie.scala-lang.org/embedded.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/data.js" defer="true"></script><script>var pathToRoot = "../../../../";</script></head><body><div id=""><div id="header" class="body-small"><div class="header-container-left"><a href="../../../../" class="logo-container"><span class="project-name h300">visitor</span></a><span onclick="dropdownHandler(event)" class="text-button with-arrow" id="dropdown-trigger"><a></a></span><div id="version-dropdown" class="dropdown-menu"></div></div><div class="header-container-right"><button id="search-toggle" class="icon-button"></button><span id="theme-toggle" class="icon-button"></span><span id="mobile-menu-toggle" class="icon-button hamburger"></span></div></div><div id="mobile-menu"><div class="mobile-menu-header body-small"><span class="mobile-menu-logo"><span class="project-name h300">visitor</span></span><button id="mobile-menu-close" class="icon-button close"></button></div><div class="mobile-menu-container body-medium"><input id="mobile-scaladoc-searchbar-input" class="scaladoc-searchbar-input" type="search" placeholder="Find anything"></input><span id="mobile-theme-toggle" class="mobile-menu-item mode"></span></div></div><span id="mobile-sidebar-toggle" class="floating-button"></span><div id="leftColumn" class="body-small"><div class="switcher-container"><a id="api-nav-button" class="switcher h100 selected" href="../../../../index.html">API</a></div><nav id="api-nav" class="side-menu"><div class="ni n0 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../../visitor.html"><span class="micon pa"></span><span>com.phasmidsoftware.visitor</span></a></span><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../core.html"><span class="micon pa"></span><span>core</span></a></span><div class="ni n2 "><span class="nh "><a href="../core/Appendable.html"><span class="micon tr"></span><span>Appendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/CameFromJournal.html"><span class="micon cl"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/CameFromJournal$.html"><span class="micon ob"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/CostUpdate.html"><span class="micon tr"></span><span>CostUpdate</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/DfsOrder.html"><span class="micon en"></span><span>DfsOrder</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Evaluable.html"><span class="micon tr"></span><span>Evaluable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Frontier.html"><span class="micon tr"></span><span>Frontier</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/IndexedPrioQueue$.html"><span class="micon ob"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/IndexedPrioQueue.html"><span class="micon cl"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Journal.html"><span class="micon tr"></span><span>Journal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/JournaledVisitor$.html"><span class="micon ob"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/JournaledVisitor.html"><span class="micon cl"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Monoid.html"><span class="micon tr"></span><span>Monoid</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Neighbours.html"><span class="micon tr"></span><span>Neighbours</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/PrioQueue.html"><span class="micon cl"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/PrioQueue$.html"><span class="micon ob"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Tracer$.html"><span class="micon ob"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Tracer.html"><span class="micon tr"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Traversal$.html"><span class="micon ob"></span><span>Traversal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/VisitedSet.html"><span class="micon tr"></span><span>VisitedSet</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Visitor.html"><span class="micon tr"></span><span>Visitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Zero.html"><span class="micon tr"></span><span>Zero</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_IndexedPrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_PrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_Queue$.html"><span class="micon ob"></span><span>given_Frontier_Queue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_Stack$.html"><span class="micon ob"></span><span>given_Frontier_Stack</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Double$.html"><span class="micon ob"></span><span>given_Monoid_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Float$.html"><span class="micon ob"></span><span>given_Monoid_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Int$.html"><span class="micon ob"></span><span>given_Monoid_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Long$.html"><span class="micon ob"></span><span>given_Monoid_Long</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Double$.html"><span class="micon ob"></span><span>given_Zero_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Float$.html"><span class="micon ob"></span><span>given_Zero_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Int$.html"><span class="micon ob"></span><span>given_Zero_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Long$.html"><span class="micon ob"></span><span>given_Zero_Long</span></a></span></div></div><div class="ni n1 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../misc.html"><span class="micon pa"></span><span>misc</span></a></span><div class="ni n2 "><span class="nh "><a href="AbstractMapJournal.html"><span class="micon cl"></span><span>AbstractMapJournal</span></a></span></div><div class="ni n2 expanded"><span class="nh h100 selected"><a href="#"><span class="micon ob"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="AppendableWriter.html"><span class="micon cl"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="FunctionMapJournal.html"><span class="micon cl"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="FunctionMapJournal$.html"><span class="micon ob"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="FunctionMappedJournal.html"><span class="micon tr"></span><span>FunctionMappedJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="MapJournal.html"><span class="micon cl"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="MapJournal$.html"><span class="micon ob"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="NonAppendable.html"><span class="micon cl"></span><span>NonAppendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../util.html"><span class="micon pa"></span><span>util</span></a></span><div class="ni n2 "><span class="nh "><a href="../util/FP$.html"><span class="micon ob"></span><span>FP</span></a></span></div><div class="ni n2"><span class="nh "><button class="ar icon-button "></button><a href="../util/Logging$.html"><span class="micon ob"></span><span>Logging</span></a></span><div class="ni n3 "><span class="nh "><a href="../util/Logging$$Loggable.html"><span class="micon cl"></span><span>Loggable</span></a></span></div></div></div></div></nav></div><div id="footer" class="body-small"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div><div id="scaladoc-searchBar"></div><div id="main"><div class="breadcrumbs container"><a href="../../../../index.html">visitor</a>/<a href="../../visitor.html">com.phasmidsoftware.visitor</a>/<a href="../misc.html">com.phasmidsoftware.visitor.misc</a>/<a href="AppendableWriter$.html">AppendableWriter</a></div><div id="content" class="body-medium"><div><div class="cover-header">
+ <a href="AppendableWriter.html"><span class="icon"><span class="micon ob"></span><span class="micon companion cl"></span></span></a>
+ <h1 class="h600 multi">AppendableWriter</h1>
+</div>
+<div class="fqname body-large">
+ <span>com.phasmidsoftware.visitor.misc.AppendableWriter</span>
+</div>
+<div class="companion-badge body-small">
+ <span>See the<span class="micon cl"></span><a href="AppendableWriter.html">AppendableWriter</a> companion class</span>
+</div>
+<div class="main-signature mono-small-block">
+ <div class="signature">
+  <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="AppendableWriter$.html" t="n" class="documentableName ">AppendableWriter</a>
+ </div>
+</div>
+<div class="cover">
+ <div class="doc">
+  <p>Companion object for <code>AppendableWriter</code> providing factory methods for creating instances.</p>
+  <p>The <code>AppendableWriter</code> allows for efficient and convenient appending of string data to files or other writable resources via a <code>BufferedWriter</code>. The factory methods in the companion object ensure flexibility by enabling creation from file names, <code>File</code> instances, <code>FileWriter</code> objects, or directly from <code>BufferedWriter</code> instances.</p>
+ </div>
+ <section id="attributes">
+  <h2 class="h500">Attributes</h2>
+  <dl class="attributes">
+   <dt class="body-small">Companion</dt>
+   <dd class="body-medium">
+    <a href="AppendableWriter.html">class</a>
+   </dd>
+   <dt class="body-small">Graph</dt>
+   <dd class="body-medium">
+    <div id="inheritance-diagram" class="diagram-class showGraph">
+     <button type="button" class="label-only-button" onclick="zoomOut()">Reset zoom</button><button type="button" class="label-only-button" onclick="hideGraph()">Hide graph</button><button type="button" class="label-only-button" onclick="showGraph()">Show graph</button>
+     <svg id="graph"></svg>
+     <script type="text/dot" id="dot"> digraph g {
+ node0 [id=node0, label="<span style=\"color: #FFFFFF;\">object <a href=\"AppendableWriter$.html\" t=\"n\">AppendableWriter</a></span>", class="object vertex"];
+node1 [id=node1, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Object</span></span>", class="class vertex"];
+node2 [id=node2, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Any</span></span>", class="class vertex"];
+node3 [id=node3, label="<span style=\"color: #FFFFFF;\">trait <span data-unresolved-link=\"\" t=\"n\">Matchable</span></span>", class="trait vertex"];
+
+
+ node0 -> node1;
+node1 -> node2;
+node1 -> node3;
+node3 -> node2;
+
+}
+</script>
+    </div>
+   </dd>
+   <dt class="body-small">Supertypes</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block supertypes">
+     <div>
+      class <span data-unresolved-link="" t="n">Object</span>
+     </div>
+     <div>
+      trait <span data-unresolved-link="" t="n">Matchable</span>
+     </div>
+     <div>
+      class <span data-unresolved-link="" t="n">Any</span>
+     </div>
+     <span></span>
+    </div>
+   </dd>
+   <dt class="body-small">Self type</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block supertypes">
+     <span></span>
+     <div>
+      <a href="AppendableWriter$.html" t="n">AppendableWriter</a>.<span t="k">type</span>
+     </div>
+    </div>
+   </dd>
+  </dl>
+ </section>
+</div>
+<section id="members-list">
+ <h2 class="h500">Members list</h2>
+ <div class="documentableFilter">
+  <div class="filtersContainer"></div>
+  <input class="filterableInput" placeholder="Filter by any phrase" data-test-id="filterBarInput" type="search"><button class="clearButton label-only-button" data-test-id="filterBarClearButton">Clear all</button>
+ </div>
+ <div class="membersList expand">
+  <div class="tabs">
+   <div class="contents">
+    <section id="Value-members">
+     <div data-togglable="Value members" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Value members" class="h400">Value members</h3>
+      </div>
+      <section id="Concrete-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Concrete methods</h4>
+        </div>
+        <div class="documentableElement" id="apply-44e">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AppendableWriter$.html#apply-44e" t="n" class="documentableName ">apply</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">name</span>: <span data-unresolved-link="" t="t">String</span>): <a href="AppendableWriter.html" t="t">AppendableWriter</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Creates an <code>AppendableWriter</code> instance for the given file name.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Creates an <code>AppendableWriter</code> instance for the given file name.</p>
+              <p>The file name must not be <code>null</code> or empty and should start with a forward slash ("/") and end with ".txt". If these conditions are not met, an <code>IllegalArgumentException</code> will be thrown. This method internally constructs a <code>File</code> instance and delegates creation to another <code>apply</code> method.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">name</dt>
+              <dd class="body-medium">
+               <p>the name of the file (must be non-null, non-empty, start with "/", and end with ".txt")</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>an <code>AppendableWriter</code> instance associated with the specified file</p>
+              </dd>
+              <dt class="body-small">Throws</dt>
+              <dd class="body-medium">
+               <div>
+                <div>
+                 <span data-unresolved-link="">IllegalArgumentException</span>
+                 <p>if <code>name</code> is <code>null</code>, empty, does not start with "/", or does not end with ".txt"</p>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="apply-fffffd7b">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AppendableWriter$.html#apply-fffffd7b" t="n" class="documentableName ">apply</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">file</span>: <span data-unresolved-link="" t="t">File</span>): <a href="AppendableWriter.html" t="t">AppendableWriter</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Creates an <code>AppendableWriter</code> instance using the specified <code>File</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Creates an <code>AppendableWriter</code> instance using the specified <code>File</code>.</p>
+              <p>This method initializes a <code>FileWriter</code> in append-mode for the provided file and then uses it to create an <code>AppendableWriter</code> instance.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">file</dt>
+              <dd class="body-medium">
+               <p>the file to which the <code>AppendableWriter</code> will append data</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>an instance of <code>AppendableWriter</code> that writes to the specified file in append-mode</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="apply-fffff348">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AppendableWriter$.html#apply-fffff348" t="n" class="documentableName ">apply</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">fileWriter</span>: <span data-unresolved-link="" t="t">FileWriter</span>): <a href="AppendableWriter.html" t="t">AppendableWriter</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Creates a new instance of <code>AppendableWriter</code> using the provided <code>FileWriter</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Creates a new instance of <code>AppendableWriter</code> using the provided <code>FileWriter</code>.</p>
+              <p>The <code>AppendableWriter</code> wraps the <code>FileWriter</code> with a <code>BufferedWriter</code>, enabling efficient writing operations, and provides an interface for appending string content.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">fileWriter</dt>
+              <dd class="body-medium">
+               <p>the <code>FileWriter</code> to be wrapped, enabling appending functionality to the file</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>a new <code>AppendableWriter</code> instance wrapping the provided <code>FileWriter</code></p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="apply-13">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AppendableWriter$.html#apply-13" t="n" class="documentableName ">apply</a>(<span t="k"></span>): <a href="AppendableWriter.html" t="t">AppendableWriter</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Creates a new instance of <code>AppendableWriter</code> with a default <code>StringWriter</code> as the underlying writer.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Creates a new instance of <code>AppendableWriter</code> with a default <code>StringWriter</code> as the underlying writer.</p>
+              <p>This method provides a convenient way to construct an <code>AppendableWriter</code> in-memory without specifying a file or an external writer.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>a new <code>AppendableWriter</code> instance wrapping a default <code>StringWriter</code></p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+   </div>
+  </div>
+ </div>
+</section></div><div id="toc" class="body-small"><div id="toc-container"><span class="toc-title h200">In this article</span><nav class="toc-nav"><ul class="toc-list"><li><a href="#attributes">Attributes</a></li><li><a href="#members-list">Members list</a><ul><li><a href="#Value-members">Value members</a><ul><li><a href="#Concrete-methods">Concrete methods</a></li></ul></li></ul></li></ul></nav></div></div></div><div id="footer" class="body-small mobile-footer"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div></div></div></body></html>

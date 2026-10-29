@@ -1,0 +1,455 @@
+<!DOCTYPE html><html data-pathToRoot="../../../../" data-rawLocation="com/phasmidsoftware/visitor/misc/AbstractMapJournal" data-dynamicSideMenu="false"><head><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta><title>AbstractMapJournal</title><link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.ico"></link><script type="text/javascript" src="../../../../scripts/theme.js"></script><script type="text/javascript" src="../../../../scripts/searchData.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scastieConfiguration.js" defer="true"></script><link rel="stylesheet" href="../../../../styles/theme/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/button/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/layout/bundle.css"></link><link rel="stylesheet" href="../../../../styles/dotty-icons.css"></link><link rel="stylesheet" href="../../../../styles/filter-bar.css"></link><link rel="stylesheet" href="../../../../styles/searchbar.css"></link><link rel="stylesheet" href="../../../../styles/social-links.css"></link><link rel="stylesheet" href="../../../../styles/versions-dropdown.css"></link><link rel="stylesheet" href="../../../../styles/content-contributors.css"></link><script type="text/javascript" src="../../../../hljs/highlight.pack.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/hljs-scala3.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/ux.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/component.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/utils.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterBar.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/DocumentableList.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Input.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterGroup.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Filter.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scaladoc-scalajs.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/contributors.js" defer="true"></script><script type="text/javascript" src="https://d3js.org/d3.v6.min.js" defer="true"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.2/dist/graphlib-dot.min.js" defer="true"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js" defer="true"></script><script type="text/javascript" src="https://scastie.scala-lang.org/embedded.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/data.js" defer="true"></script><script>var pathToRoot = "../../../../";</script></head><body><div id=""><div id="header" class="body-small"><div class="header-container-left"><a href="../../../../" class="logo-container"><span class="project-name h300">visitor</span></a><span onclick="dropdownHandler(event)" class="text-button with-arrow" id="dropdown-trigger"><a></a></span><div id="version-dropdown" class="dropdown-menu"></div></div><div class="header-container-right"><button id="search-toggle" class="icon-button"></button><span id="theme-toggle" class="icon-button"></span><span id="mobile-menu-toggle" class="icon-button hamburger"></span></div></div><div id="mobile-menu"><div class="mobile-menu-header body-small"><span class="mobile-menu-logo"><span class="project-name h300">visitor</span></span><button id="mobile-menu-close" class="icon-button close"></button></div><div class="mobile-menu-container body-medium"><input id="mobile-scaladoc-searchbar-input" class="scaladoc-searchbar-input" type="search" placeholder="Find anything"></input><span id="mobile-theme-toggle" class="mobile-menu-item mode"></span></div></div><span id="mobile-sidebar-toggle" class="floating-button"></span><div id="leftColumn" class="body-small"><div class="switcher-container"><a id="api-nav-button" class="switcher h100 selected" href="../../../../index.html">API</a></div><nav id="api-nav" class="side-menu"><div class="ni n0 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../../visitor.html"><span class="micon pa"></span><span>com.phasmidsoftware.visitor</span></a></span><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../core.html"><span class="micon pa"></span><span>core</span></a></span><div class="ni n2 "><span class="nh "><a href="../core/Appendable.html"><span class="micon tr"></span><span>Appendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/CameFromJournal.html"><span class="micon cl"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/CameFromJournal$.html"><span class="micon ob"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/CostUpdate.html"><span class="micon tr"></span><span>CostUpdate</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/DfsOrder.html"><span class="micon en"></span><span>DfsOrder</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Evaluable.html"><span class="micon tr"></span><span>Evaluable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Frontier.html"><span class="micon tr"></span><span>Frontier</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/IndexedPrioQueue$.html"><span class="micon ob"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/IndexedPrioQueue.html"><span class="micon cl"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Journal.html"><span class="micon tr"></span><span>Journal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/JournaledVisitor$.html"><span class="micon ob"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/JournaledVisitor.html"><span class="micon cl"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Monoid.html"><span class="micon tr"></span><span>Monoid</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Neighbours.html"><span class="micon tr"></span><span>Neighbours</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/PrioQueue.html"><span class="micon cl"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/PrioQueue$.html"><span class="micon ob"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Tracer$.html"><span class="micon ob"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Tracer.html"><span class="micon tr"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Traversal$.html"><span class="micon ob"></span><span>Traversal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/VisitedSet.html"><span class="micon tr"></span><span>VisitedSet</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Visitor.html"><span class="micon tr"></span><span>Visitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/Zero.html"><span class="micon tr"></span><span>Zero</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_IndexedPrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_PrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_Queue$.html"><span class="micon ob"></span><span>given_Frontier_Queue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Frontier_Stack$.html"><span class="micon ob"></span><span>given_Frontier_Stack</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Double$.html"><span class="micon ob"></span><span>given_Monoid_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Float$.html"><span class="micon ob"></span><span>given_Monoid_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Int$.html"><span class="micon ob"></span><span>given_Monoid_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Monoid_Long$.html"><span class="micon ob"></span><span>given_Monoid_Long</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Double$.html"><span class="micon ob"></span><span>given_Zero_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Float$.html"><span class="micon ob"></span><span>given_Zero_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Int$.html"><span class="micon ob"></span><span>given_Zero_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../core/given_Zero_Long$.html"><span class="micon ob"></span><span>given_Zero_Long</span></a></span></div></div><div class="ni n1 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../misc.html"><span class="micon pa"></span><span>misc</span></a></span><div class="ni n2 expanded"><span class="nh h100 selected"><a href="#"><span class="micon cl"></span><span>AbstractMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="AppendableWriter$.html"><span class="micon ob"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="AppendableWriter.html"><span class="micon cl"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="FunctionMapJournal.html"><span class="micon cl"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="FunctionMapJournal$.html"><span class="micon ob"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="FunctionMappedJournal.html"><span class="micon tr"></span><span>FunctionMappedJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="MapJournal.html"><span class="micon cl"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="MapJournal$.html"><span class="micon ob"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="NonAppendable.html"><span class="micon cl"></span><span>NonAppendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../util.html"><span class="micon pa"></span><span>util</span></a></span><div class="ni n2 "><span class="nh "><a href="../util/FP$.html"><span class="micon ob"></span><span>FP</span></a></span></div><div class="ni n2"><span class="nh "><button class="ar icon-button "></button><a href="../util/Logging$.html"><span class="micon ob"></span><span>Logging</span></a></span><div class="ni n3 "><span class="nh "><a href="../util/Logging$$Loggable.html"><span class="micon cl"></span><span>Loggable</span></a></span></div></div></div></div></nav></div><div id="footer" class="body-small"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div><div id="scaladoc-searchBar"></div><div id="main"><div class="breadcrumbs container"><a href="../../../../index.html">visitor</a>/<a href="../../visitor.html">com.phasmidsoftware.visitor</a>/<a href="../misc.html">com.phasmidsoftware.visitor.misc</a>/<a href="AbstractMapJournal.html">AbstractMapJournal</a></div><div id="content" class="body-medium"><div><div class="cover-header">
+ <span class="icon"><span class="micon cl"></span></span>
+ <h1 class="h600 single">AbstractMapJournal</h1>
+</div>
+<div class="fqname body-large">
+ <span>com.phasmidsoftware.visitor.misc.AbstractMapJournal</span>
+</div>
+<div class="main-signature mono-small-block">
+ <div class="signature">
+  <span class="signature-short"><span class="modifiers"><span t="k">abstract </span></span><span class="kind"><span t="k">class </span></span><a href="AbstractMapJournal.html" t="n" class="documentableName ">AbstractMapJournal</a>[<span t="k"></span><span data-unresolved-link="" t="t">K</span>, <span t="k"></span><span data-unresolved-link="" t="t">V</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">map</span>: <span data-unresolved-link="" t="t">Map</span>[<span data-unresolved-link="" t="t">K</span>, <span data-unresolved-link="" t="t">V</span>])<span t="k"> extends </span><a href="../core/Journal.html" t="t">Journal</a>[(<span t="t">K</span>, <span t="t">V</span>)]</span><span class="signature-long"></span>
+ </div>
+</div>
+<div class="cover">
+ <div class="doc">
+  <p>An abstract class representing a map-based implementation of a <code>Journal</code>. This class provides mechanisms to manage key-value pairs immutably in a journal-like structure. It extends the <code>Journal</code> trait, implementing appendable and iterable behaviors.</p>
+  <p>The <code>AbstractMapJournal</code> relies on an underlying immutable <code>Map</code> to store key-value pairs, allowing retrieval, iteration, and the addition of elements in a functional style.</p>
+ </div>
+ <section id="attributes">
+  <h2 class="h500">Type parameters</h2>
+  <dl class="attributes">
+   <dt class="body-small">K</dt>
+   <dd class="body-medium">
+    <p>the type of keys maintained by this journal</p>
+   </dd>
+   <dt class="body-small">V</dt>
+   <dd class="body-medium">
+    <p>the type of values associated with keys in this journal</p>
+   </dd>
+  </dl>
+  <h2 class="h500">Value parameters</h2>
+  <dl class="attributes">
+   <dt class="body-small">map</dt>
+   <dd class="body-medium">
+    <p>the underlying immutable map containing the journal entries</p>
+   </dd>
+  </dl>
+  <h2 class="h500">Attributes</h2>
+  <dl class="attributes">
+   <dt class="body-small">Constructor</dt>
+   <dd class="body-medium">
+    <p>Initializes the journal with an immutable map of key-value pairs</p>
+   </dd>
+   <dt class="body-small">Graph</dt>
+   <dd class="body-medium">
+    <div id="inheritance-diagram" class="diagram-class showGraph">
+     <button type="button" class="label-only-button" onclick="zoomOut()">Reset zoom</button><button type="button" class="label-only-button" onclick="hideGraph()">Hide graph</button><button type="button" class="label-only-button" onclick="showGraph()">Show graph</button>
+     <svg id="graph"></svg>
+     <script type="text/dot" id="dot"> digraph g {
+ node0 [id=node0, label="<span style=\"color: #FFFFFF;\">class <a href=\"AbstractMapJournal.html\" t=\"n\">AbstractMapJournal</a>[<span t=\"t\">K</span>, <span t=\"t\">V</span>]</span>", class="class vertex"];
+node1 [id=node1, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Object</span></span>", class="class vertex"];
+node2 [id=node2, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Any</span></span>", class="class vertex"];
+node3 [id=node3, label="<span style=\"color: #FFFFFF;\">trait <span data-unresolved-link=\"\" t=\"n\">Matchable</span></span>", class="trait vertex"];
+node4 [id=node4, label="<span style=\"color: #FFFFFF;\">trait <a href=\"../core/Journal.html\" t=\"n\">Journal</a>[(<span t=\"t\">K</span>, <span t=\"t\">V</span>)]</span>", class="trait vertex"];
+node5 [id=node5, label="<span style=\"color: #FFFFFF;\">trait <a href=\"../core/Appendable.html\" t=\"n\">Appendable</a>[(<span t=\"t\">K</span>, <span t=\"t\">V</span>)]</span>", class="trait vertex"];
+node6 [id=node6, label="<span style=\"color: #FFFFFF;\">trait <span data-unresolved-link=\"\" t=\"n\">AutoCloseable</span></span>", class="trait vertex"];
+node7 [id=node7, label="<span style=\"color: #FFFFFF;\">class <a href=\"FunctionMapJournal.html\" t=\"n\">FunctionMapJournal</a>[<span t=\"t\">K</span>, <span t=\"t\">V</span>]</span>", class="class vertex"];
+node8 [id=node8, label="<span style=\"color: #FFFFFF;\">class <a href=\"MapJournal.html\" t=\"n\">MapJournal</a>[<span t=\"t\">K</span>, <span t=\"t\">V</span>]</span>", class="class vertex"];
+
+
+ node0 -> node1;
+node1 -> node2;
+node1 -> node3;
+node3 -> node2;
+node0 -> node4;
+node4 -> node1;
+node4 -> node5;
+node5 -> node1;
+node5 -> node6;
+node6 -> node1;
+node7 -> node0;
+node8 -> node0;
+
+}
+</script>
+    </div>
+   </dd>
+   <dt class="body-small">Supertypes</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block supertypes">
+     <div>
+      trait <a href="../core/Journal.html" t="n">Journal</a>[(<span t="t">K</span>, <span t="t">V</span>)]
+     </div>
+     <div>
+      trait <a href="../core/Appendable.html" t="n">Appendable</a>[(<span t="t">K</span>, <span t="t">V</span>)]
+     </div>
+     <div>
+      trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+     </div>
+     <div>
+      class <span data-unresolved-link="" t="n">Object</span>
+     </div>
+     <div>
+      trait <span data-unresolved-link="" t="n">Matchable</span>
+     </div>
+     <div>
+      class <span data-unresolved-link="" t="n">Any</span>
+     </div>
+     <span class="show-all-code show-content text-button h100">Show all</span>
+    </div>
+   </dd>
+   <dt class="body-small">Known subtypes</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block subtypes">
+     <div>
+      class <a href="FunctionMapJournal.html" t="n">FunctionMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+     </div>
+     <div>
+      class <a href="MapJournal.html" t="n">MapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+     </div>
+     <span></span>
+    </div>
+   </dd>
+  </dl>
+ </section>
+</div>
+<section id="members-list">
+ <h2 class="h500">Members list</h2>
+ <div class="documentableFilter">
+  <div class="filtersContainer"></div>
+  <input class="filterableInput" placeholder="Filter by any phrase" data-test-id="filterBarInput" type="search"><button class="clearButton label-only-button" data-test-id="filterBarClearButton">Clear all</button>
+ </div>
+ <div class="membersList expand">
+  <div class="tabs">
+   <div class="contents">
+    <section id="Value-members">
+     <div data-togglable="Value members" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Value members" class="h400">Value members</h3>
+      </div>
+      <section id="Abstract-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Abstract methods</h4>
+        </div>
+        <div class="documentableElement" id="unit-fffff3e1">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#unit-fffff3e1" t="n" class="documentableName ">unit</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">xs</span>: <span data-unresolved-link="" t="t">Map</span>[<span t="t">K</span>, <span t="t">V</span>]): <a href="AbstractMapJournal.html" t="t">AbstractMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Creates a new instance of <code>AbstractMapJournal</code> with the given map.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Creates a new instance of <code>AbstractMapJournal</code> with the given map.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">xs</dt>
+              <dd class="body-medium">
+               <p>the map to be used for initializing the new <code>AbstractMapJournal</code> instance</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>a new instance of <code>AbstractMapJournal</code> containing the elements of the provided map</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+      <section id="Concrete-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Concrete methods</h4>
+        </div>
+        <div class="documentableElement" id="append-ffffff97">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#append-ffffff97" t="n" class="documentableName ">append</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">x</span>: (<span t="t">K</span>, <span t="t">V</span>)): <a href="AbstractMapJournal.html" t="t">AbstractMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Appends the specified element to this <code>Appendable</code> object, returning a new instance of the <code>Appendable</code> with the element included.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Appends the specified element to this <code>Appendable</code> object, returning a new instance of the <code>Appendable</code> with the element included.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">x</dt>
+              <dd class="body-medium">
+               <p>the element to be appended</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>a new <code>Appendable[X]</code> instance containing the existing elements and the newly appended element</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="apply-d26">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#apply-d26" t="n" class="documentableName ">apply</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">key</span>: <span t="t">K</span>): <span t="t">V</span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Retrieves the value associated with the specified key from the underlying map.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Retrieves the value associated with the specified key from the underlying map.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">key</dt>
+              <dd class="body-medium">
+               <p>the key to look up in the map</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>the value associated with the specified key</p>
+              </dd>
+              <dt class="body-small">Throws</dt>
+              <dd class="body-medium">
+               <div>
+                <div>
+                 <span data-unresolved-link="">NoSuchElementException</span>
+                 <p>if the key does not exist in the map</p>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="entries-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#entries-0" t="n" class="documentableName ">entries</a>: <span data-unresolved-link="" t="t">Iterable</span>[(<span t="t">K</span>, <span t="t">V</span>)]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Retrieves the entries of the underlying map as an iterable collection of key-value pairs.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Retrieves the entries of the underlying map as an iterable collection of key-value pairs.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>an <code>Iterable</code> containing all key-value pairs present in the map</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="get-fffffb50">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#get-fffffb50" t="n" class="documentableName ">get</a>(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">key</span>: <span t="t">K</span>): <span data-unresolved-link="" t="t">Option</span>[<span t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Retrieves the value associated with the specified key from the underlying map.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Retrieves the value associated with the specified key from the underlying map.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">key</dt>
+              <dd class="body-medium">
+               <p>the key to look up in the map</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>an <code>Option</code> containing the value associated with the key, or <code>None</code> if the key does not exist</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="keys-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#keys-0" t="n" class="documentableName ">keys</a>: <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">K</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Retrieves the keys of the underlying map as an iterable collection.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Retrieves the keys of the underlying map as an iterable collection.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>an <code>Iterable</code> containing all the keys present in the map</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="values-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#values-0" t="n" class="documentableName ">values</a>: <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Retrieves the values of the underlying map as an iterable collection.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Retrieves the values of the underlying map as an iterable collection.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>an <code>Iterable</code> containing all the values present in the map</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+      <section id="Inherited-and-Abstract-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Inherited and Abstract methods</h4>
+        </div>
+        <div class="documentableElement" id="close-94c" data-f-inherited="Journal">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="AbstractMapJournal.html#close-94c" t="n" class="documentableName ">close</a>(<span t="k"></span>): <span data-unresolved-link="" t="t">Unit</span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Inherited from:</dt>
+              <dd class="body-medium">
+               <a href="../core/Journal.html#close-94c">Journal</a>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+   </div>
+  </div>
+ </div>
+</section></div><div id="toc" class="body-small"><div id="toc-container"><span class="toc-title h200">In this article</span><nav class="toc-nav"><ul class="toc-list"><li><a href="#attributes">Type parameters</a></li><li><a href="#members-list">Members list</a><ul><li><a href="#Value-members">Value members</a><ul><li><a href="#Abstract-methods">Abstract methods</a></li><li><a href="#Concrete-methods">Concrete methods</a></li><li><a href="#Inherited-and-Abstract-methods">Inherited and Abstract methods</a></li></ul></li></ul></li></ul></nav></div></div></div><div id="footer" class="body-small mobile-footer"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div></div></div></body></html>

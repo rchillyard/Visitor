@@ -1,0 +1,361 @@
+<!DOCTYPE html><html data-pathToRoot="../../../../" data-rawLocation="com/phasmidsoftware/visitor/core/Frontier" data-dynamicSideMenu="false"><head><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta><title>Frontier</title><link rel="shortcut icon" type="image/x-icon" href="../../../../favicon.ico"></link><script type="text/javascript" src="../../../../scripts/theme.js"></script><script type="text/javascript" src="../../../../scripts/searchData.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scastieConfiguration.js" defer="true"></script><link rel="stylesheet" href="../../../../styles/theme/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/components/button/bundle.css"></link><link rel="stylesheet" href="../../../../styles/theme/layout/bundle.css"></link><link rel="stylesheet" href="../../../../styles/dotty-icons.css"></link><link rel="stylesheet" href="../../../../styles/filter-bar.css"></link><link rel="stylesheet" href="../../../../styles/searchbar.css"></link><link rel="stylesheet" href="../../../../styles/social-links.css"></link><link rel="stylesheet" href="../../../../styles/versions-dropdown.css"></link><link rel="stylesheet" href="../../../../styles/content-contributors.css"></link><script type="text/javascript" src="../../../../hljs/highlight.pack.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/hljs-scala3.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/ux.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/component.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/common/utils.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterBar.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/DocumentableList.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Input.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/FilterGroup.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/components/Filter.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/scaladoc-scalajs.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/contributors.js" defer="true"></script><script type="text/javascript" src="https://d3js.org/d3.v6.min.js" defer="true"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.2/dist/graphlib-dot.min.js" defer="true"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js" defer="true"></script><script type="text/javascript" src="https://scastie.scala-lang.org/embedded.js" defer="true"></script><script type="text/javascript" src="../../../../scripts/data.js" defer="true"></script><script>var pathToRoot = "../../../../";</script></head><body><div id=""><div id="header" class="body-small"><div class="header-container-left"><a href="../../../../" class="logo-container"><span class="project-name h300">visitor</span></a><span onclick="dropdownHandler(event)" class="text-button with-arrow" id="dropdown-trigger"><a></a></span><div id="version-dropdown" class="dropdown-menu"></div></div><div class="header-container-right"><button id="search-toggle" class="icon-button"></button><span id="theme-toggle" class="icon-button"></span><span id="mobile-menu-toggle" class="icon-button hamburger"></span></div></div><div id="mobile-menu"><div class="mobile-menu-header body-small"><span class="mobile-menu-logo"><span class="project-name h300">visitor</span></span><button id="mobile-menu-close" class="icon-button close"></button></div><div class="mobile-menu-container body-medium"><input id="mobile-scaladoc-searchbar-input" class="scaladoc-searchbar-input" type="search" placeholder="Find anything"></input><span id="mobile-theme-toggle" class="mobile-menu-item mode"></span></div></div><span id="mobile-sidebar-toggle" class="floating-button"></span><div id="leftColumn" class="body-small"><div class="switcher-container"><a id="api-nav-button" class="switcher h100 selected" href="../../../../index.html">API</a></div><nav id="api-nav" class="side-menu"><div class="ni n0 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../../visitor.html"><span class="micon pa"></span><span>com.phasmidsoftware.visitor</span></a></span><div class="ni n1 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../core.html"><span class="micon pa"></span><span>core</span></a></span><div class="ni n2 "><span class="nh "><a href="Appendable.html"><span class="micon tr"></span><span>Appendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="CameFromJournal.html"><span class="micon cl"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="CameFromJournal$.html"><span class="micon ob"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="CostUpdate.html"><span class="micon tr"></span><span>CostUpdate</span></a></span></div><div class="ni n2 "><span class="nh "><a href="DfsOrder.html"><span class="micon en"></span><span>DfsOrder</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Evaluable.html"><span class="micon tr"></span><span>Evaluable</span></a></span></div><div class="ni n2 expanded"><span class="nh h100 selected"><a href="#"><span class="micon tr"></span><span>Frontier</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IndexedPrioQueue$.html"><span class="micon ob"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IndexedPrioQueue.html"><span class="micon cl"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Journal.html"><span class="micon tr"></span><span>Journal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="JournaledVisitor$.html"><span class="micon ob"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="JournaledVisitor.html"><span class="micon cl"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Monoid.html"><span class="micon tr"></span><span>Monoid</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Neighbours.html"><span class="micon tr"></span><span>Neighbours</span></a></span></div><div class="ni n2 "><span class="nh "><a href="PrioQueue.html"><span class="micon cl"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="PrioQueue$.html"><span class="micon ob"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Tracer$.html"><span class="micon ob"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Tracer.html"><span class="micon tr"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Traversal$.html"><span class="micon ob"></span><span>Traversal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="VisitedSet.html"><span class="micon tr"></span><span>VisitedSet</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Visitor.html"><span class="micon tr"></span><span>Visitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="Zero.html"><span class="micon tr"></span><span>Zero</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_IndexedPrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_PrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_Queue$.html"><span class="micon ob"></span><span>given_Frontier_Queue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Frontier_Stack$.html"><span class="micon ob"></span><span>given_Frontier_Stack</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Double$.html"><span class="micon ob"></span><span>given_Monoid_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Float$.html"><span class="micon ob"></span><span>given_Monoid_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Int$.html"><span class="micon ob"></span><span>given_Monoid_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Monoid_Long$.html"><span class="micon ob"></span><span>given_Monoid_Long</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Double$.html"><span class="micon ob"></span><span>given_Zero_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Float$.html"><span class="micon ob"></span><span>given_Zero_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Int$.html"><span class="micon ob"></span><span>given_Zero_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="given_Zero_Long$.html"><span class="micon ob"></span><span>given_Zero_Long</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../misc.html"><span class="micon pa"></span><span>misc</span></a></span><div class="ni n2 "><span class="nh "><a href="../misc/AbstractMapJournal.html"><span class="micon cl"></span><span>AbstractMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/AppendableWriter$.html"><span class="micon ob"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/AppendableWriter.html"><span class="micon cl"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/FunctionMapJournal.html"><span class="micon cl"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/FunctionMapJournal$.html"><span class="micon ob"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/FunctionMappedJournal.html"><span class="micon tr"></span><span>FunctionMappedJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/MapJournal.html"><span class="micon cl"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/MapJournal$.html"><span class="micon ob"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/NonAppendable.html"><span class="micon cl"></span><span>NonAppendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="../misc/QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="../util.html"><span class="micon pa"></span><span>util</span></a></span><div class="ni n2 "><span class="nh "><a href="../util/FP$.html"><span class="micon ob"></span><span>FP</span></a></span></div><div class="ni n2"><span class="nh "><button class="ar icon-button "></button><a href="../util/Logging$.html"><span class="micon ob"></span><span>Logging</span></a></span><div class="ni n3 "><span class="nh "><a href="../util/Logging$$Loggable.html"><span class="micon cl"></span><span>Loggable</span></a></span></div></div></div></div></nav></div><div id="footer" class="body-small"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div><div id="scaladoc-searchBar"></div><div id="main"><div class="breadcrumbs container"><a href="../../../../index.html">visitor</a>/<a href="../../visitor.html">com.phasmidsoftware.visitor</a>/<a href="../core.html">com.phasmidsoftware.visitor.core</a>/<a href="Frontier.html">Frontier</a></div><div id="content" class="body-medium"><div><div class="cover-header">
+ <span class="icon"><span class="micon tr"></span></span>
+ <h1 class="h600 single">Frontier</h1>
+</div>
+<div class="fqname body-large">
+ <span>com.phasmidsoftware.visitor.core.Frontier</span>
+</div>
+<div class="main-signature mono-small-block">
+ <div class="signature">
+  <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="Frontier.html" t="n" class="documentableName ">Frontier</a>[<span t="k"></span><span data-unresolved-link="" t="t">F</span>[<span t="t">_</span>]]
+ </div>
+</div>
+<div class="cover">
+ <div class="doc">
+  <p>Typeclass: abstracts over frontier data structures (Queue, Stack, PriorityQueue). The three implementations below give us BFS, DFS, and best-first / Dijkstra-style traversals for free — the traversal algorithm itself doesn't change at all.</p>
+ </div>
+ <section id="attributes">
+  <h2 class="h500">Type parameters</h2>
+  <dl class="attributes">
+   <dt class="body-small">F</dt>
+   <dd class="body-medium">
+    <p>the higher-kinded frontier container type</p>
+   </dd>
+  </dl>
+  <h2 class="h500">Attributes</h2>
+  <dl class="attributes">
+   <dt class="body-small">Graph</dt>
+   <dd class="body-medium">
+    <div id="inheritance-diagram" class="diagram-class showGraph">
+     <button type="button" class="label-only-button" onclick="zoomOut()">Reset zoom</button><button type="button" class="label-only-button" onclick="hideGraph()">Hide graph</button><button type="button" class="label-only-button" onclick="showGraph()">Show graph</button>
+     <svg id="graph"></svg>
+     <script type="text/dot" id="dot"> digraph g {
+ node0 [id=node0, label="<span style=\"color: #FFFFFF;\">trait <a href=\"Frontier.html\" t=\"n\">Frontier</a>[<span t=\"t\">F</span>]</span>", class="trait vertex"];
+node1 [id=node1, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Object</span></span>", class="class vertex"];
+node2 [id=node2, label="<span style=\"color: #FFFFFF;\">class <span data-unresolved-link=\"\" t=\"n\">Any</span></span>", class="class vertex"];
+node3 [id=node3, label="<span style=\"color: #FFFFFF;\">trait <span data-unresolved-link=\"\" t=\"n\">Matchable</span></span>", class="trait vertex"];
+node4 [id=node4, label="<span style=\"color: #FFFFFF;\">object <a href=\"given_Frontier_IndexedPrioQueue$.html\" t=\"n\">given_Frontier_IndexedPrioQueue</a></span>", class="object vertex"];
+node5 [id=node5, label="<span style=\"color: #FFFFFF;\">object <a href=\"given_Frontier_PrioQueue$.html\" t=\"n\">given_Frontier_PrioQueue</a></span>", class="object vertex"];
+node6 [id=node6, label="<span style=\"color: #FFFFFF;\">object <a href=\"given_Frontier_Queue$.html\" t=\"n\">given_Frontier_Queue</a></span>", class="object vertex"];
+node7 [id=node7, label="<span style=\"color: #FFFFFF;\">object <a href=\"given_Frontier_Stack$.html\" t=\"n\">given_Frontier_Stack</a></span>", class="object vertex"];
+
+
+ node0 -> node1;
+node1 -> node2;
+node1 -> node3;
+node3 -> node2;
+node4 -> node0;
+node5 -> node0;
+node6 -> node0;
+node7 -> node0;
+
+}
+</script>
+    </div>
+   </dd>
+   <dt class="body-small">Supertypes</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block supertypes">
+     <div>
+      class <span data-unresolved-link="" t="n">Object</span>
+     </div>
+     <div>
+      trait <span data-unresolved-link="" t="n">Matchable</span>
+     </div>
+     <div>
+      class <span data-unresolved-link="" t="n">Any</span>
+     </div>
+     <span></span>
+    </div>
+   </dd>
+   <dt class="body-small">Known subtypes</dt>
+   <dd class="body-medium">
+    <div class="mono-small-block subtypes">
+     <div>
+      object <a href="given_Frontier_IndexedPrioQueue$.html" t="n">given_Frontier_IndexedPrioQueue</a>
+     </div>
+     <div>
+      object <a href="given_Frontier_PrioQueue$.html" t="n">given_Frontier_PrioQueue</a>
+     </div>
+     <div>
+      object <a href="given_Frontier_Queue$.html" t="n">given_Frontier_Queue</a>
+     </div>
+     <div>
+      object <a href="given_Frontier_Stack$.html" t="n">given_Frontier_Stack</a>
+     </div>
+     <span></span>
+    </div>
+   </dd>
+  </dl>
+ </section>
+</div>
+<section id="members-list">
+ <h2 class="h500">Members list</h2>
+ <div class="documentableFilter">
+  <div class="filtersContainer"></div>
+  <input class="filterableInput" placeholder="Filter by any phrase" data-test-id="filterBarInput" type="search"><button class="clearButton label-only-button" data-test-id="filterBarClearButton">Clear all</button>
+ </div>
+ <div class="membersList expand">
+  <div class="tabs">
+   <div class="contents">
+    <section id="Value-members">
+     <div data-togglable="Value members" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Value members" class="h400">Value members</h3>
+      </div>
+      <section id="Abstract-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Abstract methods</h4>
+        </div>
+        <div class="documentableElement" id="empty-fffff7c4">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Frontier.html#empty-fffff7c4" t="n" class="documentableName ">empty</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>]: <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Returns an empty instance of the parameterized type wrapped in the context of the effect type <code>F</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Returns an empty instance of the parameterized type wrapped in the context of the effect type <code>F</code>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>An empty instance of <code>F[T]</code>.</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="isEmpty-e1c">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Frontier.html#isEmpty-e1c" t="n" class="documentableName ">isEmpty</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">f</span>: <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>]): <span data-unresolved-link="" t="t">Boolean</span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Checks if the given frontier is empty.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Checks if the given frontier is empty.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">f</dt>
+              <dd class="body-medium">
+               <p>the frontier to be checked for emptiness</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>true if the frontier is empty, false otherwise</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="offer-fffff4ea">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Frontier.html#offer-fffff4ea" t="n" class="documentableName ">offer</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">f</span>: <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>])(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">t</span>: <span data-unresolved-link="" t="t">T</span>): <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Applies a given value to a the frontier <code>f</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Applies a given value to a the frontier <code>f</code>.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">f</dt>
+              <dd class="body-medium">
+               <p>The frontier of type <code>F[T]</code> that will receive the value.</p>
+              </dd>
+              <dt class="body-small">t</dt>
+              <dd class="body-medium">
+               <p>The value of type <code>T</code> to be applied to the frontier <code>f</code>.</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>A new frontier <code>F</code> that incorporates the provided value <code>t</code>.</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="take-fffff0f6">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Frontier.html#take-fffff0f6" t="n" class="documentableName ">take</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">f</span>: <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>]): (<span data-unresolved-link="" t="t">T</span>, <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>])
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Extracts an element of type <code>T</code> from the frontier <code>F[T]</code> and returns a tuple, where the first element is the extracted value of type <code>T</code> and the second element is the remaining frontier of type <code>F[T]</code> after the extraction.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Extracts an element of type <code>T</code> from the frontier <code>F[T]</code> and returns a tuple, where the first element is the extracted value of type <code>T</code> and the second element is the remaining frontier of type <code>F[T]</code> after the extraction.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">f</dt>
+              <dd class="body-medium">
+               <p>the input frontier of type <code>F[T]</code> from which an element is extracted</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>a tuple containing the extracted element of type <code>T</code> and the remaining frontier of type <code>F[T]</code></p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+      <section id="Concrete-methods">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Concrete methods</h4>
+        </div>
+        <div class="documentableElement" id="offerAll-9a1">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Frontier.html#offerAll-9a1" t="n" class="documentableName ">offerAll</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">f</span>: <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>])(<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">ts</span>: <span data-unresolved-link="" t="t">List</span>[<span data-unresolved-link="" t="t">T</span>]): <span t="t">F</span>[<span data-unresolved-link="" t="t">T</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Adds all elements from the given list to the provided frontier. The order in which the elements are added depends on the value of <code>reverseOnOffer</code>. If <code>reverseOnOffer</code> is <code>true</code>, the elements are added in reverse order; otherwise, they are added as-is.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Adds all elements from the given list to the provided frontier. The order in which the elements are added depends on the value of <code>reverseOnOffer</code>. If <code>reverseOnOffer</code> is <code>true</code>, the elements are added in reverse order; otherwise, they are added as-is.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">f</dt>
+              <dd class="body-medium">
+               <p>The initial frontier of type <code>F[T]</code> to which the elements will be added.</p>
+              </dd>
+              <dt class="body-small">ts</dt>
+              <dd class="body-medium">
+               <p>A list of elements of type <code>T</code> to add to the frontier.</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>A new frontier of type <code>F[T]</code> that includes all elements from the list <code>ts</code>, added in the specified order.</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="reverseOnOffer-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">def </span></span><a href="Frontier.html#reverseOnOffer-0" t="n" class="documentableName ">reverseOnOffer</a>: <span data-unresolved-link="" t="t">Boolean</span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Determines whether elements should be reversed upon being added to the frontier. This behavior is typically useful in certain traversal algorithms where the order of elements affects the outcome, such as depth-first or breadth-first search.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Determines whether elements should be reversed upon being added to the frontier. This behavior is typically useful in certain traversal algorithms where the order of elements affects the outcome, such as depth-first or breadth-first search.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Returns</dt>
+              <dd class="body-medium">
+               <p>true if elements are reversed when offered to the frontier, false otherwise</p>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+   </div>
+  </div>
+ </div>
+</section></div><div id="toc" class="body-small"><div id="toc-container"><span class="toc-title h200">In this article</span><nav class="toc-nav"><ul class="toc-list"><li><a href="#attributes">Type parameters</a></li><li><a href="#members-list">Members list</a><ul><li><a href="#Value-members">Value members</a><ul><li><a href="#Abstract-methods">Abstract methods</a></li><li><a href="#Concrete-methods">Concrete methods</a></li></ul></li></ul></li></ul></nav></div></div></div><div id="footer" class="body-small mobile-footer"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div></div></div></body></html>

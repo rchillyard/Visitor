@@ -1,0 +1,3194 @@
+<!DOCTYPE html><html data-pathToRoot="../../../" data-rawLocation="com/phasmidsoftware/visitor/core" data-dynamicSideMenu="false"><head><meta charset="utf-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"></meta><title>com.phasmidsoftware.visitor.core</title><link rel="shortcut icon" type="image/x-icon" href="../../../favicon.ico"></link><script type="text/javascript" src="../../../scripts/theme.js"></script><script type="text/javascript" src="../../../scripts/searchData.js" defer="true"></script><script type="text/javascript" src="../../../scripts/scastieConfiguration.js" defer="true"></script><link rel="stylesheet" href="../../../styles/theme/bundle.css"></link><link rel="stylesheet" href="../../../styles/theme/components/bundle.css"></link><link rel="stylesheet" href="../../../styles/theme/components/button/bundle.css"></link><link rel="stylesheet" href="../../../styles/theme/layout/bundle.css"></link><link rel="stylesheet" href="../../../styles/dotty-icons.css"></link><link rel="stylesheet" href="../../../styles/filter-bar.css"></link><link rel="stylesheet" href="../../../styles/searchbar.css"></link><link rel="stylesheet" href="../../../styles/social-links.css"></link><link rel="stylesheet" href="../../../styles/versions-dropdown.css"></link><link rel="stylesheet" href="../../../styles/content-contributors.css"></link><script type="text/javascript" src="../../../hljs/highlight.pack.js" defer="true"></script><script type="text/javascript" src="../../../scripts/hljs-scala3.js" defer="true"></script><script type="text/javascript" src="../../../scripts/ux.js" defer="true"></script><script type="text/javascript" src="../../../scripts/common/component.js" defer="true"></script><script type="text/javascript" src="../../../scripts/common/utils.js" defer="true"></script><script type="text/javascript" src="../../../scripts/components/FilterBar.js" defer="true"></script><script type="text/javascript" src="../../../scripts/components/DocumentableList.js" defer="true"></script><script type="text/javascript" src="../../../scripts/components/Input.js" defer="true"></script><script type="text/javascript" src="../../../scripts/components/FilterGroup.js" defer="true"></script><script type="text/javascript" src="../../../scripts/components/Filter.js" defer="true"></script><script type="text/javascript" src="../../../scripts/scaladoc-scalajs.js" defer="true"></script><script type="text/javascript" src="../../../scripts/contributors.js" defer="true"></script><script type="text/javascript" src="https://d3js.org/d3.v6.min.js" defer="true"></script><script type="text/javascript" src="https://cdn.jsdelivr.net/npm/graphlib-dot@0.6.2/dist/graphlib-dot.min.js" defer="true"></script><script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/dagre-d3/0.6.1/dagre-d3.min.js" defer="true"></script><script type="text/javascript" src="https://scastie.scala-lang.org/embedded.js" defer="true"></script><script type="text/javascript" src="../../../scripts/data.js" defer="true"></script><script>var pathToRoot = "../../../";</script></head><body><div id=""><div id="header" class="body-small"><div class="header-container-left"><a href="../../../" class="logo-container"><span class="project-name h300">visitor</span></a><span onclick="dropdownHandler(event)" class="text-button with-arrow" id="dropdown-trigger"><a></a></span><div id="version-dropdown" class="dropdown-menu"></div></div><div class="header-container-right"><button id="search-toggle" class="icon-button"></button><span id="theme-toggle" class="icon-button"></span><span id="mobile-menu-toggle" class="icon-button hamburger"></span></div></div><div id="mobile-menu"><div class="mobile-menu-header body-small"><span class="mobile-menu-logo"><span class="project-name h300">visitor</span></span><button id="mobile-menu-close" class="icon-button close"></button></div><div class="mobile-menu-container body-medium"><input id="mobile-scaladoc-searchbar-input" class="scaladoc-searchbar-input" type="search" placeholder="Find anything"></input><span id="mobile-theme-toggle" class="mobile-menu-item mode"></span></div></div><span id="mobile-sidebar-toggle" class="floating-button"></span><div id="leftColumn" class="body-small"><div class="switcher-container"><a id="api-nav-button" class="switcher h100 selected" href="../../../index.html">API</a></div><nav id="api-nav" class="side-menu"><div class="ni n0 expanded"><span class="nh h100 expanded cs"><button class="ar icon-button expanded"></button><a href="../visitor.html"><span class="micon pa"></span><span>com.phasmidsoftware.visitor</span></a></span><div class="ni n1 expanded"><span class="nh h100 selected"><button class="ar icon-button expanded"></button><a href="#"><span class="micon pa"></span><span>core</span></a></span><div class="ni n2 "><span class="nh "><a href="core/Appendable.html"><span class="micon tr"></span><span>Appendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/CameFromJournal.html"><span class="micon cl"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/CameFromJournal$.html"><span class="micon ob"></span><span>CameFromJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/CostUpdate.html"><span class="micon tr"></span><span>CostUpdate</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/DfsOrder.html"><span class="micon en"></span><span>DfsOrder</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Evaluable.html"><span class="micon tr"></span><span>Evaluable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Frontier.html"><span class="micon tr"></span><span>Frontier</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/IndexedPrioQueue$.html"><span class="micon ob"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/IndexedPrioQueue.html"><span class="micon cl"></span><span>IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Journal.html"><span class="micon tr"></span><span>Journal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/JournaledVisitor$.html"><span class="micon ob"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/JournaledVisitor.html"><span class="micon cl"></span><span>JournaledVisitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Monoid.html"><span class="micon tr"></span><span>Monoid</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Neighbours.html"><span class="micon tr"></span><span>Neighbours</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/PrioQueue.html"><span class="micon cl"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/PrioQueue$.html"><span class="micon ob"></span><span>PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Tracer$.html"><span class="micon ob"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Tracer.html"><span class="micon tr"></span><span>Tracer</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Traversal$.html"><span class="micon ob"></span><span>Traversal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/VisitedSet.html"><span class="micon tr"></span><span>VisitedSet</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Visitor.html"><span class="micon tr"></span><span>Visitor</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/Zero.html"><span class="micon tr"></span><span>Zero</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Frontier_IndexedPrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_IndexedPrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Frontier_PrioQueue$.html"><span class="micon ob"></span><span>given_Frontier_PrioQueue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Frontier_Queue$.html"><span class="micon ob"></span><span>given_Frontier_Queue</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Frontier_Stack$.html"><span class="micon ob"></span><span>given_Frontier_Stack</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Monoid_Double$.html"><span class="micon ob"></span><span>given_Monoid_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Monoid_Float$.html"><span class="micon ob"></span><span>given_Monoid_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Monoid_Int$.html"><span class="micon ob"></span><span>given_Monoid_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Monoid_Long$.html"><span class="micon ob"></span><span>given_Monoid_Long</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Zero_Double$.html"><span class="micon ob"></span><span>given_Zero_Double</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Zero_Float$.html"><span class="micon ob"></span><span>given_Zero_Float</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Zero_Int$.html"><span class="micon ob"></span><span>given_Zero_Int</span></a></span></div><div class="ni n2 "><span class="nh "><a href="core/given_Zero_Long$.html"><span class="micon ob"></span><span>given_Zero_Long</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="misc.html"><span class="micon pa"></span><span>misc</span></a></span><div class="ni n2 "><span class="nh "><a href="misc/AbstractMapJournal.html"><span class="micon cl"></span><span>AbstractMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/AppendableWriter$.html"><span class="micon ob"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/AppendableWriter.html"><span class="micon cl"></span><span>AppendableWriter</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/FunctionMapJournal.html"><span class="micon cl"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/FunctionMapJournal$.html"><span class="micon ob"></span><span>FunctionMapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/FunctionMappedJournal.html"><span class="micon tr"></span><span>FunctionMappedJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/IterableJournal.html"><span class="micon tr"></span><span>IterableJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/ListJournal.html"><span class="micon cl"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/ListJournal$.html"><span class="micon ob"></span><span>ListJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/MapJournal.html"><span class="micon cl"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/MapJournal$.html"><span class="micon ob"></span><span>MapJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/NonAppendable.html"><span class="micon cl"></span><span>NonAppendable</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/QueueJournal.html"><span class="micon cl"></span><span>QueueJournal</span></a></span></div><div class="ni n2 "><span class="nh "><a href="misc/QueueJournal$.html"><span class="micon ob"></span><span>QueueJournal</span></a></span></div></div><div class="ni n1"><span class="nh "><button class="ar icon-button "></button><a href="util.html"><span class="micon pa"></span><span>util</span></a></span><div class="ni n2 "><span class="nh "><a href="util/FP$.html"><span class="micon ob"></span><span>FP</span></a></span></div><div class="ni n2"><span class="nh "><button class="ar icon-button "></button><a href="util/Logging$.html"><span class="micon ob"></span><span>Logging</span></a></span><div class="ni n3 "><span class="nh "><a href="util/Logging$$Loggable.html"><span class="micon cl"></span><span>Loggable</span></a></span></div></div></div></div></nav></div><div id="footer" class="body-small"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div><div id="scaladoc-searchBar"></div><div id="main"><div class="breadcrumbs container"><a href="../../../index.html">visitor</a>/<a href="../visitor.html">com.phasmidsoftware.visitor</a>/<a href="core.html">com.phasmidsoftware.visitor.core</a></div><div id="content" class="body-medium"><div><div class="cover-header">
+ <span class="icon"><span class="micon pa"></span></span>
+ <h1 class="h600 single">com.phasmidsoftware.visitor.core</h1>
+</div>
+<div class="fqname body-large">
+ <span></span>
+</div>
+<div class="main-signature mono-small-block">
+ <div class="signature">
+  <span class="modifiers"></span><span class="kind"><span t="k">package </span></span><a href="core.html" t="n" class="documentableName ">com.phasmidsoftware.visitor.core</a>
+ </div>
+</div>
+<section id="members-list">
+ <h2 class="h500">Members list</h2>
+ <div class="documentableFilter">
+  <div class="filtersContainer"></div>
+  <input class="filterableInput" placeholder="Filter by any phrase" data-test-id="filterBarInput" type="search"><button class="clearButton label-only-button" data-test-id="filterBarClearButton">Clear all</button>
+ </div>
+ <div class="membersList expand">
+  <div class="tabs">
+   <div class="contents">
+    <section id="Type-members">
+     <div data-togglable="Type members" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Type members" class="h400">Type members</h3>
+      </div>
+      <section id="Classlikes">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Classlikes</h4>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Appendable.html" t="n" class="documentableName ">Appendable</a>[<span t="k"></span><span data-unresolved-link="" t="t">X</span>]<span t="k"> extends </span><span data-unresolved-link="" t="t">AutoCloseable</span></span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A trait representing an appendable structure that supports the addition of elements of type X and exhibits a fluent interface by returning itself after each append operation.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A trait representing an appendable structure that supports the addition of elements of type X and exhibits a fluent interface by returning itself after each append operation.</p>
+              <p>Implementing classes may define specific behavior for how elements are appended and may provide additional lifecycle management by extending AutoCloseable.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">X</dt>
+              <dd class="body-medium">
+               <p>the type of elements that can be appended to the structure</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 trait <a href="core/Journal.html" t="n">Journal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/IterableJournal.html" t="n">IterableJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="core/CameFromJournal.html" t="n">CameFromJournal</a>[<span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="core/ListJournal.html" t="n">ListJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="core/QueueJournal.html" t="n">QueueJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/AbstractMapJournal.html" t="n">AbstractMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="misc/FunctionMapJournal.html" t="n">FunctionMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="misc/MapJournal.html" t="n">MapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+                </div>
+                <div>
+                 trait <a href="misc/FunctionMappedJournal.html" t="n">FunctionMappedJournal</a>[<span t="t">X</span>, <span t="t">Y</span>]
+                </div>
+                <div>
+                 trait <a href="misc/IterableJournal.html" t="n">IterableJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/ListJournal.html" t="n">ListJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/QueueJournal.html" t="n">QueueJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/AppendableWriter.html" t="n">AppendableWriter</a>
+                </div>
+                <div>
+                 class <a href="misc/NonAppendable.html" t="n">NonAppendable</a>[<span t="t">X</span>]
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" data-f-keywords="case">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"><span t="k">case </span></span><span class="kind"><span t="k">class </span></span><a href="core/CameFromJournal.html" t="n" class="documentableName ">CameFromJournal</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">map</span>: <span data-unresolved-link="" t="t">Map</span>[<span data-unresolved-link="" t="t">V</span>, <span data-unresolved-link="" t="t">V</span>])<span t="k"> extends </span><a href="core/IterableJournal.html" t="t">IterableJournal</a>[(<span t="t">V</span>, <span t="t">V</span>)]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A journal that records the came-from relationship established during graph traversal.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A journal that records the came-from relationship established during graph traversal.</p>
+              <p>For each discovered vertex <code>v</code>, <code>map(v)</code> is the vertex from which <code>v</code> was first discovered — i.e. the vertex that was being visited when <code>v</code> was added to the frontier. The start vertex is absent from the map (it has no predecessor).</p>
+              <p>This is sometimes called a "parent map" but "came-from" is more accurate: the relationship is an artifact of traversal order, not a structural property of the graph.</p>
+              <p>Used in conjunction with <a href="core/JournaledVisitor.html">JournaledVisitor</a> when came-from tracking is requested via the <code>withQueueJournalAndCameFrom</code> or <code>withListJournalAndCameFrom</code> factory methods.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the vertex type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">map</dt>
+              <dd class="body-medium">
+               <p>the underlying came-from map: vertex → the vertex that discovered it</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/CameFromJournal$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 trait <a href="core/IterableJournal.html" t="n">IterableJournal</a>[(<span t="t">V</span>, <span t="t">V</span>)]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Iterable</span>[(<span t="t">V</span>, <span t="t">V</span>)]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableFactoryDefaults</span>[(<span t="t">V</span>, <span t="t">V</span>), <span data-unresolved-link="" t="t">Iterable</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOps</span>[(<span t="t">V</span>, <span t="t">V</span>), <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[(<span t="t">V</span>, <span t="t">V</span>)]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnceOps</span>[(<span t="t">V</span>, <span t="t">V</span>), <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[(<span t="t">V</span>, <span t="t">V</span>)]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnce</span>[(<span t="t">V</span>, <span t="t">V</span>)]
+                </div>
+                <div>
+                 trait <a href="core/Journal.html" t="n">Journal</a>[(<span t="t">V</span>, <span t="t">V</span>)]
+                </div>
+                <div>
+                 trait <a href="core/Appendable.html" t="n">Appendable</a>[(<span t="t">V</span>, <span t="t">V</span>)]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/CameFromJournal$.html" t="n" class="documentableName ">CameFromJournal</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Companion object for the <code>CameFromJournal</code> class.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Companion object for the <code>CameFromJournal</code> class.</p>
+              <p>Provides utility methods to work with the <code>CameFromJournal</code>, including initialization of an empty came-from journal.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/CameFromJournal.html">class</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Mirror</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/CameFromJournal$.html" t="n">CameFromJournal</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/CostUpdate.html" t="n" class="documentableName ">CostUpdate</a>[<span t="k"></span><span data-unresolved-link="" t="t">W</span>, <span t="k"></span><span data-unresolved-link="" t="t">F</span>[<span t="t">_</span>]]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: after a node is settled (dequeued and marked visited) and its neighbours have been offered to the frontier, optionally update the priorities of frontier entries that have improved.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: after a node is settled (dequeued and marked visited) and its neighbours have been offered to the frontier, optionally update the priorities of frontier entries that have improved.</p>
+              <p>This typeclass exists to support <code>decreaseKey</code> in Dijkstra- and Prim-style traversals. It keeps all domain knowledge (cost maps, edge weights, the notion of "improvement") out of <a href="core/Traversal$.html">Traversal</a> itself.</p>
+              <p>For DFS and BFS the default no-op given is resolved automatically. For Dijkstra and Prim, the <code>GraphTraversal</code> implementation supplies a concrete <code>given CostUpdate[W, IndexedPrioQueue]</code> (where <code>W = (E, V)</code>) that closes over a secondary vertex→cost map and calls <a href="core/IndexedPrioQueue.html#decreaseKey-fffff1ab">IndexedPrioQueue.decreaseKey</a> for any neighbour whose cost has improved since it was first offered.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">F</dt>
+              <dd class="body-medium">
+               <p>the frontier container type (e.g. <a href="core/PrioQueue.html">PrioQueue</a>, <a href="core.html#Stack-0">Stack</a>, Queue)</p>
+              </dd>
+              <dt class="body-small">W</dt>
+              <dd class="body-medium">
+               <p>the frontier element type (e.g. <code>(E, V)</code> for weighted traversals, or plain <code>V</code> for DFS / BFS)</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">enum </span></span><a href="core/DfsOrder.html" t="n" class="documentableName ">DfsOrder</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Controls whether DFS records a node before or after processing its children.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Controls whether DFS records a node before or after processing its children.</p>
+              <ul>
+               <li>Pre: node is recorded before its children are expanded (default)</li>
+               <li>Post: node is recorded after all its descendants (useful for topological sort)</li>
+              </ul>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Enum</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Evaluable.html" t="n" class="documentableName ">Evaluable</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>, <span t="k"></span><span data-unresolved-link="" t="t">R</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: given a node of type V, extract an optional result of type R. This is the "what do we want to know about a node" concern.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: given a node of type V, extract an optional result of type R. This is the "what do we want to know about a node" concern.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">R</dt>
+              <dd class="body-medium">
+               <p>the result type</p>
+              </dd>
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the node type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Frontier.html" t="n" class="documentableName ">Frontier</a>[<span t="k"></span><span data-unresolved-link="" t="t">F</span>[<span t="t">_</span>]]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: abstracts over frontier data structures (Queue, Stack, PriorityQueue). The three implementations below give us BFS, DFS, and best-first / Dijkstra-style traversals for free — the traversal algorithm itself doesn't change at all.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: abstracts over frontier data structures (Queue, Stack, PriorityQueue). The three implementations below give us BFS, DFS, and best-first / Dijkstra-style traversals for free — the traversal algorithm itself doesn't change at all.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">F</dt>
+              <dd class="body-medium">
+               <p>the higher-kinded frontier container type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 object <a href="core/given_Frontier_IndexedPrioQueue$.html" t="n">given_Frontier_IndexedPrioQueue</a>
+                </div>
+                <div>
+                 object <a href="core/given_Frontier_PrioQueue$.html" t="n">given_Frontier_PrioQueue</a>
+                </div>
+                <div>
+                 object <a href="core/given_Frontier_Queue$.html" t="n">given_Frontier_Queue</a>
+                </div>
+                <div>
+                 object <a href="core/given_Frontier_Stack$.html" t="n">given_Frontier_Stack</a>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/IndexedPrioQueue$.html" t="n" class="documentableName ">IndexedPrioQueue</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/IndexedPrioQueue.html">class</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Mirror</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/IndexedPrioQueue$.html" t="n">IndexedPrioQueue</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" data-f-keywords="case">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"><span t="k">case </span></span><span class="kind"><span t="k">class </span></span><a href="core/IndexedPrioQueue.html" t="n" class="documentableName ">IndexedPrioQueue</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>An immutable indexed priority queue ADT backed by <span data-unresolved-link="">BinaryHeap</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>An immutable indexed priority queue ADT backed by <span data-unresolved-link="">BinaryHeap</span>.</p>
+              <p>Extends the <a href="core/PrioQueue.html">PrioQueue</a> contract with O(log n) <code>decreaseKey</code> and O(1) <code>contains</code>, enabled by a <code>Map[T, Int]</code> index that tracks each element's current position in the heap array.</p>
+              <p>Unlike <a href="core/PrioQueue.html">PrioQueue</a>, duplicates are not permitted: <code>offer</code> is a no-op if the element is already present. Use <code>decreaseKey</code> to improve an existing entry's priority. This one-entry-per-key invariant is what makes the index meaningful and <code>decreaseKey</code> correct.</p>
+              <p>The index is rebuilt from <code>heap.data</code> (O(n)) after each structural operation (<code>offer</code> and <code>take</code>). This is acceptable because:</p>
+              <ul>
+               <li>the O(n) rebuild cost is dominated by the O(E log V) traversal cost</li>
+               <li>the implementation remains simple, correct, and easy to reason about</li>
+              </ul>
+              <p>Minimum element is dequeued first (or maximum via <a href="core/IndexedPrioQueue$.html#emptyMax-fffff890">IndexedPrioQueue.emptyMax</a>).</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">T</dt>
+              <dd class="body-medium">
+               <p>the element type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">heap</dt>
+              <dd class="body-medium">
+               <p>the underlying binary heap</p>
+              </dd>
+              <dt class="body-small">index</dt>
+              <dd class="body-medium">
+               <p>a map from element to its current 0-based position in heap.data</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/IndexedPrioQueue$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/IterableJournal.html" t="n" class="documentableName ">IterableJournal</a>[<span t="k"></span><span data-unresolved-link="" t="t">X</span>]<span t="k"> extends </span><a href="core/Journal.html" t="t">Journal</a>[<span t="t">X</span>]<span t="k">, </span></span><span class="signature-long"><span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]</span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A trait that combines the functionalities of a <a href="core/Journal.html">Journal</a> and <span data-unresolved-link="">Iterable</span>, enabling append operations, lifecycle management, and iterable access to elements.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A trait that combines the functionalities of a <a href="core/Journal.html">Journal</a> and <span data-unresolved-link="">Iterable</span>, enabling append operations, lifecycle management, and iterable access to elements.</p>
+              <p>This abstraction is useful for scenarios where elements need to be managed sequentially, support append operations, and be accessed through iteration.</p>
+              <p>Implementing classes are expected to define the behavior for appending elements, providing iterators, and any optional lifecycle management such as resource closure.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">X</dt>
+              <dd class="body-medium">
+               <p>the type of elements contained in the journal</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Iterable</span>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableFactoryDefaults</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOps</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnceOps</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnce</span>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/Journal.html" t="n">Journal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/Appendable.html" t="n">Appendable</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 class <a href="core/CameFromJournal.html" t="n">CameFromJournal</a>[<span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="core/ListJournal.html" t="n">ListJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="core/QueueJournal.html" t="n">QueueJournal</a>[<span t="t">X</span>]
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Journal.html" t="n" class="documentableName ">Journal</a>[<span t="k"></span><span data-unresolved-link="" t="t">X</span>]<span t="k"> extends </span><a href="core/Appendable.html" t="t">Appendable</a>[<span t="t">X</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A trait representing a journal for managing a collection of appendable elements of type X.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A trait representing a journal for managing a collection of appendable elements of type X.</p>
+              <p>The Journal extends the behavior of <a href="core/Appendable.html">Appendable</a>, supporting the addition of elements while also introducing lifecycle management through the ability to close the journal.</p>
+              <p>Implementing classes can define additional behaviors, such as persistence, iteration, or other domain-specific functionalities.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">X</dt>
+              <dd class="body-medium">
+               <p>the type of elements that can be managed by the journal</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Appendable.html" t="n">Appendable</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 trait <a href="core/IterableJournal.html" t="n">IterableJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="core/CameFromJournal.html" t="n">CameFromJournal</a>[<span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="core/ListJournal.html" t="n">ListJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="core/QueueJournal.html" t="n">QueueJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/AbstractMapJournal.html" t="n">AbstractMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="misc/FunctionMapJournal.html" t="n">FunctionMapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+                </div>
+                <div>
+                 class <a href="misc/MapJournal.html" t="n">MapJournal</a>[<span t="t">K</span>, <span t="t">V</span>]
+                </div>
+                <div>
+                 trait <a href="misc/FunctionMappedJournal.html" t="n">FunctionMappedJournal</a>[<span t="t">X</span>, <span t="t">Y</span>]
+                </div>
+                <div>
+                 trait <a href="misc/IterableJournal.html" t="n">IterableJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/ListJournal.html" t="n">ListJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 class <a href="misc/QueueJournal.html" t="n">QueueJournal</a>[<span t="t">X</span>]
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/JournaledVisitor$.html" t="n" class="documentableName ">JournaledVisitor</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/JournaledVisitor.html">class</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Mirror</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/JournaledVisitor$.html" t="n">JournaledVisitor</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" data-f-keywords="case">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"><span t="k">case </span></span><span class="kind"><span t="k">class </span></span><a href="core/JournaledVisitor.html" t="n" class="documentableName ">JournaledVisitor</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>, <span t="k"></span><span data-unresolved-link="" t="t">R</span>, <span t="k"></span><span data-unresolved-link="" t="t">J</span><span t="k"> &lt;: </span><a href="core/Appendable.html" t="t">Appendable</a>[(<span t="t">V</span>, <span data-unresolved-link="" t="t">Option</span>[<span t="t">R</span>])]](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">journal</span>: <span data-unresolved-link="" t="t">J</span>, <span t="k"></span><span data-unresolved-link="" t="n">cameFromJournal</span>: <span data-unresolved-link="" t="t">Option</span>[<a href="core/CameFromJournal.html" t="t">CameFromJournal</a>[<span data-unresolved-link="" t="t">V</span>]] = ...)<span t="k"> extends </span><a href="core/Visitor.html" t="t">Visitor</a>[<span t="t">V</span>, <span t="t">R</span>, <span t="t">J</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Canonical immutable implementation of <a href="core/Visitor.html">Visitor</a>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Canonical immutable implementation of <a href="core/Visitor.html">Visitor</a>.</p>
+              <p>Optionally carries a <a href="core/CameFromJournal.html">CameFromJournal</a> for tracking came-from relationships. When <code>cameFromJournal</code> is non-empty, <code>discover</code> records <code>(v, cameFrom)</code> pairs. The start vertex is absent from the came-from map — it has no predecessor.</p>
+              <p>Use the factory methods on the companion object to construct instances.</p>
+             </div>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">cameFromJournal</dt>
+              <dd class="body-medium">
+               <p>optionally, a journal recording came-from relationships.</p>
+              </dd>
+              <dt class="body-small">journal</dt>
+              <dd class="body-medium">
+               <p>the visit journal (ListJournal or QueueJournal).</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/JournaledVisitor$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 trait <a href="core/Visitor.html" t="n">Visitor</a>[<span t="t">V</span>, <span t="t">R</span>, <span t="t">J</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" data-f-keywords="case">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"><span t="k">case </span></span><span class="kind"><span t="k">class </span></span><a href="core/ListJournal.html" t="n" class="documentableName ">ListJournal</a>[<span t="k"></span><span data-unresolved-link="" t="t">X</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">xs</span>: <span data-unresolved-link="" t="t">List</span>[<span data-unresolved-link="" t="t">X</span>])<span t="k"> extends </span><a href="core/IterableJournal.html" t="t">IterableJournal</a>[<span t="t">X</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A case class representing a journal backed by a list, which maintains a sequence of elements.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A case class representing a journal backed by a list, which maintains a sequence of elements.</p>
+              <p>This class provides methods to append elements to the journal and to iterate over its contents. It is immutable, meaning every modification creates a new instance.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">X</dt>
+              <dd class="body-medium">
+               <p>the type of elements stored in the journal</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">xs</dt>
+              <dd class="body-medium">
+               <p>the list containing the elements of the journal</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/ListJournal$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 trait <a href="core/IterableJournal.html" t="n">IterableJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Iterable</span>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableFactoryDefaults</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOps</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnceOps</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnce</span>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/Journal.html" t="n">Journal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/Appendable.html" t="n">Appendable</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/ListJournal$.html" t="n" class="documentableName ">ListJournal</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Companion object for the <code>ListJournal</code> class, providing utility methods for creating instances of ListJournal.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Companion object for the <code>ListJournal</code> class, providing utility methods for creating instances of ListJournal.</p>
+              <p>The <code>ListJournal</code> object serves as a factory for creating empty instances of <code>ListJournal</code>. <code>ListJournal</code> is used to maintain a sequence of elements in prepend (LIFO) order.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/ListJournal.html">class</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Mirror</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/ListJournal$.html" t="n">ListJournal</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Monoid.html" t="n" class="documentableName ">Monoid</a>[<span t="k"></span><span data-unresolved-link="" t="t">A</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: an associative binary operation with an identity element.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: an associative binary operation with an identity element.</p>
+              <p>Extends <a href="core/Zero.html">Zero</a> with <code>combine</code>. Mirrors the Cats <code>Monoid</code> typeclass but without the Cats dependency.</p>
+              <p>Primary use in Visitor/Gryphon:</p>
+              <ul>
+               <li>Dijkstra needs both <code>identity</code> (seed cost) and <code>combine</code> (path cost accumulation).</li>
+               <li>Prim needs only <code>identity</code> — use <code>Zero[E]</code> for Prim, <code>Monoid[E]</code> for Dijkstra.</li>
+              </ul>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">A</dt>
+              <dd class="body-medium">
+               <p>the element type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 object <a href="core/given_Monoid_Double$.html" t="n">given_Monoid_Double</a>
+                </div>
+                <div>
+                 object <a href="core/given_Monoid_Float$.html" t="n">given_Monoid_Float</a>
+                </div>
+                <div>
+                 object <a href="core/given_Monoid_Int$.html" t="n">given_Monoid_Int</a>
+                </div>
+                <div>
+                 object <a href="core/given_Monoid_Long$.html" t="n">given_Monoid_Long</a>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Neighbours.html" t="n" class="documentableName ">Neighbours</a>[<span t="k"></span><span data-unresolved-link="" t="t">H</span>, <span t="k"></span><span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: given a structure H, yield the neighbouring nodes of type V. This is the "how do we traverse" concern — completely decoupled from domain.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: given a structure H, yield the neighbouring nodes of type V. This is the "how do we traverse" concern — completely decoupled from domain.</p>
+              <p>For homogeneous graphs (node points to node), use GraphNeighbours[V] = Neighbours[V, V]. For trees, H might be Tree[A] and V might be A.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">H</dt>
+              <dd class="body-medium">
+               <p>the container / structure type</p>
+              </dd>
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the neighbour / child type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" data-f-keywords="case">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"><span t="k">case </span></span><span class="kind"><span t="k">class </span></span><a href="core/PrioQueue.html" t="n" class="documentableName ">PrioQueue</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>An immutable priority queue ADT backed by <span data-unresolved-link="">BinaryHeap</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>An immutable priority queue ADT backed by <span data-unresolved-link="">BinaryHeap</span>.</p>
+              <p>Duplicates are permitted. The minimum element is dequeued first (or maximum via <a href="core/PrioQueue$.html#emptyMax-b11">PrioQueue.emptyMax</a>).</p>
+              <p><span data-unresolved-link="">Ordering</span>[T] is captured at construction time so that <a href="core/Frontier.html">Frontier</a>[PrioQueue] remains fully polymorphic — no <code>Ordering</code> context is needed at <code>offer</code> / <code>take</code> call sites.</p>
+              <p>For a priority queue that also supports O(log n) <code>decreaseKey</code>, see <a href="core/IndexedPrioQueue.html">IndexedPrioQueue</a>.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">T</dt>
+              <dd class="body-medium">
+               <p>the element type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">heap</dt>
+              <dd class="body-medium">
+               <p>the underlying binary heap</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/PrioQueue$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/PrioQueue$.html" t="n" class="documentableName ">PrioQueue</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/PrioQueue.html">class</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Mirror</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/PrioQueue$.html" t="n">PrioQueue</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" data-f-keywords="case">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"><span t="k">case </span></span><span class="kind"><span t="k">class </span></span><a href="core/QueueJournal.html" t="n" class="documentableName ">QueueJournal</a>[<span t="k"></span><span data-unresolved-link="" t="t">X</span>](<span t="k"></span><span t="k"></span><span data-unresolved-link="" t="n">q</span>: <span data-unresolved-link="" t="t">Queue</span>[<span data-unresolved-link="" t="t">X</span>])<span t="k"> extends </span><a href="core/IterableJournal.html" t="t">IterableJournal</a>[<span t="t">X</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>An implementation of <a href="core/IterableJournal.html">IterableJournal</a> that uses a <span data-unresolved-link="" title="Problem linking Queue: Couldn't resolve a member for the given link query">Queue</span> to manage journal entries.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>An implementation of <a href="core/IterableJournal.html">IterableJournal</a> that uses a <span data-unresolved-link="" title="Problem linking Queue: Couldn't resolve a member for the given link query">Queue</span> to manage journal entries.</p>
+              <p>This class provides a mechanism for appending elements to a queue-based journal and iterating over the elements in a sequential order. It is particularly useful in scenarios where a first-in-first-out (FIFO) ordering of operations or entries is required.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">X</dt>
+              <dd class="body-medium">
+               <p>the type of elements stored in the journal</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Value parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">q</dt>
+              <dd class="body-medium">
+               <p>the underlying queue used to store the journal's elements</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/QueueJournal$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Serializable</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Equals</span>
+                </div>
+                <div>
+                 trait <a href="core/IterableJournal.html" t="n">IterableJournal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Iterable</span>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableFactoryDefaults</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOps</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnceOps</span>[<span t="t">X</span>, <span data-unresolved-link="" t="t">Iterable</span>, <span data-unresolved-link="" t="t">Iterable</span>[<span t="t">X</span>]]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">IterableOnce</span>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/Journal.html" t="n">Journal</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <a href="core/Appendable.html" t="n">Appendable</a>[<span t="t">X</span>]
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">AutoCloseable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span class="show-all-code show-content text-button h100">Show all</span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/QueueJournal$.html" t="n" class="documentableName ">QueueJournal</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Companion object for the <code>QueueJournal</code> class.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Companion object for the <code>QueueJournal</code> class.</p>
+              <p>Provides utility methods such as creating an empty instance of <code>QueueJournal</code>.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">X</dt>
+              <dd class="body-medium">
+               <p>the type of elements that the <code>QueueJournal</code> will store</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/QueueJournal.html">class</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <span data-unresolved-link="" t="n">Product</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Mirror</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/QueueJournal$.html" t="n">QueueJournal</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/Tracer$.html" t="n" class="documentableName ">Tracer</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/Tracer.html">trait</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/Tracer$.html" t="n">Tracer</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Tracer.html" t="n" class="documentableName ">Tracer</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass for algorithm tracing. Implementations produce human-readable output showing the steps of a graph algorithm at a given nesting depth; the depth is used to indent output so that the logical structure of the algorithm is visible.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass for algorithm tracing. Implementations produce human-readable output showing the steps of a graph algorithm at a given nesting depth; the depth is used to indent output so that the logical structure of the algorithm is visible.</p>
+              <p>Each trace call provides two lazily-evaluated messages:</p>
+              <ul>
+               <li><code>brief</code> — a short summary (e.g. a count); always used by non-silent tracers</li>
+               <li><code>detail</code> — a fuller description (e.g. collection elements); used only by <code>verbose</code></li>
+              </ul>
+              <p>The canonical no-op <code>given</code> (<code>Tracer.silent</code>) is resolved automatically, so existing call sites require no changes. Students opt in by summoning a tracer:</p>
+              <div class="snippet mono-small-block">
+               <pre><code class="language-"><span line-number="1" class=""><span class="tooltip-container"></span><span class="hideable"> </span>given Tracer[Int] = Tracer.verbose()
+</span><span line-number="2" class=""><span class="tooltip-container"></span><span class="hideable"> </span>Kosaraju.stronglyConnectedComponents(graph)
+</span></code></pre>
+               <div class="buttons"></div>
+              </div>
+              <p>Both <code>brief</code> and <code>detail</code> are by-name so that string interpolation is never evaluated in the silent case — zero overhead in production use.</p>
+              <p>Three built-in modes:</p>
+              <ul>
+               <li><code>silent</code> — no output, neither <code>brief</code> nor <code>detail</code> evaluated</li>
+               <li><code>summary</code> — emits <code>brief</code> only, and only at depth 0</li>
+               <li><code>verbose</code> — emits <code>detail</code> (falling back to <code>brief</code> if <code>detail</code> is empty), up to a configurable <code>maxDepth</code></li>
+              </ul>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the vertex type (present so that, for example, a vertex tracer and an edge tracer can coexist in scope via their distinct type parameters)</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Companion</dt>
+              <dd class="body-medium">
+               <a href="core/Tracer$.html">object</a>
+              </dd>
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/Traversal$.html" t="n" class="documentableName ">Traversal</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>The traversal engine. Knows only about Frontier, Neighbours, Evaluable, VisitedSet, Visitor, and CostUpdate. Zero domain knowledge.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>The traversal engine. Knows only about Frontier, Neighbours, Evaluable, VisitedSet, Visitor, and CostUpdate. Zero domain knowledge.</p>
+              <p>The choice of frontier F determines the traversal order: F = Queue → BFS F = Stack → DFS F = PrioQueue → best-first (requires Ordering[V] in scope)</p>
+              <p>Two visitor events are fired during traversal:</p>
+              <ul>
+               <li><code>visit(v)</code> — when a vertex is settled (dequeued/popped)</li>
+               <li><code>discover(v, cameFrom)</code> — when a vertex is first seen as a neighbour</li>
+              </ul>
+              <p>NOTE that there are three independent traversal engines which should be maintained in parallel as much as possible: <code>traverse</code>, <code>traverseTree</code>, and <code>dfs</code>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/Traversal$.html" t="n">Traversal</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/VisitedSet.html" t="n" class="documentableName ">VisitedSet</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: a set of visited nodes, used to prevent revisiting in cycle-containing graphs. Immutable — markVisited returns a new instance.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: a set of visited nodes, used to prevent revisiting in cycle-containing graphs. Immutable — markVisited returns a new instance.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the node type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Visitor.html" t="n" class="documentableName ">Visitor</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>, <span t="k"></span><span data-unresolved-link="" t="t">R</span>, <span t="k"></span><span data-unresolved-link="" t="t">J</span><span t="k"> &lt;: </span><a href="core/Appendable.html" t="t">Appendable</a>[(<span t="t">V</span>, <span data-unresolved-link="" t="t">Option</span>[<span t="t">R</span>])]]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A Visitor accumulates <code>(V, Option[R])</code> pairs into a journal <code>J</code> as it traverses a structure.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A Visitor accumulates <code>(V, Option[R])</code> pairs into a journal <code>J</code> as it traverses a structure.</p>
+              <p>Two members provide access to the accumulated journal:</p>
+              <ul>
+               <li><code>journal</code> — the raw journal value of type <code>J</code>; used internally by concrete implementations (e.g. <code>JournaledVisitor.copy(journal = ...)</code>) where the specific <code>J</code> type must be visible for polymorphic copying.</li>
+               <li><code>result</code> — a public alias for <code>journal</code>, defaulting to <code>journal</code>; intended as the external API for consumers of a completed traversal. A concrete implementation could override <code>result</code> to apply post-processing (e.g. reversing a <code>ListJournal</code>) without affecting the internal <code>journal</code>.</li>
+              </ul>
+              <p>Two events are distinguished:</p>
+              <ul>
+               <li><code>visit(v)</code> — called when a vertex is settled (dequeued/popped and processed). Records <code>(v, ev.evaluate(v))</code> in the journal.</li>
+               <li><code>discover(v, cameFrom)</code> — called when a vertex is first seen as a neighbour of <code>cameFrom</code>, before it is added to the frontier. Default implementation is a no-op; override in concrete implementations that track came-from pointers.</li>
+              </ul>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">J</dt>
+              <dd class="body-medium">
+               <p>the journal type (must be Appendable of (V, Option[R]))</p>
+              </dd>
+              <dt class="body-small">R</dt>
+              <dd class="body-medium">
+               <p>the result type extracted from each node</p>
+              </dd>
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the node type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 class <a href="core/JournaledVisitor.html" t="n">JournaledVisitor</a>[<span t="t">V</span>, <span t="t">R</span>, <span t="t">J</span>]
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">trait </span></span><a href="core/Zero.html" t="n" class="documentableName ">Zero</a>[<span t="k"></span><span data-unresolved-link="" t="t">A</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Typeclass: a type with an identity element.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Typeclass: a type with an identity element.</p>
+              <p><code>Zero[A]</code> is the minimal requirement for weighted graph traversals that need a seed cost but do not accumulate costs along a path — specifically Prim's MST algorithm. Prim needs <code>identity</code> to seed the frontier but never calls <code>combine</code>.</p>
+              <p><code>Monoid[A]</code> extends <code>Zero[A]</code> by adding <code>combine</code>, making <code>Zero</code> the honest supertype for the two-context-bound pattern <code>E: {Zero, Ordering}</code>.</p>
+              <p>Any <code>given Monoid[A]</code> automatically satisfies <code>Zero[A]</code> through inheritance.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">A</dt>
+              <dd class="body-medium">
+               <p>the element type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Known subtypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block subtypes">
+                <div>
+                 object <a href="core/given_Zero_Double$.html" t="n">given_Zero_Double</a>
+                </div>
+                <div>
+                 object <a href="core/given_Zero_Float$.html" t="n">given_Zero_Float</a>
+                </div>
+                <div>
+                 object <a href="core/given_Zero_Int$.html" t="n">given_Zero_Int</a>
+                </div>
+                <div>
+                 object <a href="core/given_Zero_Long$.html" t="n">given_Zero_Long</a>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Frontier_IndexedPrioQueue$.html" t="n" class="documentableName ">given_Frontier_IndexedPrioQueue</a><span t="k"> extends </span><a href="core/Frontier.html" t="t">Frontier</a>[<a href="core/IndexedPrioQueue.html" t="t">IndexedPrioQueue</a>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Indexed priority-queue frontier: best-first traversal using <a href="core/IndexedPrioQueue.html">IndexedPrioQueue</a>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Indexed priority-queue frontier: best-first traversal using <a href="core/IndexedPrioQueue.html">IndexedPrioQueue</a>.</p>
+              <p>Duplicates are not permitted — <code>offer</code> is a no-op if the element is already present. Supports <code>decreaseKey</code> via <a href="core/CostUpdate.html">CostUpdate</a>. Used by <code>bestFirstWeighted</code> (Dijkstra, Prim).</p>
+              <p>Supply <code>given IndexedPrioQueue[T] = IndexedPrioQueue.empty[T]</code> at the call site.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Frontier.html" t="n">Frontier</a>[<a href="core/IndexedPrioQueue.html" t="t">IndexedPrioQueue</a>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Frontier_IndexedPrioQueue$.html" t="n">given_Frontier_IndexedPrioQueue</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Frontier_PrioQueue$.html" t="n" class="documentableName ">given_Frontier_PrioQueue</a><span t="k"> extends </span><a href="core/Frontier.html" t="t">Frontier</a>[<a href="core/PrioQueue.html" t="t">PrioQueue</a>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Priority-queue frontier: best-first traversal using <a href="core/PrioQueue.html">PrioQueue</a>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Priority-queue frontier: best-first traversal using <a href="core/PrioQueue.html">PrioQueue</a>.</p>
+              <p>Duplicates are permitted. Used by <code>bestFirst</code> and <code>bestFirstMax</code>. <code>Ordering[T]</code> is captured at <code>PrioQueue</code> construction time.</p>
+              <p>Supply <code>given PrioQueue[T] = PrioQueue.empty[T]</code> (or <code>emptyMax</code>) at the call site.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Frontier.html" t="n">Frontier</a>[<a href="core/PrioQueue.html" t="t">PrioQueue</a>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Frontier_PrioQueue$.html" t="n">given_Frontier_PrioQueue</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Frontier_Queue$.html" t="n" class="documentableName ">given_Frontier_Queue</a><span t="k"> extends </span><a href="core/Frontier.html" t="t">Frontier</a>[<span data-unresolved-link="" t="t">Queue</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Implementation of the <code>Frontier</code> typeclass for the <code>Queue</code> data structure. This implementation provides a breadth-first search (BFS) traversal strategy due to the FIFO (First-In-First-Out) nature of <code>Queue</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Implementation of the <code>Frontier</code> typeclass for the <code>Queue</code> data structure. This implementation provides a breadth-first search (BFS) traversal strategy due to the FIFO (First-In-First-Out) nature of <code>Queue</code>.</p>
+              <p>Functions:</p>
+              <ul>
+               <li><code>empty</code> — Constructs an empty <code>Queue</code>.</li>
+               <li><code>offer</code> — Enqueues an element into the <code>Queue</code>.</li>
+               <li><code>take</code> — Dequeues an element from the <code>Queue</code>, returning the element and the resulting <code>Queue</code>.</li>
+               <li><code>isEmpty</code> — Checks if the <code>Queue</code> is empty.</li>
+              </ul>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Frontier.html" t="n">Frontier</a>[<span data-unresolved-link="" t="t">Queue</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Frontier_Queue$.html" t="n">given_Frontier_Queue</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Frontier_Stack$.html" t="n" class="documentableName ">given_Frontier_Stack</a><span t="k"> extends </span><a href="core/Frontier.html" t="t">Frontier</a>[<a href="core.html#Stack-0" t="t">Stack</a>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Implementation of the <code>Frontier</code> typeclass for a stack-based data structure. This implementation provides depth-first traversal behavior by leveraging the characteristics of a stack (LIFO - Last In, First Out).</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Implementation of the <code>Frontier</code> typeclass for a stack-based data structure. This implementation provides depth-first traversal behavior by leveraging the characteristics of a stack (LIFO - Last In, First Out).</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Frontier.html" t="n">Frontier</a>[<a href="core.html#Stack-0" t="t">Stack</a>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Frontier_Stack$.html" t="n">given_Frontier_Stack</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Monoid_Double$.html" t="n" class="documentableName ">given_Monoid_Double</a><span t="k"> extends </span><a href="core/Monoid.html" t="t">Monoid</a>[<span data-unresolved-link="" t="t">Double</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Double</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Double</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Monoid.html" t="n">Monoid</a>[<span data-unresolved-link="" t="t">Double</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Monoid_Double$.html" t="n">given_Monoid_Double</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Monoid_Float$.html" t="n" class="documentableName ">given_Monoid_Float</a><span t="k"> extends </span><a href="core/Monoid.html" t="t">Monoid</a>[<span data-unresolved-link="" t="t">Float</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Float</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Float</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Monoid.html" t="n">Monoid</a>[<span data-unresolved-link="" t="t">Float</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Monoid_Float$.html" t="n">given_Monoid_Float</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Monoid_Int$.html" t="n" class="documentableName ">given_Monoid_Int</a><span t="k"> extends </span><a href="core/Monoid.html" t="t">Monoid</a>[<span data-unresolved-link="" t="t">Int</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Int</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Int</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Monoid.html" t="n">Monoid</a>[<span data-unresolved-link="" t="t">Int</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Monoid_Int$.html" t="n">given_Monoid_Int</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Monoid_Long$.html" t="n" class="documentableName ">given_Monoid_Long</a><span t="k"> extends </span><a href="core/Monoid.html" t="t">Monoid</a>[<span data-unresolved-link="" t="t">Long</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Long</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Long</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Monoid.html" t="n">Monoid</a>[<span data-unresolved-link="" t="t">Long</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Monoid_Long$.html" t="n">given_Monoid_Long</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Zero_Double$.html" t="n" class="documentableName ">given_Zero_Double</a><span t="k"> extends </span><a href="core/Zero.html" t="t">Zero</a>[<span data-unresolved-link="" t="t">Double</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Zero.html" t="n">Zero</a>[<span data-unresolved-link="" t="t">Double</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Zero_Double$.html" t="n">given_Zero_Double</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Zero_Float$.html" t="n" class="documentableName ">given_Zero_Float</a><span t="k"> extends </span><a href="core/Zero.html" t="t">Zero</a>[<span data-unresolved-link="" t="t">Float</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Zero.html" t="n">Zero</a>[<span data-unresolved-link="" t="t">Float</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Zero_Float$.html" t="n">given_Zero_Float</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Zero_Int$.html" t="n" class="documentableName ">given_Zero_Int</a><span t="k"> extends </span><a href="core/Zero.html" t="t">Zero</a>[<span data-unresolved-link="" t="t">Int</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Zero.html" t="n">Zero</a>[<span data-unresolved-link="" t="t">Int</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Zero_Int$.html" t="n">given_Zero_Int</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="signature-short"><span class="modifiers"></span><span class="kind"><span t="k">object </span></span><a href="core/given_Zero_Long$.html" t="n" class="documentableName ">given_Zero_Long</a><span t="k"> extends </span><a href="core/Zero.html" t="t">Zero</a>[<span data-unresolved-link="" t="t">Long</span>]</span><span class="signature-long"></span>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="cover">
+             <div class="doc"></div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">Supertypes</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <div>
+                 trait <a href="core/Zero.html" t="n">Zero</a>[<span data-unresolved-link="" t="t">Long</span>]
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Object</span>
+                </div>
+                <div>
+                 trait <span data-unresolved-link="" t="n">Matchable</span>
+                </div>
+                <div>
+                 class <span data-unresolved-link="" t="n">Any</span>
+                </div>
+                <span></span>
+               </div>
+              </dd>
+              <dt class="body-small">Self type</dt>
+              <dd class="body-medium">
+               <div class="mono-small-block supertypes">
+                <span></span>
+                <div>
+                 <a href="core/given_Zero_Long$.html" t="n">given_Zero_Long</a>.<span t="k">type</span>
+                </div>
+               </div>
+              </dd>
+             </dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+      <section id="Types">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Types</h4>
+        </div>
+        <div class="documentableElement" id="GraphNeighbors-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">type </span></span><a href="core.html#GraphNeighbors-0" t="n" class="documentableName ">GraphNeighbors</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>] = <a href="core.html#GraphNeighbours-0" t="t">GraphNeighbours</a>[<span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>American English alias for <a href="core.html#GraphNeighbours-0">GraphNeighbours</a></p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>American English alias for <a href="core.html#GraphNeighbours-0">GraphNeighbours</a></p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="GraphNeighbours-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">type </span></span><a href="core.html#GraphNeighbours-0" t="n" class="documentableName ">GraphNeighbours</a>[<span t="k"></span><span data-unresolved-link="" t="t">V</span>] = <a href="core/Neighbours.html" t="t">Neighbours</a>[<span data-unresolved-link="" t="t">V</span>, <span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Convenience alias for homogeneous graphs.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Convenience alias for homogeneous graphs.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="Neighbors-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">type </span></span><a href="core.html#Neighbors-0" t="n" class="documentableName ">Neighbors</a>[<span t="k"></span><span data-unresolved-link="" t="t">H</span>, <span t="k"></span><span data-unresolved-link="" t="t">V</span>] = <a href="core/Neighbours.html" t="t">Neighbours</a>[<span data-unresolved-link="" t="t">H</span>, <span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>American English alias for <a href="core/Neighbours.html">Neighbours</a></p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>American English alias for <a href="core/Neighbours.html">Neighbours</a></p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="Stack-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">type </span></span><a href="core.html#Stack-0" t="n" class="documentableName ">Stack</a>[<span t="k"></span><span data-unresolved-link="" t="t">T</span>] = <span data-unresolved-link="" t="t">List</span>[<span data-unresolved-link="" t="t">T</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A type alias representing a stack, implemented as a <code>List</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A type alias representing a stack, implemented as a <code>List</code>.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">T</dt>
+              <dd class="body-medium">
+               <p>the type of elements stored in the stack</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+    <section id="Givens">
+     <div data-togglable="Givens" class="tab expand">
+      <div class="member-group-header">
+       <h3 data-togglable="Givens" class="h400">Givens</h3>
+      </div>
+      <section id="Givens">
+       <div class="documentableList expand">
+        <div class="documentableList-expander">
+         <button class="icon-button show-content expand"></button>
+         <h4 class="groupHeader h200">Givens</h4>
+        </div>
+        <div class="documentableElement" id="given_CostUpdate_W_F-fffff300">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_CostUpdate_W_F-fffff300" t="n" class="documentableName ">given_CostUpdate_W_F</a>: [<span t="k"></span><span data-unresolved-link="" t="t">W</span>, <span t="k"></span><span data-unresolved-link="" t="t">F</span>[<span t="t">_</span>]]<span t="k"> =&gt; </span><span data-unresolved-link="" t="t">given_CostUpdate_W_F</span>[<span data-unresolved-link="" t="t">W</span>, <span data-unresolved-link="" t="t">F</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Default no-op implementation. Resolved automatically for DFS (<code>Stack</code>) and BFS (<code>Queue</code>) traversals, and for any weighted traversal that does not need re-keying.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Default no-op implementation. Resolved automatically for DFS (<code>Stack</code>) and BFS (<code>Queue</code>) traversals, and for any weighted traversal that does not need re-keying.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Frontier_IndexedPrioQueue-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Frontier_IndexedPrioQueue-0" t="n" class="documentableName ">given_Frontier_IndexedPrioQueue</a>: <a href="core/given_Frontier_IndexedPrioQueue$.html" t="t">given_Frontier_IndexedPrioQueue</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Indexed priority-queue frontier: best-first traversal using <a href="core/IndexedPrioQueue.html">IndexedPrioQueue</a>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Indexed priority-queue frontier: best-first traversal using <a href="core/IndexedPrioQueue.html">IndexedPrioQueue</a>.</p>
+              <p>Duplicates are not permitted — <code>offer</code> is a no-op if the element is already present. Supports <code>decreaseKey</code> via <a href="core/CostUpdate.html">CostUpdate</a>. Used by <code>bestFirstWeighted</code> (Dijkstra, Prim).</p>
+              <p>Supply <code>given IndexedPrioQueue[T] = IndexedPrioQueue.empty[T]</code> at the call site.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Frontier_PrioQueue-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Frontier_PrioQueue-0" t="n" class="documentableName ">given_Frontier_PrioQueue</a>: <a href="core/given_Frontier_PrioQueue$.html" t="t">given_Frontier_PrioQueue</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Priority-queue frontier: best-first traversal using <a href="core/PrioQueue.html">PrioQueue</a>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Priority-queue frontier: best-first traversal using <a href="core/PrioQueue.html">PrioQueue</a>.</p>
+              <p>Duplicates are permitted. Used by <code>bestFirst</code> and <code>bestFirstMax</code>. <code>Ordering[T]</code> is captured at <code>PrioQueue</code> construction time.</p>
+              <p>Supply <code>given PrioQueue[T] = PrioQueue.empty[T]</code> (or <code>emptyMax</code>) at the call site.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Frontier_Queue-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Frontier_Queue-0" t="n" class="documentableName ">given_Frontier_Queue</a>: <a href="core/given_Frontier_Queue$.html" t="t">given_Frontier_Queue</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Implementation of the <code>Frontier</code> typeclass for the <code>Queue</code> data structure. This implementation provides a breadth-first search (BFS) traversal strategy due to the FIFO (First-In-First-Out) nature of <code>Queue</code>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Implementation of the <code>Frontier</code> typeclass for the <code>Queue</code> data structure. This implementation provides a breadth-first search (BFS) traversal strategy due to the FIFO (First-In-First-Out) nature of <code>Queue</code>.</p>
+              <p>Functions:</p>
+              <ul>
+               <li><code>empty</code> — Constructs an empty <code>Queue</code>.</li>
+               <li><code>offer</code> — Enqueues an element into the <code>Queue</code>.</li>
+               <li><code>take</code> — Dequeues an element from the <code>Queue</code>, returning the element and the resulting <code>Queue</code>.</li>
+               <li><code>isEmpty</code> — Checks if the <code>Queue</code> is empty.</li>
+              </ul>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Frontier_Stack-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Frontier_Stack-0" t="n" class="documentableName ">given_Frontier_Stack</a>: <a href="core/given_Frontier_Stack$.html" t="t">given_Frontier_Stack</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Implementation of the <code>Frontier</code> typeclass for a stack-based data structure. This implementation provides depth-first traversal behavior by leveraging the characteristics of a stack (LIFO - Last In, First Out).</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Implementation of the <code>Frontier</code> typeclass for a stack-based data structure. This implementation provides depth-first traversal behavior by leveraging the characteristics of a stack (LIFO - Last In, First Out).</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Monoid_Double-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Monoid_Double-0" t="n" class="documentableName ">given_Monoid_Double</a>: <a href="core/given_Monoid_Double$.html" t="t">given_Monoid_Double</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Double</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Double</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Monoid_Float-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Monoid_Float-0" t="n" class="documentableName ">given_Monoid_Float</a>: <a href="core/given_Monoid_Float$.html" t="t">given_Monoid_Float</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Float</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Float</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Monoid_Int-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Monoid_Int-0" t="n" class="documentableName ">given_Monoid_Int</a>: <a href="core/given_Monoid_Int$.html" t="t">given_Monoid_Int</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Int</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Int</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Monoid_Long-0">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Monoid_Long-0" t="n" class="documentableName ">given_Monoid_Long</a>: <a href="core/given_Monoid_Long$.html" t="t">given_Monoid_Long</a>
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Additive monoid for <span data-unresolved-link="">Long</span>.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Additive monoid for <span data-unresolved-link="">Long</span>.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_VisitedSet_E_V-cdf">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_VisitedSet_E_V-cdf" t="n" class="documentableName ">given_VisitedSet_E_V</a>: [<span t="k"></span><span data-unresolved-link="" t="t">E</span>, <span t="k"></span><span data-unresolved-link="" t="t">V</span>]<span t="k"> =&gt; </span><a href="core/VisitedSet.html" t="t">VisitedSet</a>[(<span data-unresolved-link="" t="t">E</span>, <span data-unresolved-link="" t="t">V</span>)]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>A <code>VisitedSet</code> for <code>(E, V)</code> frontier tuples used in weighted traversals (Dijkstra, Prim). Visited-ness is tracked on the vertex <code>V</code> alone — the cost component <code>E</code> is ignored — so that stale (higher-cost) copies of the same vertex in the frontier are correctly recognised as already visited.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>A <code>VisitedSet</code> for <code>(E, V)</code> frontier tuples used in weighted traversals (Dijkstra, Prim). Visited-ness is tracked on the vertex <code>V</code> alone — the cost component <code>E</code> is ignored — so that stale (higher-cost) copies of the same vertex in the frontier are correctly recognised as already visited.</p>
+              <p>This given has higher priority than the plain <code>VisitedSet[V]</code> given because it is more specific: it matches only <code>(E, V)</code> pairs, not arbitrary <code>V</code>. It is resolved automatically whenever <code>Traversal</code> is invoked with a tuple frontier element type.</p>
+             </div>
+             <h2 class="h200">Type parameters</h2>
+             <dl class="attributes attributes-small">
+              <dt class="body-small">E</dt>
+              <dd class="body-medium">
+               <p>the cost / edge-weight type</p>
+              </dd>
+              <dt class="body-small">V</dt>
+              <dd class="body-medium">
+               <p>the vertex type</p>
+              </dd>
+             </dl>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_VisitedSet_V-fffff380">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_VisitedSet_V-fffff380" t="n" class="documentableName ">given_VisitedSet_V</a>: [<span t="k"></span><span data-unresolved-link="" t="t">V</span>]<span t="k"> =&gt; </span><a href="core/VisitedSet.html" t="t">VisitedSet</a>[<span data-unresolved-link="" t="t">V</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Default given: immutable Set-backed VisitedSet for plain node types.</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Default given: immutable Set-backed VisitedSet for plain node types.</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Zero_A-fffffda1">
+         <div class="documentableElement-expander">
+          <button class="icon-button ar show-content"></button>
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Zero_A-fffffda1" t="n" class="documentableName ">given_Zero_A</a>: [<span t="k"></span><span data-unresolved-link="" t="t">A</span> : <a href="core/Monoid.html" t="t">Monoid</a>]<span t="k"> =&gt; </span><span data-unresolved-link="" t="t">given_Zero_A</span>[<span data-unresolved-link="" t="t">A</span>]
+           </div>
+          </div>
+         </div>
+         <div class="docs">
+          <span class="modifiers"></span>
+          <div>
+           <div class="originInfo"></div>
+           <div class="memberDocumentation">
+            <div class="documentableBrief doc">
+             <p>Any Monoid[A] automatically satisfies Zero[A].</p>
+            </div>
+            <div class="cover">
+             <div class="doc">
+              <p>Any Monoid[A] automatically satisfies Zero[A].</p>
+             </div>
+             <h2 class="h200">Attributes</h2>
+             <dl class="attributes attributes-small"></dl>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Zero_Double-0">
+         <div class="documentableElement-expander">
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Zero_Double-0" t="n" class="documentableName ">given_Zero_Double</a>: <a href="core/given_Zero_Double$.html" t="t">given_Zero_Double</a>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Zero_Float-0">
+         <div class="documentableElement-expander">
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Zero_Float-0" t="n" class="documentableName ">given_Zero_Float</a>: <a href="core/given_Zero_Float$.html" t="t">given_Zero_Float</a>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Zero_Int-0">
+         <div class="documentableElement-expander">
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Zero_Int-0" t="n" class="documentableName ">given_Zero_Int</a>: <a href="core/given_Zero_Int$.html" t="t">given_Zero_Int</a>
+           </div>
+          </div>
+         </div>
+        </div>
+        <div class="documentableElement" id="given_Zero_Long-0">
+         <div class="documentableElement-expander">
+          <div class="header monospace mono-medium">
+           <div class="signature">
+            <span class="modifiers"></span><span class="kind"><span t="k">given </span></span><a href="core.html#given_Zero_Long-0" t="n" class="documentableName ">given_Zero_Long</a>: <a href="core/given_Zero_Long$.html" t="t">given_Zero_Long</a>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </section>
+     </div>
+    </section>
+   </div>
+  </div>
+ </div>
+</section></div><div id="toc" class="body-small"><div id="toc-container"><span class="toc-title h200">In this article</span><nav class="toc-nav"><ul class="toc-list"><li><a href="#members-list">Members list</a><ul><li><a href="#Type-members">Type members</a><ul><li><a href="#Classlikes">Classlikes</a></li><li><a href="#Types">Types</a></li></ul></li><li><a href="#Givens">Givens</a><ul><li><a href="#Givens">Givens</a></li></ul></li></ul></li></ul></nav></div></div></div><div id="footer" class="body-small mobile-footer"><div class="left-container">Generated with</div><div class="right-container"><div class="text"></div></div><div class="text-mobile"></div></div></div></div></body></html>
