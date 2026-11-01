@@ -1,19 +1,20 @@
 # Visitor
 
 [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.phasmidsoftware/visitor_3/badge.svg?color=blue)](https://central.sonatype.com/artifact/com.phasmidsoftware/visitor_3)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e898359ab5574493b4e607aa8267e9fc)](https://app.codacy.com/gh/rchillyard/Visitor/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![API Docs](https://img.shields.io/badge/api-docs-blue)](https://rchillyard.github.io/Visitor/latest/api/)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/e898359ab5574493b4e607aa8267e9fc)](https://app.codacy.com/gh/rchillyard/Visitor/dashboard)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/rchillyard/Visitor/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/rchillyard/Visitor/tree/main)
-![GitHub Top Languages](https://img.shields.io/github/languages/top/rchillyard/Visitor)
-![GitHub](https://img.shields.io/github/license/rchillyard/Visitor)
-![GitHub last commit](https://img.shields.io/github/last-commit/rchillyard/Visitor)
-![GitHub issues](https://img.shields.io/github/issues-raw/rchillyard/Visitor)
-![GitHub issues by-label](https://img.shields.io/github/issues/rchillyard/Visitor/bug)
+[![GitHub Top Languages](https://img.shields.io/github/languages/top/rchillyard/Visitor)](https://github.com/rchillyard/Visitor)
+[![GitHub](https://img.shields.io/github/license/rchillyard/Visitor)](https://github.com/rchillyard/Visitor/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/rchillyard/Visitor)](https://github.com/rchillyard/Visitor/commits/main)
+[![GitHub issues](https://img.shields.io/github/issues-raw/rchillyard/Visitor)](https://github.com/rchillyard/Visitor/issues)
+[![GitHub issues by-label](https://img.shields.io/github/issues/rchillyard/Visitor/bug)](https://github.com/rchillyard/Visitor/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
 
 A purely functional, typeclass-driven graph and tree traversal library for Scala 3.
 
 ## API Documentation
 
-Full Scaladoc is available via [javadoc.io](https://javadoc.io/doc/com.phasmidsoftware/visitor_3).
+Full Scaladoc is at <https://rchillyard.github.io/Visitor/latest/api/>.
 
 ## Core Idea
 

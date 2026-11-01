@@ -4,7 +4,7 @@ organization := "com.phasmidsoftware"
 
 version := "1.6.0"
 
-val scalaVersionNumber  = "3.7.4"
+val scalaVersionNumber  = "3.9.0" // the current LTS
 val scalaTestVersion    = "3.2.20"
 val logbackVersion      = "1.5.32"
 val slf4jVersion        = "2.0.17"
@@ -27,9 +27,7 @@ val scala3Options = Seq(
   "-Wvalue-discard",              // Error on discarded non-Unit values
   "-Wnonunit-statement",          // Error when non-Unit expressions used as statements
   "-explain",                     // Detailed error explanations
-  "-Wunused:imports",             // Catch unused imports
-  "-Wunused:privates",            // Catch unused private members
-  "-Wunused:locals",              // Catch unused local definitions
+  "-Wunused:all",                 // Catch unused imports, privates, locals, parameters, etc.
   "-Wconf:msg=Couldn't resolve a member:s" // Suppress linker warnings in doc generation
 )
 
@@ -59,6 +57,9 @@ lazy val root = (project in file("."))
     )
   )
   .settings(scala3TestSettings)
+  // Scaladoc is published to https://rchillyard.github.io/Visitor/latest/api/ by `sbt ghpagesPushSite`
+  .enablePlugins(GhpagesPlugin, SiteScaladocPlugin)
+  .settings(git.remoteRepo := "git@github.com:rchillyard/Visitor.git")
 
 // ============================================================================
 // GLOBAL SETTINGS
@@ -78,7 +79,7 @@ Test / testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 //   -Wvalue-discard      : catches silently discarded non-Unit values
 //   -Wnonunit-statement  : catches non-Unit expressions used as statements
 //                          (filtered out for test code — see scala3TestSettings)
-//   -Wunused:*           : catches unused imports, privates, locals
+//   -Wunused:all         : catches unused imports, privates, locals, parameters, etc.
 //
 // To treat all warnings as errors, uncomment -Xfatal-warnings above.
 // ============================================================================
