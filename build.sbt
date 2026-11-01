@@ -67,7 +67,6 @@ lazy val root = (project in file("."))
 
 Test / parallelExecution := false
 
-Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports")
 Test / testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 
 // ============================================================================
