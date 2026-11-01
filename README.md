@@ -394,3 +394,4 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.4.0   | `Monoid[A]` typeclass with `given` instances for `Int`, `Long`, `Double`, `Float`; replaces `Numeric` in weighted traversal context bounds |
 | 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` extends `Zero[A]`; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
+| 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
