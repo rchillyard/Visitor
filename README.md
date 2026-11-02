@@ -12,6 +12,12 @@
 
 A purely functional, typeclass-driven graph and tree traversal library for Scala 3.
 
+```scala
+libraryDependencies += "com.phasmidsoftware" %% "visitor" % "1.7.0"
+```
+
+Visitor 1.7.0 and later need Scala 3.9 or later; for Scala 3.7 or 3.8, use 1.6.0. (No release supports Scala 3.3.)
+
 ## API Documentation
 
 Full Scaladoc is at <https://rchillyard.github.io/Visitor/latest/api/>.
