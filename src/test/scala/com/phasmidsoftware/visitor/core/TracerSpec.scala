@@ -29,18 +29,18 @@ class TracerSpec extends AnyFlatSpec with Matchers:
 
   it should "produce no output at depth 0" in :
     val tracer: Tracer[Int] = summon[Tracer[Int]] // resolves the given silent
-    val lines = captureOutput(ps => tracer.trace(0, "top-level message"))
+    val lines = captureOutput(_ => tracer.trace(0, "top-level message"))
     lines shouldBe empty
 
   it should "produce no output at depth 1" in :
     val tracer: Tracer[Int] = summon[Tracer[Int]]
-    val lines = captureOutput(ps => tracer.trace(1, "nested message"))
+    val lines = captureOutput(_ => tracer.trace(1, "nested message"))
     lines shouldBe empty
 
   it should "not evaluate brief" in :
     val tracer: Tracer[Int] = summon[Tracer[Int]]
     var evaluated = false
-    captureOutput(ps => tracer.trace(0, {
+    captureOutput(_ => tracer.trace(0, {
       evaluated = true; "brief"
     }))
     evaluated shouldBe false
@@ -48,7 +48,7 @@ class TracerSpec extends AnyFlatSpec with Matchers:
   it should "not evaluate detail" in :
     val tracer: Tracer[Int] = summon[Tracer[Int]]
     var evaluated = false
-    captureOutput(ps => tracer.trace(0, "brief", {
+    captureOutput(_ => tracer.trace(0, "brief", {
       evaluated = true; "detail"
     }))
     evaluated shouldBe false

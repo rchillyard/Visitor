@@ -86,7 +86,7 @@ object ListJournal:
   def empty[X]: ListJournal[X] = ListJournal(Nil)
 
 /**
-  * An implementation of [[IterableJournal]] that uses a [[Queue]] to manage journal entries.
+  * An implementation of [[IterableJournal]] that uses a `Queue` to manage journal entries.
   *
   * This class provides a mechanism for appending elements to a queue-based journal and iterating
   * over the elements in a sequential order. It is particularly useful in scenarios where a
