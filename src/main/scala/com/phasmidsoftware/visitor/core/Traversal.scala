@@ -1,5 +1,6 @@
 package com.phasmidsoftware.visitor.core
 
+import scala.annotation.nowarn
 import scala.collection.immutable.Queue
 
 // ============================================================
@@ -345,6 +346,8 @@ object Traversal:
     *
     * @param goal optional early-termination predicate.
     */
+  // The Ordering bound isn't used here, but it stays so that the method's signature (and binary API) doesn't change.
+  @nowarn("msg=unused implicit parameter")
   def bestFirstWeighted[W: Ordering, R, J <: Appendable[(W, Option[R])]](
                                                                           start: W,
                                                                           visitor: Visitor[W, R, J],

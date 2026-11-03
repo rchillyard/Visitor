@@ -15,27 +15,18 @@ ThisBuild / scalaVersion := scalaVersionNumber
 // COMPILER OPTIONS
 // ============================================================================
 
-val commonScalacOptions = Seq(
+// The compiler options that all the Phasmid libraries share.
+scalacOptions ++= Seq(
   "-encoding", "UTF-8",
-  "-unchecked",
   "-deprecation",
-  "-feature"
+  "-feature",
+  "-unchecked",
+  "-Wunused:all",
+  "-Wvalue-discard",
+  "-Wnonunit-statement"
 )
-
-val scala3Options = Seq(
-  // "-Xfatal-warnings",         // Turn warnings into errors (uncomment to enable)
-  "-Wvalue-discard",              // Error on discarded non-Unit values
-  "-Wnonunit-statement",          // Error when non-Unit expressions used as statements
-  "-explain",                     // Detailed error explanations
-  "-Wunused:all",                 // Catch unused imports, privates, locals, parameters, etc.
-  "-Wconf:msg=Couldn't resolve a member:s" // Suppress linker warnings in doc generation
-)
-
-// ScalaTest assertions return Assertion (not Unit), so -Wnonunit-statement
-// would fire on every multi-assertion test. Filter it out for test compilation.
-val scala3TestSettings = Seq(
-  Test / scalacOptions := scalacOptions.value.filterNot(_ == "-Wnonunit-statement")
-)
+// Tests may use a value as a statement (for example, in a matcher), so they skip -Wnonunit-statement.
+Test / scalacOptions ~= (_.filterNot(_ == "-Wnonunit-statement"))
 
 // ============================================================================
 // MODULE DEFINITION
@@ -45,7 +36,6 @@ lazy val root = (project in file("."))
   .settings(
     name         := "visitor",
     scalaVersion := scalaVersionNumber,
-    scalacOptions ++= commonScalacOptions ++ scala3Options,
 
     libraryDependencies ++= Seq(
       "org.slf4j"       %  "slf4j-api"         % slf4jVersion,
@@ -56,7 +46,6 @@ lazy val root = (project in file("."))
       "com.github.sbt"    % "junit-interface"      % "0.13.3" % Test
     )
   )
-  .settings(scala3TestSettings)
   // Scaladoc is published to https://rchillyard.github.io/Visitor/latest/api/ by `sbt ghpagesPushSite`
   .enablePlugins(GhpagesPlugin, SiteScaladocPlugin)
   .settings(git.remoteRepo := "git@github.com:rchillyard/Visitor.git")
@@ -72,13 +61,11 @@ Test / testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
 // ============================================================================
 // USAGE NOTES
 // ============================================================================
-// Compiler options mirror those used in the Number project for consistency.
+// The compiler options are the ones that all the Phasmid libraries share.
 //
 // Key options:
 //   -Wvalue-discard      : catches silently discarded non-Unit values
 //   -Wnonunit-statement  : catches non-Unit expressions used as statements
-//                          (filtered out for test code — see scala3TestSettings)
+//                          (filtered out for test code)
 //   -Wunused:all         : catches unused imports, privates, locals, parameters, etc.
-//
-// To treat all warnings as errors, uncomment -Xfatal-warnings above.
 // ============================================================================

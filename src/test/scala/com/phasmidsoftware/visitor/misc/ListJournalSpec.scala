@@ -14,9 +14,9 @@ class ListJournalSpec extends AnyFlatSpec with should.Matchers {
     val journal = emptyJournal.append("a").append("b")
     val iterator = journal.iterator
     iterator.hasNext shouldBe true
-    iterator.next shouldBe "b"
+    iterator.next() shouldBe "b"
     iterator.hasNext shouldBe true
-    iterator.next shouldBe "a"
+    iterator.next() shouldBe "a"
     iterator.hasNext shouldBe false
   }
 
