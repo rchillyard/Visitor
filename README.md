@@ -3,6 +3,7 @@
 [![Sonatype Central](https://maven-badges.sml.io/sonatype-central/com.phasmidsoftware/visitor_3/badge.svg?color=blue)](https://central.sonatype.com/artifact/com.phasmidsoftware/visitor_3)
 [![API Docs](https://img.shields.io/badge/api-docs-blue)](https://rchillyard.github.io/Visitor/latest/api/)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/e898359ab5574493b4e607aa8267e9fc)](https://app.codacy.com/gh/rchillyard/Visitor/dashboard)
+[![Codacy Coverage](https://app.codacy.com/project/badge/Coverage/e898359ab5574493b4e607aa8267e9fc)](https://app.codacy.com/gh/rchillyard/Visitor/dashboard)
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/rchillyard/Visitor/tree/main.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/rchillyard/Visitor/tree/main)
 [![GitHub Top Languages](https://img.shields.io/github/languages/top/rchillyard/Visitor)](https://github.com/rchillyard/Visitor)
 [![GitHub](https://img.shields.io/github/license/rchillyard/Visitor)](https://github.com/rchillyard/Visitor/blob/main/LICENSE)
