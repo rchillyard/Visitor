@@ -26,15 +26,6 @@ package com.phasmidsoftware.visitor.core
   */
 trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
   /**
-    * Retrieves the journal `J` that accumulates pairs of `(V, Option[R])`
-    * as a result of traversing a structure. The journal is an appendable
-    * collection used for recording events during the traversal.
-    *
-    * @return the journal of type `J` containing the accumulated data.
-    */
-  def journal: J
-
-  /**
     * Visits a vertex `v`, evaluates it using the implicit `Evaluable` instance,
     * and records the result in the journal. The visitor is returned after the
     * operation with an updated state.
@@ -64,6 +55,15 @@ trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
     */
   def result: J = journal
 
+  /**
+    * Protected method to retrieve the journal `J` that accumulates pairs of `(V, Option[R])`
+    * as a result of traversing a structure. The journal is an appendable
+    * collection used for recording events during the traversal.
+    *
+    * @return the journal of type `J` containing the accumulated data.
+    */
+  protected def journal: J
+
 /**
   * Canonical immutable implementation of [[Visitor]].
   *
@@ -77,7 +77,7 @@ trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
   * @param cameFromJournal optionally, a journal recording came-from relationships.
   */
 case class JournaledVisitor[V, R, J <: Appendable[(V, Option[R])]](
-                                                                    journal: J,
+                                                                    protected val journal: J,
                                                                     cameFromJournal: Option[CameFromJournal[V]] = None
                                                                   ) extends Visitor[V, R, J]:
 

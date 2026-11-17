@@ -4,8 +4,8 @@
 
 This document captures the design decisions behind the Visitor library — a purely
 functional, typeclass-driven graph and tree traversal engine for Scala 3. It covers
-the priority queue hierarchy, the `CostUpdate` typeclass, the `Zero`/`Monoid`
-hierarchy, the came-from mechanism, and the tuple frontier approach used by weighted
+the priority queue hierarchy, the `CostUpdate` typeclass, how weighted traversals treat their
+cost type, the came-from mechanism, and the tuple frontier approach used by weighted
 traversals.
 
 For the design of the graph algorithms built on top of Visitor (Dijkstra, Prim,
@@ -25,9 +25,6 @@ Kruskal, Kosaraju, etc.) see `GraphTraversalDesign.md` in the Gryphon repository
 - `TupleVisitedSet[(E,V)]` and `given [E, V]: VisitedSet[(E, V)]` — supports
   weighted tuple frontiers for Dijkstra/Prim
 - `Evaluable[V, R]`, `Neighbours[V, V]`, `VisitedSet[V]` typeclasses
-- `Zero[A]` typeclass (identity only); `Monoid[A] extends Zero[A]` (adds `combine`)
-- `given` instances for `Zero` and `Monoid` for `Int`, `Long`, `Double`, `Float`;
-  derived `given [A: Monoid]: Zero[A]`
 - `Visitor` trait with `visit` and `discover(v, cameFrom)` (default no-op)
 - `JournaledVisitor` with optional `CameFromJournal[V]`; `cameFrom: Option[Map[V,V]]`
   accessor; factory methods `withQueueJournalAndCameFrom` and
@@ -43,7 +40,7 @@ Kruskal, Kosaraju, etc.) see `GraphTraversalDesign.md` in the Gryphon repository
 
 | File | Contents |
 |------|----------|
-| `Behaviours.scala` | `Zero`, `Monoid`, `Evaluable`, `Neighbours`, `VisitedSet`, `Frontier`, `CostUpdate`; all given instances |
+| `Behaviours.scala` | `Evaluable`, `Neighbours`, `VisitedSet`, `Frontier`, `CostUpdate`; all given instances |
 | `Visitor.scala` | `Visitor` trait, `JournaledVisitor` case class and companion |
 | `Journal.scala` | `Appendable`, `Journal`, `IterableJournal`, `ListJournal`, `QueueJournal`, `CameFromJournal` |
 | `Traversal.scala` | `Traversal` object, `DfsOrder` enum |
@@ -177,52 +174,22 @@ value and either miss improvements or look up the wrong frontier entry.
 
 ---
 
-## Zero and Monoid Typeclass Hierarchy
+## Weighted Traversal Cost Types
 
-### Motivation
+Weighted traversals need different things from their cost type: Prim compares edge weights but
+never accumulates them, while Dijkstra both seeds a start cost and combines costs along a path.
 
-Weighted traversals need different things from their cost type:
+Up to 1.7.0 Visitor published its own `Zero[A]` and `Monoid[A]` type classes for this, with given
+instances for the numeric types. **They were removed in 1.8.0.** The algorithms that justified
+them — `PrimTraversal`, `DijkstraTraversal`, `MST.prim`, `ShortestPaths.dijkstra` — live in
+Gryphon, not here, and Gryphon moved to `cats.kernel.Monoid` in its 1.8.0. Visitor's own engine
+never consumed either type class: neither appeared in any signature in its public API.
 
-- **Prim** needs only an identity element (`Zero.identity`) to seed the initial
-  frontier cost. It compares edge weights but never accumulates them.
-- **Dijkstra** needs both identity (`Zero.identity` as the start cost) and
-  combination (`Monoid.combine` for cumulative path cost accumulation).
+A consumer needing an identity-and-combine abstraction over costs should take it from
+`cats-kernel`, which Visitor does not depend on. `bestFirstWeighted` asks only for an `Ordering`
+and a `CostUpdate`, which is all the engine itself needs.
 
-Making both use `Monoid[E]` was dishonest for Prim — it required a stub `combine`
-that returned `x` unchanged and was never called. The `Zero`/`Monoid` hierarchy
-makes the requirements explicit and honest.
-
-### Design
-
-```scala
-trait Zero[A]:
-  def identity: A
-
-trait Monoid[A] extends Zero[A]:
-  def combine(x: A, y: A): A
-```
-
-`given` instances for `Zero[Int]`, `Zero[Long]`, `Zero[Double]`, `Zero[Float]` are
-provided separately from the `Monoid` instances. A derived given:
-
-```scala
-given [A: Monoid]: Zero[A] with
-  def identity: A = summon[Monoid[A]].identity
-```
-
-allows any `Monoid[A]` in scope to satisfy a `Zero[A]` requirement. This is needed
-because Scala 3's given resolution does not automatically project a `given Monoid[A]`
-to satisfy `given Zero[A]` without this bridge.
-
-### Context Bounds
-
-| Algorithm | Context bound | Reason |
-|-----------|--------------|--------|
-| `WeightedTraversal` | `E: {Zero, Ordering}` | Base class; only needs identity and ordering |
-| `PrimTraversal` | `E: {Zero, Ordering}` | Compares but never combines costs |
-| `DijkstraTraversal` | `E: {Monoid, Ordering}` | Accumulates cumulative path costs |
-| `MST.prim` | `E: {Zero, Ordering}` | Entry point mirrors `PrimTraversal` |
-| `ShortestPaths.dijkstra` | `E: {Monoid, Ordering}` | Entry point mirrors `DijkstraTraversal` |
+See [issue #21](https://github.com/rchillyard/Visitor/issues/21).
 
 ---
 
@@ -344,11 +311,13 @@ val v: V       = ev._2
   typeclass yielding exactly `(left, right)` and a separate `dfsInOrder` entry
   point in `Traversal`.
 
-- **Cats integration** — `Monoid[A]` was added as a home-grown typeclass to avoid
-  the Cats dependency. The remaining question is whether to provide `Monoid[J]` on
-  `Journal` and `Monoid[VisitedSet[V]]` as natural entry points for parallel
-  traversal.
+- **Cats integration** — settled for the cost type classes: the home-grown `Zero` and `Monoid`
+  were removed in 1.8.0 rather than migrated, because nothing in Visitor consumed them and
+  adding `cats-kernel` at the base of the stack to supply an unused abstraction is a poor trade.
+  What remains open is whether to provide a `Monoid[J]` on `Journal` and a
+  `Monoid[VisitedSet[V]]` — those would be *consumed* by Visitor, for parallel traversal below,
+  and so would justify the dependency on their own merits.
 
 - **Parallel traversal** — splitting the frontier and merging results. Would require
-  `Monoid[J]` and `Monoid[VisitedSet[V]]` — a natural consequence of Cats
-  integration above.
+  `Monoid[J]` and `Monoid[VisitedSet[V]]`, which is the real argument for a `cats-kernel`
+  dependency, should it ever be made.

@@ -9,28 +9,32 @@ postponed for future attention.
    For binary trees only. Requires a `BinaryNeighbours[H, V]` typeclass yielding
    exactly `(left, right)` and a separate `dfsInOrder` entry point.
 
-2. **Java API**
-   A clean Java facade over the typeclass machinery. Waiting for the Scala API
-   to fully stabilise before tackling the Scala 3 / Java interop story for
-   `given`/`using`.
+2. ~~**Java API**~~ — **DONE in 1.8.0.** `com.phasmidsoftware.visitor.java` covers `bfs`, `dfs`
+   and `traverseTree`. The interop story turned out to be straightforward: the Java-facing types
+   (`NeighbourFunction`, `Evaluator`) are ordinary functional interfaces, and a package-private
+   Scala bridge turns them into the `given` instances the engine wants. What is *not* yet
+   exposed is the weighted family (`bestFirst`, `bestFirstMax`, `bestFirstWeighted`), which
+   needs an `Ordering` and a `CostUpdate` from Java — that is the remaining piece.
 
 3. **Cats integration**
-   `Monoid[A]` was added in V1.4.0 as a home-grown typeclass (mirroring Cats)
-   to avoid the dependency. The remaining Cats integration question is whether to
-   also provide `Monoid[J]` on `Journal` and `Monoid[VisitedSet[V]]` — these are
-   the natural entry points for parallel traversal. Intentionally kept separate
-   for now.
+   Settled for the cost type classes: `Zero` and `Monoid` were **removed** in 1.8.0, not
+   migrated. Nothing in Visitor consumed them, so taking on `cats-kernel` at the base of the
+   Phasmid stack would have bought an abstraction no code here uses
+   ([#21](https://github.com/rchillyard/Visitor/issues/21)). The question that remains open is
+   `Monoid[J]` on `Journal` and `Monoid[VisitedSet[V]]` — those *would* be consumed, for
+   parallel traversal below, so they would justify the dependency on their own merits.
 
 4. **Parallel traversal**
    Splitting the frontier and merging results. Would require `Monoid[J]` and
-   `Monoid[VisitedSet[V]]` — a natural consequence of the Cats integration above.
+   `Monoid[VisitedSet[V]]`, which is the real argument for a `cats-kernel` dependency.
 
-5. **`Monoid` vs `Ordering` relationship**
+5. **`Monoid` vs `Ordering` relationship** — *historical; both types are gone as of 1.8.0.*
    Considered making `Monoid[A] extends Ordering[A]` to allow a single context
    bound `E: Monoid` for weighted traversals. Rejected: a monoid does not imply
    an ordering (`String` concatenation is a valid monoid with no natural ordering),
    and an ordering does not imply a monoid. The two context bounds `E: {Monoid, Ordering}`
-   are the honest design. Recorded here in case the question resurfaces.
+   are the honest design. Recorded here in case the question resurfaces — it applies equally
+   to `cats.kernel.Monoid`, which a consumer would now use instead.
    See also [Issue #9](https://github.com/rchillyard/Visitor/issues/9#issue-4240254773).
 6. **CameFrom pointers in the Visitor engine.** Adding a `CameFromJournal[V]` to
   Visitor would allow `GraphTraversal.bfs` / `dfs` to delegate fully to the
