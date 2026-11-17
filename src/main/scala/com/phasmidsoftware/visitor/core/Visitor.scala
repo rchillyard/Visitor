@@ -182,6 +182,68 @@ case class SimpleVisitor[V, J <: Appendable[V, J]](
   def visit(v: V): SimpleVisitor[V, J] =
     copy(journal = journal.append(v))
 
+/**
+  * A [[Visitor]] that evaluates each node knowing the node it was first reached from.
+  *
+  * It records predecessors as the engine discovers them and supplies them to an
+  * [[EvaluableFrom]] when the node is finally visited. This works because the engine calls
+  * `discover(v, parent)` before `visit(v)` for every non-start node — a contract pinned by
+  * `VisitorOrderingSpec` — so no change to [[Traversal]] is required.
+  *
+  * First discovery wins, matching [[CameFromJournal]]: a node reached again by another route
+  * keeps its original predecessor. The start node has no predecessor, so it evaluates with
+  * `None`.
+  *
+  * See [[https://github.com/rchillyard/Visitor/issues/20 issue #20]].
+  *
+  * {{{
+  * // Which nodes were reached by a non-tree edge in an undirected graph?
+  * val v = ParentedVisitor.withQueueJournal(using EvaluableFrom.parentOf[V])
+  * }}}
+  *
+  * @param journal   the visit journal.
+  * @param evaluable extracts a result from each node and the node it came from.
+  * @param parents   predecessors recorded so far.
+  */
+case class ParentedVisitor[V, R, J <: Appendable[Mapped[V, R], J]](
+                                                                    protected val journal: J,
+                                                                    evaluable: EvaluableFrom[V, R],
+                                                                    parents: Map[V, V] = Map.empty[V, V]
+                                                                  ) extends Visitor[V, Mapped[V, R], J]:
+
+  def visit(v: V): ParentedVisitor[V, R, J] =
+    copy(journal = journal.append(v -> evaluable.evaluate(parents.get(v), v)))
+
+  override def discover(v: V, cameFrom: V): ParentedVisitor[V, R, J] =
+    if parents.contains(v) then this // first discovery wins
+    else copy(parents = parents + (v -> cameFrom))
+
+  /**
+    * The predecessors recorded so far: which node each node was first reached from.
+    * The start node is absent.
+    */
+  def cameFrom: Map[V, V] = parents
+
+object ParentedVisitor:
+  /**
+    * A parent-aware visitor with a queue journal, so the journal reads in visit order.
+    *
+    * @tparam V the node type
+    * @tparam R the result type
+    */
+  def withQueueJournal[V, R](using ev: EvaluableFrom[V, R]): ParentedVisitor[V, R, QueueJournal[Mapped[V, R]]] =
+    ParentedVisitor(QueueJournal.empty, ev)
+
+  /**
+    * A parent-aware visitor with a list journal, which prepends, so the journal reads in
+    * reverse visit order.
+    *
+    * @tparam V the node type
+    * @tparam R the result type
+    */
+  def withListJournal[V, R](using ev: EvaluableFrom[V, R]): ParentedVisitor[V, R, ListJournal[Mapped[V, R]]] =
+    ParentedVisitor(ListJournal.empty, ev)
+
 object SimpleVisitor:
   /**
     * Creates a simple visitor with a queue-based journal, so the journal reads in visit order.

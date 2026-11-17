@@ -33,6 +33,17 @@ enum DfsOrder:
   * NOTE that there are three independent traversal engines which should be maintained
   * in parallel as much as possible: `traverse`, `traverseTree`, and `dfs`.
   */
+/**
+  * The outcome of a traversal that hands back the visited set it built, as well as the visitor.
+  *
+  * @param visitor the visitor, carrying the journal
+  * @param visited the visited set as it stood when the traversal finished
+  * @tparam V the node type
+  * @tparam E the journal's element type
+  * @tparam J the journal type
+  */
+case class Traversed[V, E, J <: Appendable[E, J]](visitor: Visitor[V, E, J], visited: VisitedSet[V])
+
 object Traversal:
 
   /**
@@ -224,6 +235,45 @@ object Traversal:
                                                   vs: VisitedSet[V],
                                                   tracer: Tracer[V] = Tracer.silent
   ): Visitor[V, E, J] =
+    dfsTracking(start, visitor, vs, order, goal).visitor
+
+  /**
+    * Depth-first search that also returns the [[VisitedSet]] it built.
+    *
+    * `dfs` necessarily constructs a visited set — that is how it avoids revisiting — and then
+    * throws it away. A caller running DFS repeatedly over the components of a graph has to know
+    * what the previous run reached, and so must reconstruct it: `V` redundant `markVisited`
+    * calls across a sort, each allocating, to rebuild something the engine already had.
+    *
+    * This entry point hands it back instead, so the next component can start from it:
+    *
+    * The visited set is an ordinary parameter, not a `using` one, precisely so that carrying it
+    * forward reads naturally. Supplying it through the `using` clause would have forced the
+    * caller to name the `Tracer` as well, since a partial explicit `using` list cannot be
+    * completed from defaults.
+    *
+    * {{{
+    * var seen = VisitedSet.empty[V]
+    * for start <- roots if !seen.isVisited(start) do
+    *   val out = Traversal.dfsTracking(start, visitor, seen)
+    *   seen = out.visited
+    * }}}
+    *
+    * See [[https://github.com/rchillyard/Visitor/issues/22 issue #22]].
+    *
+    * @param goal optional early-termination predicate. Defaults to never stopping early.
+    * @return the visitor and the visited set, as a [[Traversed]]
+    */
+  def dfsTracking[V, E, J <: Appendable[E, J]](
+                                                  start: V,
+                                                  visitor: Visitor[V, E, J],
+                                                  vs: VisitedSet[V],
+                                                  order: DfsOrder = DfsOrder.Pre,
+                                                  goal: V => Boolean = (_: V) => false
+                                                )(using
+                                                  nbrs: GraphNeighbours[V],
+                                                  tracer: Tracer[V] = Tracer.silent
+  ): Traversed[V, E, J] =
 
     tracer.trace(0, s"dfs ($order): start=$start")
 
@@ -234,14 +284,14 @@ object Traversal:
               stack: List[Frame],
               vis: Visitor[V, E, J],
               visited: VisitedSet[V]
-            ): Visitor[V, E, J] =
+            ): Traversed[V, E, J] =
       stack match
-        case Nil => vis
+        case Nil => Traversed(vis, visited)
 
         case Right(node) :: rest =>
           tracer.trace(1, s"record: $node")
           val newVisitor = vis.visit(node)
-          if goal(node) then newVisitor
+          if goal(node) then Traversed(newVisitor, visited)
           else loop(rest, newVisitor, visited)
 
         case Left(node) :: rest =>

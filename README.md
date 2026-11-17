@@ -387,6 +387,51 @@ For evaluated results, came-from maps, or a journal of `(node, result)` pairs, u
 `Visitor[V, E, J]` abstracts over `E`, the journal's element type, which is `Mapped[V, R]` for
 one and `V` for the other.
 
+## Knowing where a node came from
+
+`Evaluable` sees a node alone. Some algorithms decide on the strength of *how* they arrived —
+cycle detection in an undirected graph is "a back edge to anything other than my parent", and
+edge classification is the same family. `EvaluableFrom` adds the predecessor:
+
+```scala
+trait EvaluableFrom[V, R]:
+  def evaluate(from: Option[V], v: V): Option[R]
+```
+
+`ParentedVisitor` supplies it. It records predecessors as the engine discovers them and reads
+them back at visit time, which works because **the engine calls `discover(v, parent)` before
+`visit(v)` for every non-start node** — a contract pinned by `VisitorOrderingSpec`. No change
+to `Traversal` is involved:
+
+```scala
+given EvaluableFrom[V, Option[V]] = EvaluableFrom.parentOf[V]
+Traversal.bfs(start, ParentedVisitor.withQueueJournal[V, Option[V]])
+```
+
+`from` is `None` for the start node. First discovery wins, as with `CameFromJournal`. Note this
+gives the predecessor *node*, not the edge traversed — Visitor has no notion of an edge, since
+`Neighbours` yields nodes, so an algorithm needing the edge must carry it in `V`.
+
+## Traversing several components
+
+`dfs` builds a `VisitedSet` — that is how it avoids revisiting — and then discards it, so a
+caller walking each component of a graph in turn had to rebuild one. `dfsTracking` hands it
+back:
+
+```scala
+var seen = VisitedSet.empty[V]
+for start <- roots if !seen.isVisited(start) do
+  val out = Traversal.dfsTracking(start, SimpleVisitor.withQueueJournal[V], seen)
+  seen = out.visited
+```
+
+The visited set is an ordinary parameter rather than a `using` one, so that carrying it forward
+reads naturally; a partial explicit `using` list cannot be completed from defaults, and would
+have forced the caller to name the `Tracer` too.
+
+`VisitedSet.from(set)` builds one from an existing `Set` in O(1), for callers who already track
+visited nodes themselves.
+
 ## Java API
 
 Visitor's Scala API is driven by `given` instances, which a Java caller cannot supply. The
@@ -449,7 +494,7 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
-| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
+| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
 
 ## Migrating to 1.8.0
 
