@@ -30,7 +30,7 @@ trees, ASTs, file systems, dependency graphs, or any structure for which a
 | `Neighbours[H, V]` | Given a frontier element `H`, yields neighbouring `V`s |
 | `VisitedSet[V]` | Tracks which vertices have been visited (immutable) |
 | `Frontier[F[_]]` | The frontier data structure (stack, queue, priority queue) |
-| `Visitor[V, R, J]` | Accumulates results into a journal `J` |
+| `Visitor[V, E, J]` | Accumulates entries of type `E` into a journal `J` |
 
 These typeclasses are orthogonal: swap any one independently to change traversal
 behaviour without touching the others.
