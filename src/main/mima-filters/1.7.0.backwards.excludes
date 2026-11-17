@@ -1,0 +1,28 @@
+# Deliberate binary breaks in 1.8.0, relative to 1.7.0. See the release note in README.md.
+#
+# core.Zero and core.Monoid were published type classes that Visitor itself never consumed:
+# neither appeared in any signature in the public API, and the only references to them anywhere
+# were their own declarations and their given instances for Int/Long/Float/Double. Visitor
+# defined them and never asked a caller for one. They are removed rather than migrated to
+# cats.kernel.Monoid, which would have put cats-kernel at the base of the Phasmid stack to supply
+# something nothing here uses. A caller who imported `given Monoid[Double]` (or Int/Long/Float)
+# from core should depend on cats-kernel, which supplies these through the implicit scope with no
+# import at all. See https://github.com/rchillyard/Visitor/issues/21
+#
+# Under PVP, 1.7.0 -> 1.8.0 is a major bump, so these breaks are permitted. This file retires
+# itself: once previousRelease moves past 1.7.0, MiMa stops consulting it.
+#
+# The exact filter lines below are MiMa's own suggestions from the failing run, not hand-written.
+
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Zero")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Monoid")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Behaviours#package.given_Zero_A(com.phasmidsoftware.visitor.core.Monoid)com.phasmidsoftware.visitor.core.Behaviours#package#given_Zero_A")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Monoid_Double$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Monoid_Float$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Monoid_Int$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Monoid_Long$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_A")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Double$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Float$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Int$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Long$")

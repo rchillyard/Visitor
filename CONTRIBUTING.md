@@ -64,9 +64,10 @@ abstract data type:
 
 ### Weight abstraction
 
-`Monoid[A]` (mirroring Cats: `identity` + `combine`) replaces `Numeric[E]` as
-the context bound for weighted traversals. Provided instances: `Int`, `Long`,
-`Double`, `Float`.
+Visitor's own `Zero[A]` and `Monoid[A]` were removed in 1.8.0: nothing in the engine consumed
+them. `bestFirstWeighted` asks only for an `Ordering` and a `CostUpdate`. A consumer that needs
+identity-and-combine over costs takes it from `cats-kernel`, which Visitor does not depend on.
+See [issue #21](https://github.com/rchillyard/Visitor/issues/21).
 
 ### `CostUpdate[V, F[_]]`
 
@@ -115,11 +116,17 @@ src/
     core/
       Behaviours.scala   — Evaluable, Neighbours, VisitedSet, Frontier,
                            Visitor, JournaledVisitor, GraphNeighbours,
-                           Monoid (given instances), CostUpdate, Tracer
+                           CostUpdate, Tracer
       Journal.scala      — Appendable, Journal, ListJournal, QueueJournal
       PrioQueue.scala    — BinaryHeap, PrioQueue, IndexedPrioQueue
       Traversal.scala    — dfs, bfs, bestFirst, bestFirstWeighted, traverseTree
+    java/
+      JavaBridge.scala   — package-private bridge for the Java façade
+  main/java/com/phasmidsoftware/visitor/java/
+                         — Traversals, NeighbourFunction, Evaluator, Order,
+                           TraversalResult (the public Java API)
   test/scala/            — ScalaTest specs
+  test/java/             — JUnit 5 tests for the Java façade
 attic/                   — Historical/non-compiling code preserved for reference
 ```
 
@@ -140,9 +147,11 @@ attic/                   — Historical/non-compiling code preserved for referen
   correct behaviour, not a bug. Document it clearly.
 - **`shouldBe` in tests** — use `shouldBe` rather than `should be` in ScalaTest
   specs.
-- **No Cats dependency** — Visitor intentionally avoids depending on Cats.
-  `Monoid` is defined locally. If Cats integration is desired, it belongs in a
-  separate optional module.
+- **No Cats dependency** — Visitor intentionally avoids depending on Cats. It sits at the base
+  of the Phasmid stack, so anything it depends on, all its consumers inherit. As of 1.8.0 it
+  defines no monoid of its own either: the unused `Zero`/`Monoid` were deleted rather than
+  migrated. A dependency on `cats-kernel` would need to pay for itself in code Visitor actually
+  runs — `Monoid[J]` for parallel traversal is the one candidate.
 - **Purely functional** — all traversal methods are pure. The `pred` and
   `bestCost` mutable maps in `WeightedTraversal` are the one principled
   exception; they are owned exclusively by `CostUpdate` and not observable
@@ -174,7 +183,9 @@ sbt test
 - **Journal types** — new `Appendable` implementations (e.g. a `ParentJournal`
   recording `(child, parent)` pairs, which would allow Gryphon's Java façade to
   eliminate its Java BFS/DFS reimplementation).
-- **`Monoid` instances** — additional given instances for standard types.
+- **Java façade coverage** — the weighted traversals (`bestFirst`, `bestFirstMax`,
+  `bestFirstWeighted`) are not yet reachable from `com.phasmidsoftware.visitor.java`; they need
+  an `Ordering` and a `CostUpdate` supplied from Java.
 - **Bug fixes** — particularly anything related to lazy binding in iterators.
 - **Test coverage** — additional edge cases, especially for `bestFirstWeighted`
   with non-`Double` weight types.

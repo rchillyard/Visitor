@@ -14,7 +14,20 @@
 A purely functional, typeclass-driven graph and tree traversal library for Scala 3.
 
 ```scala
-libraryDependencies += "com.phasmidsoftware" %% "visitor" % "1.7.0"
+libraryDependencies += "com.phasmidsoftware" %% "visitor" % "x.y.z"
+```
+
+where `x.y.z` is the latest version on Maven Central — see the
+[Sonatype Central badge](https://central.sonatype.com/artifact/com.phasmidsoftware/visitor_3) above.
+
+From Java, or from Maven:
+
+```xml
+<dependency>
+    <groupId>com.phasmidsoftware</groupId>
+    <artifactId>visitor_3</artifactId>
+    <version>x.y.z</version>
+</dependency>
 ```
 
 Visitor 1.7.0 and later need Scala 3.9 or later; for Scala 3.7 or 3.8, use 1.6.0. (No release supports Scala 3.3.)
@@ -118,42 +131,6 @@ A default no-op `given` is provided, resolved automatically for DFS and BFS.
 For Dijkstra and Prim, the consuming library provides a `given CostUpdate[W, IndexedPrioQueue]`
 that calls `decreaseKey` whenever a cheaper path to a frontier vertex is found.
 This keeps all domain knowledge out of `Traversal` itself.
-
-### `Zero[A]`
-
-Answers: *what is the identity cost?*
-
-```scala
-trait Zero[A]:
-  def identity: A
-```
-
-The minimal requirement for weighted traversals that need a seed cost but do not
-accumulate costs along a path — specifically Prim's MST algorithm. `given` instances
-are provided for `Int`, `Long`, `Double`, and `Float`.
-
-`Monoid[A]` extends `Zero[A]`, so any `given Monoid[A]` automatically satisfies
-`Zero[A]`. A derived `given [A: Monoid]: Zero[A]` is also provided for contexts
-where only `Monoid` is in scope.
-
-### `Monoid[A]`
-
-Answers: *what is the identity cost, and how do costs combine?*
-
-```scala
-trait Monoid[A] extends Zero[A]:
-  def combine(x: A, y: A): A
-```
-
-Extends `Zero[A]` with an associative binary operation. Mirrors the Cats `Monoid`
-typeclass without the Cats dependency. Used by Dijkstra to accumulate path costs.
-`given` instances are provided for `Int`, `Long`, `Double`, and `Float`.
-
-The distinction between `Zero` and `Monoid` is intentional and pedagogically
-significant: Prim's MST algorithm compares edge weights but never combines them,
-so requiring `Monoid` for Prim would be dishonest. The correct context bound for
-weighted traversals is `E: {Zero, Ordering}` for Prim and `E: {Monoid, Ordering}`
-for Dijkstra.
 
 ### `Visitor[V, R, J]`
 
@@ -381,6 +358,47 @@ val result = Traversal.bfs(start, visitor, goal = _ == 4)
 This works uniformly across `bfs`, `dfs`, `bestFirst`, `bestFirstMax`, and `bestFirstWeighted`.
 Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
 
+## Java API
+
+Visitor's Scala API is driven by `given` instances, which a Java caller cannot supply. The
+`com.phasmidsoftware.visitor.java` package takes the two type classes that matter —
+`Neighbours` and `Evaluable` — as ordinary arguments instead, so from Java they are just lambdas:
+
+```java
+import com.phasmidsoftware.visitor.java.*;
+
+Map<String, List<String>> graph = Map.of(
+        "A", List.of("B", "C"),
+        "B", List.of("D"),
+        "C", List.of("D"),
+        "D", List.of());
+
+TraversalResult<String, String> r =
+        Traversals.bfs("A", v -> graph.getOrDefault(v, List.of()));
+
+r.visited();   // [A, B, C, D]
+r.cameFrom();  // {B=A, C=A, D=B}
+```
+
+| Type | Role |
+|---|---|
+| `Traversals` | the entry points: `bfs`, `dfs`, `traverseTree`, each with optional goal and evaluator |
+| `NeighbourFunction<H, V>` | the adjacency — the Java form of `Neighbours[H, V]` |
+| `Evaluator<V, R>` | what to extract from each node — the Java form of `Evaluable[V, R]`; returning `Optional.empty()` filters |
+| `Order` | `PRE` or `POST`, the Java form of `DfsOrder` |
+| `TraversalResult<V, R>` | `visited()`, `results()` and `cameFrom()`, all unmodifiable |
+
+A `goal` predicate halts the traversal *after* recording the first node it accepts, so that node
+is present in the result. Note that `cameFrom()` records *discovery*, not visiting: a node
+discovered just before the goal fired appears there without appearing in `visited()`. For a tree,
+`cameFrom()` is always empty — the parent is already evident from the tree's shape.
+
+The weighted traversals (`bestFirst`, `bestFirstMax`, `bestFirstWeighted`) are not yet exposed to
+Java; they need an `Ordering` and a `CostUpdate`, and are reached from Scala.
+
+Javadoc for this package is published alongside the Scaladoc, at
+<https://rchillyard.github.io/Visitor/latest/javadoc/>.
+
 ## Immutability
 
 Everything is immutable. Visiting a node yields a new `Visitor`.
@@ -400,5 +418,29 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.3.0   | Three-type priority queue hierarchy (`BinaryHeap`, `PrioQueue`, `IndexedPrioQueue`); `CostUpdate[W, F[_]]` typeclass; `TupleVisitedSet[(E,V)]`; `bestFirstWeighted` entry point for Dijkstra/Prim |
 | 1.4.0   | `Monoid[A]` typeclass with `given` instances for `Int`, `Long`, `Double`, `Float`; replaces `Numeric` in weighted traversal context bounds |
 | 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
-| 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` extends `Zero[A]`; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
+| 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
+| 1.8.0   | **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
+
+## Migrating to 1.8.0
+
+1.8.0 removes `com.phasmidsoftware.visitor.core.Zero` and
+`com.phasmidsoftware.visitor.core.Monoid`, together with their `given` instances for `Int`,
+`Long`, `Double` and `Float` and the derived `given [A: Monoid]: Zero[A]`.
+
+This is a binary break, which is why it is a minor release: under PVP the first two numbers form
+the major version, so 1.7.x and 1.8.x are not binary compatible.
+
+Nothing inside Visitor used either type. Neither appeared in any signature in the public API, and
+the only references to them anywhere were their own declarations and their given instances —
+Visitor defined two type classes, published instances of them, and never asked a caller for one.
+
+| If you were doing this | Do this instead |
+|---|---|
+| `import ...visitor.core.given` to pick up a `Monoid[Double]` (or `Int`/`Long`/`Float`) | depend on `org.typelevel %% "cats-kernel"` and use `cats.kernel.Monoid`, which supplies these through the implicit scope with no import at all |
+| `import ...visitor.core.{Monoid as _, *, given}` to dodge a clash with your own `Monoid` | drop the `Monoid as _` exclusion; the clash is gone |
+| writing `E: {Zero, Ordering}` or `E: {Monoid, Ordering}` against Visitor's types | the same bounds against `cats.kernel.Monoid`; Visitor's traversals never required either |
+
+They were not migrated to `cats.kernel.Monoid` inside Visitor because that would have added
+`cats-kernel` at the base of the dependency stack to supply something Visitor does not use.
+See [issue #21](https://github.com/rchillyard/Visitor/issues/21).

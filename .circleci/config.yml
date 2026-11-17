@@ -49,10 +49,18 @@ jobs:
           name: Test
           command: cat /dev/null | sbt test
 
-      # Generate Scaladoc (catches doc warnings, and the docs are published to GitHub Pages)
+      # Binary compatibility against the previous release (see build.sbt). Under PVP a patch
+      # release must pass; a deliberate break in a minor release is listed in
+      # src/main/mima-filters/<previousRelease>.backwards.excludes with a release note.
+      - run:
+          name: MiMa
+          command: cat /dev/null | sbt mimaReportBinaryIssues
+
+      # Generate Scaladoc and the Java façade's Javadoc (catches doc warnings; both are published
+      # to GitHub Pages, at latest/api and latest/javadoc respectively)
       - run:
           name: Doc
-          command: cat /dev/null | sbt doc
+          command: cat /dev/null | sbt doc javaApiDoc
 
       - store_test_results:
           path: target/test-reports
