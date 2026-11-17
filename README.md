@@ -132,25 +132,42 @@ For Dijkstra and Prim, the consuming library provides a `given CostUpdate[W, Ind
 that calls `decreaseKey` whenever a cheaper path to a frontier vertex is found.
 This keeps all domain knowledge out of `Traversal` itself.
 
-### `Visitor[V, R, J]`
+### `Visitor[V, E, J]`
 
 Answers: *where do the results go, and how do we track came-from relationships?*
 
 ```scala
-trait Visitor[V, R, J <: Appendable[(V, Option[R])]]:
-  def journal: J
-  def visit(v: V)(using ev: Evaluable[V, R]): Visitor[V, R, J]
-  def discover(v: V, cameFrom: V): Visitor[V, R, J] = this  // default no-op
+trait Visitor[V, E, J <: Appendable[E, J]]:
+  def visit(v: V): Visitor[V, E, J]
+  def discover(v: V, cameFrom: V): Visitor[V, E, J] = this  // default no-op
   def result: J
+  protected def journal: J
 ```
+
+`E` is the journal's element type, and it is what distinguishes the implementations:
+`JournaledVisitor` records `Mapped[V, R]`, `SimpleVisitor` records `V`, and
+`ParentedVisitor` records `Mapped[V, R]` having consulted the node's predecessor. All three
+are ordinary `Visitor`s, so every `Traversal` entry point accepts any of them.
+
+Note that `visit` takes no `using` clause: a visitor that needs an `Evaluable` holds its own,
+bound once when it is built.
 
 Two events are distinguished:
 - `visit(v)` — called when a vertex is *settled* (dequeued/popped and processed).
 - `discover(v, cameFrom)` — called when a vertex is first *discovered* as a neighbour
-  of `cameFrom`, before it is added to the frontier. Default is a no-op.
+  of `cameFrom`, before it is added to the frontier. Default is a no-op. The engine always
+  calls `discover(v, parent)` **before** `visit(v)` for a non-start node, which is what lets
+  `ParentedVisitor` work.
 
-The canonical implementation is `JournaledVisitor`. When constructed with a
-`CameFromJournal`, it overrides `discover` to record came-from relationships.
+### `Appendable[X, A]`
+
+```scala
+trait Appendable[X, A <: Appendable[X, A]] extends AutoCloseable:
+  def append(x: X): A
+```
+
+F-bounded, so appending returns the journal's own type rather than the supertype. This is what
+makes `journal.append(x): J` type-check without a cast.
 
 ## Priority Queue Hierarchy
 
@@ -171,27 +188,35 @@ Its internal `loop` is a tail-recursive function shared across all traversal str
 
 ```scala
 object Traversal:
-  def bfs[V, R, J](start: V, visitor: Visitor[V, R, J], goal: V => Boolean = _ => false)
-      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+  def bfs[V, E, J](start: V, visitor: Visitor[V, E, J], goal: V => Boolean = _ => false)
+      (using Neighbours[V, V], VisitedSet[V]): Visitor[V, E, J]
 
-  def dfs[V, R, J](start: V, visitor: Visitor[V, R, J],
+  def dfs[V, E, J](start: V, visitor: Visitor[V, E, J],
                    order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
-      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+      (using Neighbours[V, V], VisitedSet[V]): Visitor[V, E, J]
 
-  def bestFirst[V: Ordering, R, J](start: V, visitor: Visitor[V, R, J], goal: V => Boolean = _ => false)
-      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+  // as dfs, but also returns the VisitedSet it built
+  def dfsTracking[V, E, J](start: V, visitor: Visitor[V, E, J], vs: VisitedSet[V],
+                           order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
+      (using Neighbours[V, V]): Traversed[V, E, J]
 
-  def bestFirstMax[V: Ordering, R, J](start: V, visitor: Visitor[V, R, J], goal: V => Boolean = _ => false)
-      (using Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+  def bestFirst[V: Ordering, E, J](start: V, visitor: Visitor[V, E, J], goal: V => Boolean = _ => false)
+      (using Neighbours[V, V], VisitedSet[V]): Visitor[V, E, J]
 
-  def bestFirstWeighted[W: Ordering, R, J](start: W, visitor: Visitor[W, R, J], goal: W => Boolean = _ => false)
-      (using Neighbours[W, W], Evaluable[W, R], VisitedSet[W],
-             CostUpdate[W, IndexedPrioQueue], IndexedPrioQueue[W]): Visitor[W, R, J]
+  def bestFirstMax[V: Ordering, E, J](start: V, visitor: Visitor[V, E, J], goal: V => Boolean = _ => false)
+      (using Neighbours[V, V], VisitedSet[V]): Visitor[V, E, J]
 
-  def traverseTree[H, V, R, J](start: H, visitor: Visitor[V, R, J],
+  def bestFirstWeighted[W: Ordering, E, J](start: W, visitor: Visitor[W, E, J], goal: W => Boolean = _ => false)
+      (using Neighbours[W, W], VisitedSet[W],
+             CostUpdate[W, IndexedPrioQueue], IndexedPrioQueue[W]): Visitor[W, E, J]
+
+  def traverseTree[H, V, E, J](start: H, visitor: Visitor[V, E, J],
                                 order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
-      (using Neighbours[H, V], Neighbours[V, V], Evaluable[V, R], VisitedSet[V]): Visitor[V, R, J]
+      (using Neighbours[H, V], Neighbours[V, V], VisitedSet[V]): Visitor[V, E, J]
 ```
+
+(`J` is bounded `J <: Appendable[E, J]` throughout; elided above for readability. Note that no
+entry point asks for an `Evaluable` — the visitor carries whatever it needs.)
 
 `bestFirstWeighted` is the entry point for Dijkstra- and Prim-style traversals.
 The frontier element type `W` is typically `(E, V)` where `E` is the cost type.
@@ -494,7 +519,7 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
-| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
+| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`Appendable[X]` is now F-bounded as `Appendable[X, A <: Appendable[X, A]]`**, with `append(x: X): A`, removing four unchecked casts. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
 
 ## Migrating to 1.8.0
 
@@ -517,6 +542,8 @@ Visitor defined two type classes, published instances of them, and never asked a
 | writing `Visitor[V, R, J]` in your own signatures | `Visitor[V, Mapped[V, R], J]` — the second parameter is now the journal's element type |
 | calling `Traversal.bfs(...)(using nbrs, ev, vs, tracer)` with an explicit `using` list | drop `ev`; the visitor carries its own `Evaluable` now |
 | `JournaledVisitor.withQueueJournal[V, R]` with no `Evaluable` in scope | bring one into scope — it is needed when the visitor is built, not when it visits |
+| implementing `Appendable[X]` yourself | implement `Appendable[X, YourType]`, with `append` returning `YourType`; the same applies to `Journal`, `IterableJournal` and `AbstractMapJournal` |
+| writing `J <: Appendable[X]` as a bound | `J <: Appendable[X, J]` |
 
 They were not migrated to `cats.kernel.Monoid` inside Visitor because that would have added
 `cats-kernel` at the base of the dependency stack to supply something Visitor does not use.
