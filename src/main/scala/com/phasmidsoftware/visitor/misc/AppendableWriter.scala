@@ -16,7 +16,7 @@ import java.io.*
  * @param writer    the underlying `Writer` instance to which strings are appended
  * @param closeable an optional `AutoCloseable` resource that will be closed along with the writer
  */
-case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends com.phasmidsoftware.visitor.core.Appendable[String] {
+case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends com.phasmidsoftware.visitor.core.Appendable[String, AppendableWriter] {
 
   /**
    * Appends the specified string to this `AppendableWriter` instance.
@@ -26,7 +26,7 @@ case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) ex
    * @param x the string to be appended to the `AppendableWriter`
    * @return the current `AppendableWriter` instance with the appended string
    */
-  def append(x: String): com.phasmidsoftware.visitor.core.Appendable[String] = {
+  def append(x: String): AppendableWriter = {
     writer.append(x)
     this
   }

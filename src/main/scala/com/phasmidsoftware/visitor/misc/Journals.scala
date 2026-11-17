@@ -17,7 +17,7 @@ import scala.collection.immutable.Queue
  *
  * @tparam X the type of elements contained in the iterable journal
  */
-trait IterableJournal[X] extends Journal[X] with Iterable[X]
+trait IterableJournal[X, A <: IterableJournal[X, A]] extends Journal[X, A] with Iterable[X]
 
 /**
  * A trait that combines the behavior of a function and a journal.
@@ -33,7 +33,7 @@ trait IterableJournal[X] extends Journal[X] with Iterable[X]
  * @tparam X the type of input to the function
  * @tparam Y the type of output from the function
  */
-trait FunctionMappedJournal[X, Y] extends Journal[(X, Y)] with (X => Y)
+trait FunctionMappedJournal[X, Y, A <: FunctionMappedJournal[X, Y, A]] extends Journal[(X, Y), A] with (X => Y)
 
 /**
  * Represents a journal implemented as a list of elements of type `X`.
@@ -44,7 +44,7 @@ trait FunctionMappedJournal[X, Y] extends Journal[(X, Y)] with (X => Y)
  * @tparam X the type of elements stored in the journal
  * @param list the list of elements in the journal
  */
-case class ListJournal[X](list: List[X]) extends IterableJournal[X] {
+case class ListJournal[X](list: List[X]) extends IterableJournal[X, ListJournal[X]] {
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
    * of the `Appendable` with the element included.
@@ -89,7 +89,7 @@ object ListJournal {
  * @tparam X the type of elements stored in the journal
  * @param queue the list of elements in the journal
  */
-case class QueueJournal[X](queue: Queue[X]) extends IterableJournal[X] {
+case class QueueJournal[X](queue: Queue[X]) extends IterableJournal[X, QueueJournal[X]] {
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
    * of the `Appendable` with the element included.
@@ -138,7 +138,7 @@ object QueueJournal {
  * @constructor Initializes the journal with an immutable map of key-value pairs
  * @param map the underlying immutable map containing the journal entries
  */
-abstract class AbstractMapJournal[K, V](map: Map[K, V]) extends Journal[(K, V)] {
+abstract class AbstractMapJournal[K, V, A <: AbstractMapJournal[K, V, A]](map: Map[K, V]) extends Journal[(K, V), A] {
 
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
@@ -147,7 +147,7 @@ abstract class AbstractMapJournal[K, V](map: Map[K, V]) extends Journal[(K, V)] 
    * @param x the element to be appended
    * @return a new `Appendable[X]` instance containing the existing elements and the newly appended element
    */
-  def append(x: (K, V)): AbstractMapJournal[K, V] =
+  def append(x: (K, V)): A =
     unit(map + x)
 
   /**
@@ -199,7 +199,7 @@ abstract class AbstractMapJournal[K, V](map: Map[K, V]) extends Journal[(K, V)] 
    * @param xs the map to be used for initializing the new `AbstractMapJournal` instance
    * @return a new instance of `AbstractMapJournal` containing the elements of the provided map
    */
-  def unit(xs: Map[K, V]): AbstractMapJournal[K, V]
+  def unit(xs: Map[K, V]): A
 }
 
 /**
@@ -214,7 +214,7 @@ abstract class AbstractMapJournal[K, V](map: Map[K, V]) extends Journal[(K, V)] 
  * @tparam V the type of values associated with the keys
  * @param map the underlying map storing the key-value pairs of the journal
  */
-case class MapJournal[K, V](map: Map[K, V]) extends AbstractMapJournal[K, V](map) {
+case class MapJournal[K, V](map: Map[K, V]) extends AbstractMapJournal[K, V, MapJournal[K, V]](map) {
 
   /**
    * Appends the specified element to this `Appendable` object, returning a new instance
@@ -223,9 +223,6 @@ case class MapJournal[K, V](map: Map[K, V]) extends AbstractMapJournal[K, V](map
    * @param x the element to be appended
    * @return a new `Appendable[X]` instance containing the existing elements and the newly appended element
    */
-  override def append(x: (K, V)): MapJournal[K, V] =
-    super.append(x).asInstanceOf[MapJournal[K, V]]
-
   /**
    * Creates a new `MapJournal` instance containing the specified key-value pairs.
    *
@@ -267,7 +264,7 @@ object MapJournal {
  * @tparam K the type of the keys in the journal
  * @tparam V the type of the values in the journal
  */
-case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMapJournal[K, V](xs) with FunctionMappedJournal[K, V] {
+case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMapJournal[K, V, FunctionMapJournal[K, V]](xs) with FunctionMappedJournal[K, V, FunctionMapJournal[K, V]] {
 
   /**
    * Applies the function `f` to the given key and returns the resulting value.
@@ -290,7 +287,7 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
    * @return a new `FunctionMapJournal[K, V]` instance containing the updated mapping
    */
   def appendByFunction(k: K): FunctionMapJournal[K, V] =
-    append(k -> apply(k)).asInstanceOf[FunctionMapJournal[K, V]]
+    append(k -> apply(k))
 
   /**
    * Creates a new instance of `AbstractMapJournal` with the given map.
@@ -298,7 +295,7 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
    * @param xs the map to be used for initializing the new `AbstractMapJournal` instance
    * @return a new instance of `AbstractMapJournal` containing the elements of the provided map
    */
-  def unit(xs: Map[K, V]): AbstractMapJournal[K, V] =
+  def unit(xs: Map[K, V]): FunctionMapJournal[K, V] =
     FunctionMapJournal(xs)(f)
 
   def close(): Unit = ()
