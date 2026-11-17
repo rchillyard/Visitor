@@ -66,7 +66,7 @@ object Traversal:
     * @param tracer  Typeclass for tracing the primary parametric type (`V`).
     * @return A `Visitor` instance containing the accumulated results after traversal completes.
     */
-  def traverse[V, E, J <: Appendable[E], F[_]](
+  def traverse[V, E, J <: Appendable[E, J], F[_]](
                                                              start: V,
                                                              visitor: Visitor[V, E, J],
                                                              goal: V => Boolean = (_: V) => false
@@ -148,7 +148,7 @@ object Traversal:
     * @param vs        A typeclass representing a set of visited nodes to prevent revisits.
     * @return A `Visitor` instance containing the accumulated results of the traversal.
     */
-  def traverseTree[H, V, E, J <: Appendable[E]](
+  def traverseTree[H, V, E, J <: Appendable[E, J]](
                                                               start: H,
                                                               visitor: Visitor[V, E, J],
                                                               order: DfsOrder = DfsOrder.Pre,
@@ -214,7 +214,7 @@ object Traversal:
     * @param order DfsOrder.Pre (default) or DfsOrder.Post
     * @param goal  optional early-termination predicate. Defaults to never stopping early.
     */
-  def dfs[V, E, J <: Appendable[E]](
+  def dfs[V, E, J <: Appendable[E, J]](
                                                   start: V,
                                                   visitor: Visitor[V, E, J],
                                                   order: DfsOrder = DfsOrder.Pre,
@@ -272,7 +272,7 @@ object Traversal:
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
-  def bfs[V, E, J <: Appendable[E]](
+  def bfs[V, E, J <: Appendable[E, J]](
                                                   start: V,
                                                   visitor: Visitor[V, E, J],
                                                   goal: V => Boolean = (_: V) => false
@@ -291,7 +291,7 @@ object Traversal:
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
-  def bestFirst[V: Ordering, E, J <: Appendable[E]](
+  def bestFirst[V: Ordering, E, J <: Appendable[E, J]](
                                                                   start: V,
                                                                   visitor: Visitor[V, E, J],
                                                                   goal: V => Boolean = (_: V) => false
@@ -309,7 +309,7 @@ object Traversal:
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
-  def bestFirstMax[V: Ordering, E, J <: Appendable[E]](
+  def bestFirstMax[V: Ordering, E, J <: Appendable[E, J]](
                                                                      start: V,
                                                                      visitor: Visitor[V, E, J],
                                                                      goal: V => Boolean = (_: V) => false
@@ -341,7 +341,7 @@ object Traversal:
     */
   // The Ordering bound isn't used here, but it stays so that the method's signature (and binary API) doesn't change.
   @nowarn("msg=unused implicit parameter")
-  def bestFirstWeighted[W: Ordering, E, J <: Appendable[E]](
+  def bestFirstWeighted[W: Ordering, E, J <: Appendable[E, J]](
                                                                           start: W,
                                                                           visitor: Visitor[W, E, J],
                                                                           goal: W => Boolean = (_: W) => false

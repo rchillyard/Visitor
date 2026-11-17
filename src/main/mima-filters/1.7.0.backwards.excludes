@@ -72,3 +72,20 @@ ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.
 ProblemFilters.exclude[IncompatibleResultTypeProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor._2()scala.Option")
 ProblemFilters.exclude[IncompatibleResultTypeProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.copy$default$2()scala.Option")
 ProblemFilters.exclude[ReversedMissingMethodProblem]("com.phasmidsoftware.visitor.core.Visitor.visit(java.lang.Object)com.phasmidsoftware.visitor.core.Visitor")
+
+# ---------------------------------------------------------------------------
+# F-bounding Appendable (1.8.0).
+#
+# `Appendable[X]` becomes `Appendable[X, A <: Appendable[X, A]]`, with `append(x: X): A`, so
+# appending to a journal returns that journal's own type rather than the supertype. This removes
+# four unchecked `asInstanceOf` casts that were otherwise on the hot path of every visit — two in
+# Visitor itself and two in misc.Journals — and turns what would have been a ClassCastException
+# into a compile error.
+#
+# Only two bytecode-visible breaks result, because type parameters erase: MapJournal's narrowing
+# `append` override is no longer needed at all, and AppendableWriter's append now returns
+# AppendableWriter rather than Appendable.
+# ---------------------------------------------------------------------------
+
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.misc.MapJournal.append(scala.Tuple2)com.phasmidsoftware.visitor.misc.MapJournal")
+ProblemFilters.exclude[IncompatibleResultTypeProblem]("com.phasmidsoftware.visitor.misc.AppendableWriter.append(java.lang.String)com.phasmidsoftware.visitor.core.Appendable")

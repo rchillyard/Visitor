@@ -16,7 +16,7 @@ import scala.collection.immutable.Queue
   *
   * @tparam X the type of elements that can be appended to the structure
   */
-trait Appendable[X] extends AutoCloseable:
+trait Appendable[X, A <: Appendable[X, A]] extends AutoCloseable:
   /**
     * Appends the specified element to this appendable structure and returns
     * the instance itself, allowing for a fluent interface.
@@ -24,7 +24,7 @@ trait Appendable[X] extends AutoCloseable:
     * @param x the element of type X to be appended
     * @return the instance of the appendable structure with the new element appended
     */
-  def append(x: X): Appendable[X]
+  def append(x: X): A
 
 /**
   * A trait representing a journal for managing a collection of appendable elements of type X.
@@ -37,7 +37,7 @@ trait Appendable[X] extends AutoCloseable:
   *
   * @tparam X the type of elements that can be managed by the journal
   */
-trait Journal[X] extends Appendable[X]:
+trait Journal[X, A <: Journal[X, A]] extends Appendable[X, A]:
   def close(): Unit
 
 /**
@@ -52,7 +52,7 @@ trait Journal[X] extends Appendable[X]:
   *
   * @tparam X the type of elements contained in the journal
   */
-trait IterableJournal[X] extends Journal[X] with Iterable[X]
+trait IterableJournal[X, A <: IterableJournal[X, A]] extends Journal[X, A] with Iterable[X]
 
 /**
   * A case class representing a journal backed by a list, which maintains a sequence of elements.
@@ -63,7 +63,7 @@ trait IterableJournal[X] extends Journal[X] with Iterable[X]
   * @param xs the list containing the elements of the journal
   * @tparam X the type of elements stored in the journal
   */
-case class ListJournal[X](xs: List[X]) extends IterableJournal[X]:
+case class ListJournal[X](xs: List[X]) extends IterableJournal[X, ListJournal[X]]:
   def append(x: X): ListJournal[X] = copy(x :: xs)
 
   def iterator: Iterator[X] = xs.iterator
@@ -95,7 +95,7 @@ object ListJournal:
   * @param q the underlying queue used to store the journal's elements
   * @tparam X the type of elements stored in the journal
   */
-case class QueueJournal[X](q: Queue[X]) extends IterableJournal[X]:
+case class QueueJournal[X](q: Queue[X]) extends IterableJournal[X, QueueJournal[X]]:
   def append(x: X): QueueJournal[X] = copy(q.enqueue(x))
 
   def iterator: Iterator[X] = q.iterator
@@ -129,7 +129,7 @@ object QueueJournal:
   * @param map the underlying came-from map: vertex → the vertex that discovered it
   * @tparam V the vertex type
   */
-case class CameFromJournal[V](map: Map[V, V]) extends IterableJournal[(V, V)]:
+case class CameFromJournal[V](map: Map[V, V]) extends IterableJournal[(V, V), CameFromJournal[V]]:
 
   def append(x: (V, V)): CameFromJournal[V] =
     if map.contains(x._1) then this // already discovered — keep first

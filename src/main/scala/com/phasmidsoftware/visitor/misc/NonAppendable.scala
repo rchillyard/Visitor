@@ -12,7 +12,7 @@ package com.phasmidsoftware.visitor.misc
  * @param f a function to be executed with each appended element
  * @tparam X the type of elements that can be appended to this `Appendable`
  */
-case class NonAppendable[X](f: X => Unit) extends com.phasmidsoftware.visitor.core.Appendable[X] {
+case class NonAppendable[X](f: X => Unit) extends com.phasmidsoftware.visitor.core.Appendable[X, NonAppendable[X]] {
 
   /**
    * "Appends" the specified element to this `Appendable` object, returning a new instance
@@ -23,7 +23,7 @@ case class NonAppendable[X](f: X => Unit) extends com.phasmidsoftware.visitor.co
    * @param x the element to be "appended"
    * @return a new `Appendable[X]` instance containing the existing elements and the newly appended element
    */
-  def append(x: X): com.phasmidsoftware.visitor.core.Appendable[X] = {
+  def append(x: X): NonAppendable[X] = {
     f(x)
     this
   }

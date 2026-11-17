@@ -41,7 +41,7 @@ type Mapped[V, R] = (V, Option[R])
   * @tparam E the journal's element type
   * @tparam J the journal type (must be an `Appendable` of `E`)
   */
-trait Visitor[V, E, J <: Appendable[E]]:
+trait Visitor[V, E, J <: Appendable[E, J]]:
   /**
     * Visits a node `v` and records it in the journal, returning the updated visitor.
     *
@@ -89,14 +89,14 @@ trait Visitor[V, E, J <: Appendable[E]]:
   * @param evaluable       extracts the result recorded alongside each node.
   * @param cameFromJournal optionally, a journal recording came-from relationships.
   */
-case class JournaledVisitor[V, R, J <: Appendable[Mapped[V, R]]](
+case class JournaledVisitor[V, R, J <: Appendable[Mapped[V, R], J]](
                                                                   protected val journal: J,
                                                                   evaluable: Evaluable[V, R],
                                                                   cameFromJournal: Option[CameFromJournal[V]] = None
                                                                 ) extends Visitor[V, Mapped[V, R], J]:
 
   def visit(v: V): JournaledVisitor[V, R, J] =
-    copy(journal = journal.append(v -> evaluable.evaluate(v)).asInstanceOf[J])
+    copy(journal = journal.append(v -> evaluable.evaluate(v)))
 
   override def discover(v: V, cameFrom: V): JournaledVisitor[V, R, J] =
     cameFromJournal match
@@ -175,12 +175,12 @@ object JournaledVisitor:
   * @tparam V the node type
   * @tparam J the journal type (must be an `Appendable` of `V`)
   */
-case class SimpleVisitor[V, J <: Appendable[V]](
+case class SimpleVisitor[V, J <: Appendable[V, J]](
                                                  protected val journal: J
                                                ) extends Visitor[V, V, J]:
 
   def visit(v: V): SimpleVisitor[V, J] =
-    copy(journal = journal.append(v).asInstanceOf[J])
+    copy(journal = journal.append(v))
 
 object SimpleVisitor:
   /**
