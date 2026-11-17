@@ -17,6 +17,48 @@ trait Evaluable[V, R]:
   def evaluate(v: V): Option[R]
 
 /**
+  * Typeclass: like [[Evaluable]], but also given the node this one was first reached from.
+  *
+  * Some algorithms decide on the strength of *how* they arrived, not just where they are —
+  * cycle detection in an undirected graph is "a back edge to anything other than my parent",
+  * and edge classification (tree / back / forward / cross) is the same family. `Evaluable` sees
+  * the node alone and cannot express those.
+  *
+  * `from` is `None` for the start node, which was reached from nowhere, and for any node whose
+  * predecessor the visitor did not record. It is the *first* node this one was discovered from:
+  * a node reached again by another route keeps its original predecessor, matching
+  * [[CameFromJournal]].
+  *
+  * Use it with [[ParentedVisitor]], which records predecessors at discovery and supplies them
+  * here at visit time. No change to [[Traversal]] is needed: the engine already calls
+  * `discover(v, parent)` before `visit(v)` for every non-start node.
+  *
+  * See [[https://github.com/rchillyard/Visitor/issues/20 issue #20]]. Note that this gives the
+  * predecessor *node*, not the edge traversed — Visitor has no notion of an edge, since
+  * [[Neighbours]] yields nodes. An algorithm needing the edge must carry it in `V`.
+  *
+  * @tparam V the node type
+  * @tparam R the result type
+  */
+trait EvaluableFrom[V, R]:
+  def evaluate(from: Option[V], v: V): Option[R]
+
+object EvaluableFrom:
+  /**
+    * Adapts an ordinary [[Evaluable]], ignoring the predecessor.
+    *
+    * @param ev the evaluable to adapt
+    * @tparam V the node type
+    * @tparam R the result type
+    */
+  def ignoringParent[V, R](ev: Evaluable[V, R]): EvaluableFrom[V, R] =
+    (_: Option[V], v: V) => ev.evaluate(v)
+
+  /** Yields each node paired with the node it was reached from. */
+  def parentOf[V]: EvaluableFrom[V, Option[V]] =
+    (from: Option[V], _: V) => Some(from)
+
+/**
   * Typeclass: given a structure H, yield the neighbouring nodes of type V.
   * This is the "how do we traverse" concern — completely decoupled from domain.
   *
@@ -47,6 +89,31 @@ type GraphNeighbors[V] = GraphNeighbours[V]
 trait VisitedSet[V]:
   def isVisited(v: V): Boolean
   def markVisited(v: V): VisitedSet[V]
+
+object VisitedSet:
+  /**
+    * An empty `VisitedSet`.
+    *
+    * @tparam V the node type
+    */
+  def empty[V]: VisitedSet[V] = SetVisitedSet(Set.empty)
+
+  /**
+    * A `VisitedSet` containing exactly `visited`, built in O(1).
+    *
+    * Without this, a caller holding a `Set` of already-visited nodes — for instance one running
+    * a traversal over each component of a graph in turn — could only rebuild a `VisitedSet` by
+    * folding `markVisited` over it, allocating once per element. The backing implementation is
+    * private, so there was no way to do it directly.
+    *
+    * See [[https://github.com/rchillyard/Visitor/issues/22 issue #22]]; prefer
+    * [[Traversal.dfsTracking]], which hands the visited set back rather than making you rebuild
+    * one at all.
+    *
+    * @param visited the nodes to mark as already visited
+    * @tparam V the node type
+    */
+  def from[V](visited: Set[V]): VisitedSet[V] = SetVisitedSet(visited)
 
 /** Default given: immutable Set-backed VisitedSet for plain node types. */
 given [V]: VisitedSet[V] = SetVisitedSet(Set.empty)
