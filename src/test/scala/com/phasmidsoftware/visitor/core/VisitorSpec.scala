@@ -326,7 +326,7 @@ class TraverseTreeSpec extends AnyFlatSpec with Matchers:
                        order: DfsOrder = DfsOrder.Pre,
                        goal:  String => Boolean = _ => false
                      ) =
-    Traversal.traverseTree[TestTree.Tree, String, String, QueueJournal[(String, Option[String])]](
+    Traversal.traverseTree(
       TestTree.root,
       JournaledVisitor.withQueueJournal[String, String],
       order,
@@ -410,6 +410,10 @@ class CameFromJournalSpec extends AnyFlatSpec with Matchers:
 // ============================================================
 
 class JournaledVisitorDiscoverSpec extends AnyFlatSpec with Matchers:
+
+  // A JournaledVisitor binds its Evaluable when it is built, not at each visit, so one is needed
+  // even by these tests, which only exercise discover and cameFrom and never evaluate anything.
+  private given Evaluable[Int, Int] = (v: Int) => Some(v)
 
   "JournaledVisitor without came-from journal" should "return None for cameFrom" in :
     val v = JournaledVisitor.withQueueJournal[Int, Int]

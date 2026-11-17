@@ -358,6 +358,35 @@ val result = Traversal.bfs(start, visitor, goal = _ == 4)
 This works uniformly across `bfs`, `dfs`, `bestFirst`, `bestFirstMax`, and `bestFirstWeighted`.
 Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style goal-directed search.
 
+## Simple Traversals
+
+When the answer is simply *which nodes, in what order*, you don't need an `Evaluable` and you
+don't need to read a journal of pairs. `Traverse` returns a `List[V]` directly:
+
+```scala
+given GraphNeighbours[String] = v => graph.getOrElse(v, Nil).iterator
+
+Traverse.bfs("A")                    // List(A, B, C, D)
+Traverse.dfs("A", DfsOrder.Post)     // post-order
+Traverse.tree(root)                  // a tree, root not visited
+```
+
+These are the Scala counterparts of the Java façade's `Traversals`.
+
+Underneath, each builds a `SimpleVisitor` — a `Visitor` whose journal is an ordinary
+`Appendable[V]` rather than `Appendable[Mapped[V, R]]`. It needs no `Evaluable`, allocates no
+pair per visit, and leaves `discover` as the inherited no-op, so it records no came-from. Use it
+directly when you want the journal itself:
+
+```scala
+Traversal.dfs(start, SimpleVisitor.withQueueJournal[V], DfsOrder.Post)
+```
+
+For evaluated results, came-from maps, or a journal of `(node, result)` pairs, use
+`JournaledVisitor` as before. The two are interchangeable wherever a `Visitor` is called for:
+`Visitor[V, E, J]` abstracts over `E`, the journal's element type, which is `Mapped[V, R]` for
+one and `V` for the other.
+
 ## Java API
 
 Visitor's Scala API is driven by `given` instances, which a Java caller cannot supply. The
@@ -420,7 +449,7 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
-| 1.8.0   | **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
+| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
 
 ## Migrating to 1.8.0
 
@@ -440,6 +469,9 @@ Visitor defined two type classes, published instances of them, and never asked a
 | `import ...visitor.core.given` to pick up a `Monoid[Double]` (or `Int`/`Long`/`Float`) | depend on `org.typelevel %% "cats-kernel"` and use `cats.kernel.Monoid`, which supplies these through the implicit scope with no import at all |
 | `import ...visitor.core.{Monoid as _, *, given}` to dodge a clash with your own `Monoid` | drop the `Monoid as _` exclusion; the clash is gone |
 | writing `E: {Zero, Ordering}` or `E: {Monoid, Ordering}` against Visitor's types | the same bounds against `cats.kernel.Monoid`; Visitor's traversals never required either |
+| writing `Visitor[V, R, J]` in your own signatures | `Visitor[V, Mapped[V, R], J]` — the second parameter is now the journal's element type |
+| calling `Traversal.bfs(...)(using nbrs, ev, vs, tracer)` with an explicit `using` list | drop `ev`; the visitor carries its own `Evaluable` now |
+| `JournaledVisitor.withQueueJournal[V, R]` with no `Evaluable` in scope | bring one into scope — it is needed when the visitor is built, not when it visits |
 
 They were not migrated to `cats.kernel.Monoid` inside Visitor because that would have added
 `cats-kernel` at the base of the dependency stack to supply something Visitor does not use.

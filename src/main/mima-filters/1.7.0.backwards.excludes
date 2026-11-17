@@ -26,3 +26,49 @@ ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Be
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Float$")
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Int$")
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Zero_Long$")
+
+# ---------------------------------------------------------------------------
+# Generalising Visitor over its journal's element type (1.8.0).
+#
+# `Visitor[V, R, J <: Appendable[Mapped[V, R]]]` becomes `Visitor[V, E, J <: Appendable[E]]`,
+# where E is what the journal holds. This is what lets SimpleVisitor — which records bare nodes
+# into an Appendable[V] and needs no Evaluable — be an ordinary Visitor that every Traversal
+# entry point accepts. Appendable is invariant in its element type (it appears both as append's
+# parameter and in its result), so Appendable[V] is not an Appendable[(V, Option[R])]; without E
+# the simple case could only be expressed by an adapter that discarded half of every entry.
+#
+# Consequently `visit` loses its `using Evaluable` clause — a JournaledVisitor now binds its
+# Evaluable once, when built — and all seven Traversal entry points lose that implicit
+# parameter. Source impact on callers is small: in Visitor's own 183-test suite only two sites
+# needed changing.
+#
+# The lines below are MiMa's own suggestions from the failing run, not hand-written.
+# ---------------------------------------------------------------------------
+
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.<init>$default$2()scala.None#")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.apply(com.phasmidsoftware.visitor.core.Appendable,scala.Option)com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.copy(com.phasmidsoftware.visitor.core.Appendable,scala.Option)com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.this(com.phasmidsoftware.visitor.core.Appendable,scala.Option)Unit")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.visit(java.lang.Object,com.phasmidsoftware.visitor.core.Evaluable)com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.withListJournal()com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.withListJournalAndCameFrom()com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.withQueueJournal()com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.withQueueJournalAndCameFrom()com.phasmidsoftware.visitor.core.JournaledVisitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bestFirst$default$8(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bestFirst(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1,scala.math.Ordering,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bestFirstMax$default$8(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bestFirstMax(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1,scala.math.Ordering,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bestFirstWeighted$default$10(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bestFirstWeighted(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1,scala.math.Ordering,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.CostUpdate,com.phasmidsoftware.visitor.core.IndexedPrioQueue,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bfs$default$7(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.bfs(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.dfs$default$8(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,com.phasmidsoftware.visitor.core.DfsOrder,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.dfs(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,com.phasmidsoftware.visitor.core.DfsOrder,scala.Function1,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.traverse$default$10(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.traverse(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,scala.Function1,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.Frontier,com.phasmidsoftware.visitor.core.CostUpdate,java.lang.Object,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.traverseTree$default$9(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,com.phasmidsoftware.visitor.core.DfsOrder,scala.Function1)com.phasmidsoftware.visitor.core.Tracer#silent")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Traversal.traverseTree(java.lang.Object,com.phasmidsoftware.visitor.core.Visitor,com.phasmidsoftware.visitor.core.DfsOrder,scala.Function1,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Neighbours,com.phasmidsoftware.visitor.core.Evaluable,com.phasmidsoftware.visitor.core.VisitedSet,com.phasmidsoftware.visitor.core.Tracer)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.Visitor.visit(java.lang.Object,com.phasmidsoftware.visitor.core.Evaluable)com.phasmidsoftware.visitor.core.Visitor")
+ProblemFilters.exclude[IncompatibleResultTypeProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor._2()scala.Option")
+ProblemFilters.exclude[IncompatibleResultTypeProblem]("com.phasmidsoftware.visitor.core.JournaledVisitor.copy$default$2()scala.Option")
+ProblemFilters.exclude[ReversedMissingMethodProblem]("com.phasmidsoftware.visitor.core.Visitor.visit(java.lang.Object)com.phasmidsoftware.visitor.core.Visitor")

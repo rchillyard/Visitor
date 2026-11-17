@@ -17,8 +17,9 @@ enum DfsOrder:
   case Pre, Post
 
 /**
-  * The traversal engine. Knows only about Frontier, Neighbours, Evaluable,
-  * VisitedSet, Visitor, and CostUpdate. Zero domain knowledge.
+  * The traversal engine. Knows only about Frontier, Neighbours, VisitedSet, Visitor, and
+  * CostUpdate. Zero domain knowledge — and, since a `Visitor` carries whatever it needs to turn
+  * a node into a journal entry, no knowledge of `Evaluable` either.
   *
   * The choice of frontier F determines the traversal order:
   * F = Queue     → BFS
@@ -58,7 +59,6 @@ object Traversal:
     * @param goal    A predicate that, when true for a visited node, halts the traversal
     *                after recording that node. Defaults to never stopping early.
     * @param nbrs    Typeclass providing the neighbours for each node.
-    * @param ev      Typeclass defining how to extract results from each node.
     * @param vs      Typeclass representing the set of visited nodes to prevent revisiting.
     * @param fr      Typeclass representing the frontier structure used for traversal.
     * @param cu      Typeclass for post-settle priority updates (no-op for DFS/BFS).
@@ -66,28 +66,27 @@ object Traversal:
     * @param tracer  Typeclass for tracing the primary parametric type (`V`).
     * @return A `Visitor` instance containing the accumulated results after traversal completes.
     */
-  def traverse[V, R, J <: Appendable[(V, Option[R])], F[_]](
+  def traverse[V, E, J <: Appendable[E], F[_]](
                                                              start: V,
-                                                             visitor: Visitor[V, R, J],
+                                                             visitor: Visitor[V, E, J],
                                                              goal: V => Boolean = (_: V) => false
                                                            )(using
                                                              nbrs: Neighbours[V, V],
-                                                             ev: Evaluable[V, R],
                                                              vs: VisitedSet[V],
                                                              fr: Frontier[F],
                                                              cu: CostUpdate[V, F],
                                                              initial: F[V],
                                                              tracer: Tracer[V] = Tracer.silent
-  ): Visitor[V, R, J] =
+  ): Visitor[V, E, J] =
 
     tracer.trace(0, s"traverse: start=$start")
 
     @annotation.tailrec
     def loop(
               frontier: F[V],
-              vis: Visitor[V, R, J],
+              vis: Visitor[V, E, J],
               visited: VisitedSet[V]
-            ): Visitor[V, R, J] =
+            ): Visitor[V, E, J] =
       if fr.isEmpty(frontier) then vis
       else
         val (node, rest) = fr.take(frontier)
@@ -120,9 +119,9 @@ object Traversal:
     * Traverses a tree-like structure starting from a given root node, visiting nodes
     * as specified by the provided `Visitor`.
     *
-    * NOTE: traverseTree does not visit the root `start` itself (there is no
-    * `Evaluable[H, R]` in scope for `H`), so the visitor is unseeded before
-    * the loop begins — unlike `traverse` where `visitor.visit(start)` is called first.
+    * NOTE: traverseTree does not visit the root `start` itself — the visitor visits nodes of
+    * type `V`, and the root is an `H` — so the visitor is unseeded before the loop begins,
+    * unlike `traverse` where `visitor.visit(start)` is called first.
     *
     * The `order` parameter controls pre- or post-order recording, using the same
     * `Either`-tagged stack mechanism as `dfs`:
@@ -146,31 +145,29 @@ object Traversal:
     *                  after recording that node. Defaults to never stopping early.
     * @param rootNbrs  A typeclass instance providing neighbour nodes for the root structure.
     * @param graphNbrs A typeclass instance providing neighbour nodes for the graph structure.
-    * @param ev        A typeclass representing how to evaluate a node and extract its result.
     * @param vs        A typeclass representing a set of visited nodes to prevent revisits.
     * @return A `Visitor` instance containing the accumulated results of the traversal.
     */
-  def traverseTree[H, V, R, J <: Appendable[(V, Option[R])]](
+  def traverseTree[H, V, E, J <: Appendable[E]](
                                                               start: H,
-                                                              visitor: Visitor[V, R, J],
+                                                              visitor: Visitor[V, E, J],
                                                               order: DfsOrder = DfsOrder.Pre,
                                                               goal: V => Boolean = (_: V) => false
                                                             )(using
                                                               rootNbrs: Neighbours[H, V],
                                                               graphNbrs: Neighbours[V, V],
-                                                              ev: Evaluable[V, R],
                                                               vs: VisitedSet[V],
                                                               tracer: Tracer[V] = Tracer.silent
-  ): Visitor[V, R, J] =
+  ): Visitor[V, E, J] =
 
     type Frame = Either[V, V]
 
     @annotation.tailrec
     def loop(
               stack: List[Frame],
-              vis: Visitor[V, R, J],
+              vis: Visitor[V, E, J],
               visited: VisitedSet[V]
-            ): Visitor[V, R, J] =
+            ): Visitor[V, E, J] =
       stack match
         case Nil => vis
 
@@ -217,17 +214,16 @@ object Traversal:
     * @param order DfsOrder.Pre (default) or DfsOrder.Post
     * @param goal  optional early-termination predicate. Defaults to never stopping early.
     */
-  def dfs[V, R, J <: Appendable[(V, Option[R])]](
+  def dfs[V, E, J <: Appendable[E]](
                                                   start: V,
-                                                  visitor: Visitor[V, R, J],
+                                                  visitor: Visitor[V, E, J],
                                                   order: DfsOrder = DfsOrder.Pre,
                                                   goal: V => Boolean = (_: V) => false
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
-                                                  ev: Evaluable[V, R],
                                                   vs: VisitedSet[V],
                                                   tracer: Tracer[V] = Tracer.silent
-  ): Visitor[V, R, J] =
+  ): Visitor[V, E, J] =
 
     tracer.trace(0, s"dfs ($order): start=$start")
 
@@ -236,9 +232,9 @@ object Traversal:
     @annotation.tailrec
     def loop(
               stack: List[Frame],
-              vis: Visitor[V, R, J],
+              vis: Visitor[V, E, J],
               visited: VisitedSet[V]
-            ): Visitor[V, R, J] =
+            ): Visitor[V, E, J] =
       stack match
         case Nil => vis
 
@@ -276,19 +272,18 @@ object Traversal:
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
-  def bfs[V, R, J <: Appendable[(V, Option[R])]](
+  def bfs[V, E, J <: Appendable[E]](
                                                   start: V,
-                                                  visitor: Visitor[V, R, J],
+                                                  visitor: Visitor[V, E, J],
                                                   goal: V => Boolean = (_: V) => false
                                                 )(using
                                                   nbrs: GraphNeighbours[V],
-                                                  ev: Evaluable[V, R],
                                                   vs: VisitedSet[V],
                                                   tracer: Tracer[V] = Tracer.silent
-                                                ): Visitor[V, R, J] =
+                                                ): Visitor[V, E, J] =
     given Queue[V] = Queue.empty
 
-    traverse[V, R, J, Queue](start, visitor, goal)
+    traverse[V, E, J, Queue](start, visitor, goal)
 
   /**
     * Best-first / min-priority-queue traversal. Smallest element dequeued first.
@@ -296,18 +291,17 @@ object Traversal:
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
-  def bestFirst[V: Ordering, R, J <: Appendable[(V, Option[R])]](
+  def bestFirst[V: Ordering, E, J <: Appendable[E]](
                                                                   start: V,
-                                                                  visitor: Visitor[V, R, J],
+                                                                  visitor: Visitor[V, E, J],
                                                                   goal: V => Boolean = (_: V) => false
                                                                 )(using
                                                                   nbrs: GraphNeighbours[V],
-                                                                  ev: Evaluable[V, R],
                                                                   vs: VisitedSet[V],
                                                                   tracer: Tracer[V] = Tracer.silent
-  ): Visitor[V, R, J] =
+  ): Visitor[V, E, J] =
     given PrioQueue[V] = PrioQueue.empty[V]
-    traverse[V, R, J, PrioQueue](start, visitor, goal)
+    traverse[V, E, J, PrioQueue](start, visitor, goal)
 
   /**
     * Best-first / max-priority-queue traversal. Largest element dequeued first.
@@ -315,18 +309,17 @@ object Traversal:
     *
     * @param goal optional early-termination predicate. Defaults to never stopping early.
     */
-  def bestFirstMax[V: Ordering, R, J <: Appendable[(V, Option[R])]](
+  def bestFirstMax[V: Ordering, E, J <: Appendable[E]](
                                                                      start: V,
-                                                                     visitor: Visitor[V, R, J],
+                                                                     visitor: Visitor[V, E, J],
                                                                      goal: V => Boolean = (_: V) => false
                                                                    )(using
                                                                      nbrs: GraphNeighbours[V],
-                                                                     ev: Evaluable[V, R],
                                                                      vs: VisitedSet[V],
                                                                      tracer: Tracer[V] = Tracer.silent
-  ): Visitor[V, R, J] =
+  ): Visitor[V, E, J] =
     given PrioQueue[V] = PrioQueue.emptyMax[V]
-    traverse[V, R, J, PrioQueue](start, visitor, goal)
+    traverse[V, E, J, PrioQueue](start, visitor, goal)
 
   /**
     * Best-first traversal with an explicit `CostUpdate` — for Dijkstra and Prim.
@@ -348,16 +341,15 @@ object Traversal:
     */
   // The Ordering bound isn't used here, but it stays so that the method's signature (and binary API) doesn't change.
   @nowarn("msg=unused implicit parameter")
-  def bestFirstWeighted[W: Ordering, R, J <: Appendable[(W, Option[R])]](
+  def bestFirstWeighted[W: Ordering, E, J <: Appendable[E]](
                                                                           start: W,
-                                                                          visitor: Visitor[W, R, J],
+                                                                          visitor: Visitor[W, E, J],
                                                                           goal: W => Boolean = (_: W) => false
                                                                         )(using
                                                                           nbrs: GraphNeighbours[W],
-                                                                          ev: Evaluable[W, R],
                                                                           vs: VisitedSet[W],
                                                                           cu: CostUpdate[W, IndexedPrioQueue],
                                                                           initial: IndexedPrioQueue[W],
                                                                           tracer: Tracer[W] = Tracer.silent
-  ): Visitor[W, R, J] =
-    traverse[W, R, J, IndexedPrioQueue](start, visitor, goal)
+  ): Visitor[W, E, J] =
+    traverse[W, E, J, IndexedPrioQueue](start, visitor, goal)

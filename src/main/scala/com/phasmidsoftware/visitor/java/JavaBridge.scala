@@ -6,7 +6,7 @@ package com.phasmidsoftware.visitor.java
 // by a same-named member of this package. The façade's own types are deliberately named apart
 // from the core ones (NeighbourFunction/Neighbours, Evaluator/Evaluable, Order/DfsOrder,
 // Traversals/Traversal) so that no such clash exists today.
-import com.phasmidsoftware.visitor.core.{DfsOrder, Evaluable, JournaledVisitor, Neighbours, QueueJournal, Traversal, Visitor, given}
+import com.phasmidsoftware.visitor.core.{DfsOrder, Evaluable, JournaledVisitor, Mapped, Neighbours, QueueJournal, Traversal, Visitor, given}
 // java.* is aliased because this package is itself called `java`: an unqualified `java.util.List`
 // would be looked up as `com.phasmidsoftware.visitor.java.util.List` and not found.
 import java.util.function.Predicate as JavaPredicate
@@ -99,8 +99,14 @@ private[java] object JavaBridge:
   // Conversions
   // ---------------------------------------------------------------------------
 
-  /** A visitor with a queue journal (visit order) and came-from tracking enabled. */
-  private def newVisitor[V, R]: JournaledVisitor[V, R, QJ[V, R]] =
+  /**
+    * A visitor with a queue journal (visit order) and came-from tracking enabled.
+    *
+    * This is a `JournaledVisitor` rather than a `SimpleVisitor` even for the façade's plain
+    * traversals, because `TraversalResult` always offers `cameFrom()` and only a journaled
+    * visitor records it. The plain Java entry points pass an identity `Evaluator`.
+    */
+  private def newVisitor[V, R](using Evaluable[V, R]): JournaledVisitor[V, R, QJ[V, R]] =
     JournaledVisitor.withQueueJournalAndCameFrom[V, R]
 
   private def asNeighbours[H, V](f: NeighbourFunction[H, V]): Neighbours[H, V] =
@@ -126,7 +132,7 @@ private[java] object JavaBridge:
     * The journal holds `(node, Option[result])` pairs in visit order; nodes whose evaluation was
     * empty contribute to `visited` but not to `results`.
     */
-  private def materialise[V, R](out: Visitor[V, R, QJ[V, R]]): TraversalResult[V, R] =
+  private def materialise[V, R](out: Visitor[V, Mapped[V, R], QJ[V, R]]): TraversalResult[V, R] =
     val entries = out.result.iterator.toList
     val visited: JavaList[V] = entries.map(_._1).asJava
     val results: JavaList[R] = entries.flatMap(_._2).asJava
