@@ -269,8 +269,8 @@ case class FunctionMapJournal[K, V](xs: Map[K, V])(f: K => V) extends AbstractMa
   /**
    * Applies the function `f` to the given key and returns the resulting value.
    * This method uses the stored function `f` to compute the value associated with the provided key.
-   * TESTME is this method ever actually invoked? It seems like we always invoke apply((K,V))
-   * CONSIDER if this method isn't invoked, then we don't need the f parameter in the declaration.
+   * NOTE: invoked by `appendByFunction`, which is in turn exercised only by the specs — see
+   * issue #31, which considers the fate of this package.
    *
    * @param key the key for which the value is to be computed using the stored function `f`
    * @return the value corresponding to the provided key, computed by the function `f`
