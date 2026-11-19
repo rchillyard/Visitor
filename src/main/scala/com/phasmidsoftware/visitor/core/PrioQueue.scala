@@ -46,6 +46,12 @@ private[core] case class BinaryHeap[T](data: Vector[T])(using val ord: Ordering[
   def removeMin: (T, BinaryHeap[T]) =
     require(data.nonEmpty, "removeMin on empty heap")
     val min = data(0)
+    // The size-1 branch is a fast path, not a correctness requirement, so mutating this
+    // condition away is an equivalent mutant and `sbt stryker` will always report it as a
+    // survivor. The general path yields the same answer: `data.last` is `data(0)`, so
+    // `updated(0, data.last)` is the original vector, `.init` empties it, and
+    // `siftDown(Vector.empty, 0)` returns at once (`left` and `right` both exceed `n = 0`).
+    // What the branch buys is two skipped allocations on the last removal of a drain.
     if data.size == 1 then
       (min, copy(data = Vector.empty))
     else
@@ -58,6 +64,12 @@ private[core] case class BinaryHeap[T](data: Vector[T])(using val ord: Ordering[
 
   @tailrec
   private def siftUp(v: Vector[T], i: Int): Vector[T] =
+    // Like the size-1 branch in `removeMin`, this guard is an optimisation rather than a
+    // correctness requirement, so it too survives mutation permanently. At `i == 0` the else
+    // branch computes `parent = (0 - 1) / 2`, which is 0 — integer division truncates toward
+    // zero — and `ord.lteq(v(0), v(0))` then holds for any lawful Ordering, so it returns `v`
+    // without recursing. Keep the guard regardless: it saves a comparison, and it is the only
+    // thing standing between a caller's non-reflexive Ordering and an infinite sift.
     if i == 0 then v
     else
       val parent = (i - 1) / 2
