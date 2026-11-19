@@ -5,3 +5,6 @@ addSbtPlugin("com.github.sbt" % "sbt-ghpages" % "0.10.0")
 addSbtPlugin("com.typesafe" % "sbt-mima-plugin" % "1.2.1")
 // The sbt test interface for JUnit 5. Without it, sbt compiles src/test/java and never runs it.
 addSbtPlugin("com.github.sbt.junit" % "sbt-jupiter-interface" % "0.19.0")
+// Mutation testing: `sbt stryker`. Asks whether a test *asserts* a behaviour, which
+// scoverage cannot — it only shows the line ran. Configured in stryker4s.conf.
+addSbtPlugin("io.stryker-mutator" % "sbt-stryker4s" % "1.1.1")
