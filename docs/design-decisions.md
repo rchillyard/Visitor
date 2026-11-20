@@ -49,3 +49,17 @@ inexpressible. `SimpleVisitor` exists because that restriction was lifted.
 The cost is that a `JournaledVisitor` cannot be constructed without an `Evaluable` in scope, even
 to exercise `discover` in isolation. That was judged the better trade: a dependency bound once at
 construction, rather than resolved repeatedly at use.
+
+---
+
+## Mutation testing is a diagnostic, not a gate
+
+`stryker4s.conf` mutation-tests the whole of `src/main/scala`, excludes the `StringLiteral`
+mutator, and sets `break = 0` so the score never fails the build. Each of those three is a
+decision rather than a default, and the reasoning — along with the measurements behind it and an
+honest account of what it does *not* add over scoverage's branch report — is in
+[stryker4s-trial.md](stryker4s-trial.md).
+
+The short version: scoping `mutate` by file saves nothing, because the cost is two compiles plus
+sbt start-up rather than the mutant count; `StringLiteral` was 11 of 17 survivors and all noise;
+and a surviving mutant may be an equivalent mutant, which is a judgement no threshold can make.
