@@ -191,8 +191,16 @@ public final class Traversals {
      * Depth-first traversal of a tree whose root may have a different type from its descendants.
      *
      * <p>The root itself is <strong>not</strong> visited: {@code rootChildren} yields the nodes
-     * the traversal begins from, and {@code children} carries it down from there. Where the root
-     * is of the same type as its descendants, pass the same function twice.
+     * the traversal begins from, and {@code children} carries it down from there.
+     *
+     * <p><strong>Where the root is of the same type as its descendants, use {@code dfs} instead:
+     * it records the start node.</strong> You can pass the same function twice here, but the root
+     * will then be absent from the result, which is rarely what is wanted. This entry point is for
+     * a root that is not itself a node — a tree object whose children are strings, say — where
+     * there is nothing of type {@code V} to record for it. Given a homogeneous adjacency,
+     * {@code dfs} returns exactly this result with the root included: first in {@code Order.PRE},
+     * last in {@code Order.POST}. See
+     * <a href="https://github.com/rchillyard/Visitor/issues/30">issue #30</a>.
      *
      * <p>{@link TraversalResult#cameFrom()} is always empty for a tree traversal, because the
      * engine does not record came-from where the parent is already evident from the tree's shape.
@@ -214,6 +222,10 @@ public final class Traversals {
     /**
      * Depth-first traversal of a tree, halting after the first node that satisfies {@code goal}.
      *
+     * <p>The root itself is not visited. Where the root is of the same type as its descendants,
+     * use {@code dfs} instead: it records the start node. See
+     * <a href="https://github.com/rchillyard/Visitor/issues/30">issue #30</a>.
+     *
      * @param root         the root structure
      * @param rootChildren the children of the root
      * @param children     the children of each node below the root
@@ -231,6 +243,11 @@ public final class Traversals {
 
     /**
      * Depth-first traversal of a tree, evaluating each node as it is visited.
+     *
+     * <p>The root itself is not visited, so it is evaluated by neither this method nor the
+     * evaluator. Where the root is of the same type as its descendants, use
+     * {@code dfsEvaluating} instead: it records and evaluates the start node. See
+     * <a href="https://github.com/rchillyard/Visitor/issues/30">issue #30</a>.
      *
      * @param root         the root structure
      * @param rootChildren the children of the root
@@ -251,6 +268,11 @@ public final class Traversals {
     /**
      * Depth-first traversal of a tree, evaluating each node and halting after the first node that
      * satisfies {@code goal}.
+     *
+     * <p>The root itself is not visited, so it is evaluated by neither this method nor the
+     * evaluator. Where the root is of the same type as its descendants, use
+     * {@code dfsEvaluating} instead: it records and evaluates the start node. See
+     * <a href="https://github.com/rchillyard/Visitor/issues/30">issue #30</a>.
      *
      * @param root         the root structure
      * @param rootChildren the children of the root
