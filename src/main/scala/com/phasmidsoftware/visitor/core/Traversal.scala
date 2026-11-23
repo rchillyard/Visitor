@@ -134,6 +134,20 @@ object Traversal:
     * type `V`, and the root is an `H` — so the visitor is unseeded before the loop begins,
     * unlike `traverse` where `visitor.visit(start)` is called first.
     *
+    * '''If `H` and `V` are the same type, use [[dfs]] instead: it records the start node.'''
+    * This entry point exists for the heterogeneous case, where there is genuinely nothing of
+    * type `V` to record for an `H` root. In the homogeneous case the root is an ordinary node,
+    * and `dfs` is this same loop seeded with `Left(start)` — identical results, in both orders.
+    * Note `GraphNeighbours[V]` is `Neighbours[V, V]`, so the adjacency you already have for
+    * `graphNbrs` is exactly what `dfs` asks for.
+    *
+    * The one behavioural difference is that `dfs` calls `discover(child, node)` as it expands,
+    * which `traverseTree` never does (see the NOTE below). `Visitor.discover` defaults to
+    * returning `this`, so for a `SimpleVisitor` — or any visitor that has not opted into
+    * came-from tracking — the two are indistinguishable; for a `ParentedVisitor`, `dfs`
+    * additionally yields the parent map. See
+    * [[https://github.com/rchillyard/Visitor/issues/30 issue #30]].
+    *
     * The `order` parameter controls pre- or post-order recording, using the same
     * `Either`-tagged stack mechanism as `dfs`:
     *   - `Left(v)`  — expand node: mark visited, push children and a record frame

@@ -85,3 +85,29 @@ class SimpleVisitorSpec extends AnyFlatSpec with Matchers:
   it should "need no Evaluable, unlike the JournaledVisitor path" in :
     // VisitorSpec's equivalent requires a `given Evaluable[String, String]`; this does not.
     Traverse.tree[TestTree.Tree, String](TestTree.root) should not be empty
+
+  behavior of "Traverse.tree against Traverse.dfs, where H and V are the same type"
+
+  // Issue #30: a homogeneous root is an ordinary node, so `dfs` is this same traversal with the
+  // root recorded. Both entry points' scaladoc now says so; these pin the claim, which otherwise
+  // nothing checks. A tree, not a graph, so there is no re-convergence to confuse the comparison.
+  //      a
+  //    /   \
+  //   b     c
+  //  / \
+  // d   e
+  private object HomogeneousTree:
+    val adjacency: Map[Char, List[Char]] = Map('a' -> List('b', 'c'), 'b' -> List('d', 'e'))
+
+    given GraphNeighbours[Char] with
+      def neighbours(h: Char): Iterator[Char] = adjacency.getOrElse(h, Nil).iterator
+
+  it should "differ only by the root, in pre-order" in :
+    import HomogeneousTree.given
+    Traverse.tree[Char, Char]('a') shouldBe List('b', 'd', 'e', 'c')
+    Traverse.dfs('a') shouldBe 'a' :: Traverse.tree[Char, Char]('a')
+
+  it should "differ only by the root, in post-order" in :
+    import HomogeneousTree.given
+    Traverse.tree[Char, Char]('a', DfsOrder.Post) shouldBe List('d', 'e', 'b', 'c')
+    Traverse.dfs('a', DfsOrder.Post) shouldBe (Traverse.tree[Char, Char]('a', DfsOrder.Post) :+ 'a')

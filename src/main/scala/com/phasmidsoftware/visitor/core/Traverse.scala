@@ -56,6 +56,13 @@ object Traverse:
     *
     * The root itself is not visited; `rootNbrs` yields the nodes the traversal begins from.
     *
+    * '''If the root has the same type as its descendants, use [[dfs]] instead: it records the
+    * root.''' This entry point is for a root that is not itself a node — a `Tree` whose children
+    * are `String`, say — where there is nothing of type `V` to record for it. Given a homogeneous
+    * adjacency, `dfs(root, order, goal)` returns exactly this list with the root included (first
+    * in pre-order, last in post-order). See
+    * [[https://github.com/rchillyard/Visitor/issues/30 issue #30]].
+    *
     * @param root      the root structure
     * @param order     pre- or post-order recording. Defaults to pre-order.
     * @param goal      optional early-termination predicate. Defaults to never stopping early.
