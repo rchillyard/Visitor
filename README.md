@@ -239,7 +239,7 @@ given BinaryNeighbours[Node] with
   def left(n: Node): Option[Node] = n.l
   def right(n: Node): Option[Node] = n.r
 
-Traverse.inOrder(root)   // over a binary search tree, the nodes in ascending order
+Visits.inOrder(root)   // over a binary search tree, the nodes in ascending order
 ```
 
 A node with no children collapses pre-, in- and post-order to one; a node with one is resolved
@@ -415,18 +415,20 @@ Combined with `bestFirst` and an appropriate `Ordering`, it gives you A\*-style 
 ## Simple Traversals
 
 When the answer is simply *which nodes, in what order*, you don't need an `Evaluable` and you
-don't need to read a journal of pairs. `Traverse` returns a `List[V]` directly:
+don't need to read a journal of pairs. `Visits` returns a `List[V]` directly:
 
 ```scala
 given GraphNeighbours[String] = v => graph.getOrElse(v, Nil).iterator
 
-Traverse.bfs("A")                    // List(A, B, C, D)
-Traverse.dfs("A", DfsOrder.Post)     // post-order
-Traverse.inOrder(root)               // in-order; needs a BinaryNeighbours
-Traverse.tree(root)                  // a tree, root not visited
+Visits.bfs("A")                    // List(A, B, C, D)
+Visits.dfs("A", DfsOrder.Post)     // post-order
+Visits.inOrder(root)               // in-order; needs a BinaryNeighbours
+Visits.tree(root)                  // a tree, root not visited
 ```
 
-These are the Scala counterparts of the Java façade's `Traversals`.
+These are the Scala counterparts of the Java façade's `Traversals`. The Scala object is named
+`Visits` rather than `Traversals` to keep it clearly apart from the `Traversal` engine: it is
+named for what it returns, the visits in order, not for what it does.
 
 Underneath, each builds a `SimpleVisitor` — a `Visitor` whose journal is an ordinary
 `Appendable[V]` rather than `Appendable[Mapped[V, R]]`. It needs no `Evaluable`, allocates no
@@ -549,8 +551,8 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.5.0   | Added `Tracer`; replaced com.novocode with junit.jupiter.xxx |
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
-| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`Appendable[X]` is now F-bounded as `Appendable[X, A <: Appendable[X, A]]`**, with `append(x: X): A`, removing four unchecked casts. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
-| 1.9.0   | Added **in-order traversal** for binary trees: `Traversal.inOrder`, `Traversal.inOrderTracking` and `Traverse.inOrder`, together with the **`BinaryNeighbours[V]`** typeclass they require ([#48](https://github.com/rchillyard/Visitor/issues/48)). `BinaryNeighbours` extends `GraphNeighbours` with `left` and `right` and supplies `neighbours` from them, so one instance drives every traversal. In-order is a separate entry point rather than a third `DfsOrder` case because it needs to know which side each child is on, which a `Neighbours` cannot say — see the note in the Traversal section. All additive: MiMa is clean against 1.8.0 |
+| 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Visits.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`Appendable[X]` is now F-bounded as `Appendable[X, A <: Appendable[X, A]]`**, with `append(x: X): A`, removing four unchecked casts. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
+| 1.9.0   | Added **in-order traversal** for binary trees: `Traversal.inOrder`, `Traversal.inOrderTracking` and `Visits.inOrder`, together with the **`BinaryNeighbours[V]`** typeclass they require ([#48](https://github.com/rchillyard/Visitor/issues/48)). `BinaryNeighbours` extends `GraphNeighbours` with `left` and `right` and supplies `neighbours` from them, so one instance drives every traversal. In-order is a separate entry point rather than a third `DfsOrder` case because it needs to know which side each child is on, which a `Neighbours` cannot say — see the note in the Traversal section. **`Traverse` is renamed to `Visits`** — the one breaking change in this release, and the reason it is 1.9.0 rather than 1.8.1. The division between the engine and the facade is sound, but `Traversal`, `Traverse` and `Traversed` were distinguishable only by inflection, and the inflection did not map to the roles; `Visits` is named for what it returns. `Traverse` was introduced in 1.8.0, so it carried the least history of the three. **`Traversed` moves to its own file**, which is also how a long-orphaned scaladoc block on `object Traversal` came to light: it sat immediately before `Traversed`'s own comment and so had never been rendered. **`Behaviours.scala` is split into one file per typeclass family** — `Evaluable`, `Neighbours`, `VisitedSet`, `Frontier` and `CostUpdate` — which is source-compatible, nothing having left the package, but binary-breaking, because Scala 3 compiles a file's top-level definitions into a synthetic class named after the file. Everything else in this release is additive |
 
 ## Migrating to 1.8.0
 

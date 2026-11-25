@@ -1,0 +1,52 @@
+# Deliberate binary break in 1.9.0, relative to 1.8.0. See the release note in README.md.
+#
+# `object Traverse` is renamed to `object Visits`. The division it belongs to is sound — the
+# engine takes a Visitor and returns a Visitor, while this facade builds a SimpleVisitor for the
+# caller and returns a List[V] — but the three names in that area, Traversal, Traverse and
+# Traversed, were distinguishable only by inflection, and the inflection did not map to the
+# roles. `Visits` says what the caller gets back: the visits, in order.
+#
+# Traverse was introduced in 1.8.0 and so carries one release of history, which made it the
+# cheapest of the three to rename. The engine keeps the name Traversal.
+#
+# Under PVP, 1.8.0 -> 1.9.0 is a major bump, so this break is permitted. See
+# https://github.com/rchillyard/Visitor/issues/48 for the release it travels with.
+#
+# NOTE: contrary to what the comment in build.sbt long claimed, this file does NOT retire itself
+# when previousRelease moves past 1.8.0. sbt-mima applies every *.backwards.excludes file in
+# this directory, whatever it is named, so these two lines stay in force until the file is
+# deleted by hand. Delete it once 1.9.0 is published and previousRelease has moved on, after
+# checking that mimaReportBinaryIssues is still clean without it. See
+# https://github.com/rchillyard/Visitor/issues/50
+#
+# The exact filter lines below are MiMa's own suggestions from the failing run, not hand-written.
+
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Traverse")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Traverse$")
+
+# ---------------------------------------------------------------------------
+# Behaviours.scala is split into one file per typeclass family (1.9.0).
+#
+# It had become a grab-bag of five unrelated typeclasses whose only common feature was that
+# nobody had found a home for them: Evaluable, Neighbours, VisitedSet, Frontier and CostUpdate.
+# Each now has its own file, named for the typeclass it holds.
+#
+# No logic changed, and nothing moved out of the package, so this is source-compatible: callers'
+# imports and implicit resolution are unaffected. It is nevertheless a binary break, because in
+# Scala 3 the top-level definitions of a file compile into a synthetic class named after that
+# file. Moving a top-level given from Behaviours.scala to Frontier.scala renames its enclosing
+# class, and Behaviours$package ceases to exist. The traits themselves are ordinary classes and
+# move for free; the seven entries below are the synthetic holder and the top-level givens.
+#
+# This is why the split was done in 1.9.0, which is a major bump under PVP and was already
+# breaking for the Traverse rename, rather than left for later.
+#
+# The exact filter lines below are MiMa's own suggestions from the failing run, not hand-written.
+
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_CostUpdate_W_F")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_IndexedPrioQueue$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_PrioQueue$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_Queue$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_Stack$")

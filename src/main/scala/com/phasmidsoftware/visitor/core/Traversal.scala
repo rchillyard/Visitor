@@ -17,33 +17,45 @@ enum DfsOrder:
   case Pre, Post
 
 /**
-  * The traversal engine. Knows only about Frontier, Neighbours, VisitedSet, Visitor, and
-  * CostUpdate. Zero domain knowledge — and, since a `Visitor` carries whatever it needs to turn
-  * a node into a journal entry, no knowledge of `Evaluable` either.
+  * Provides traversal operations for graph-like and tree-like structures.
   *
-  * The choice of frontier F determines the traversal order:
-  * F = Queue     → BFS
-  * F = Stack     → DFS
-  * F = PrioQueue → best-first (requires Ordering[V] in scope)
+  * `Traversal` centralizes the iterative traversal logic used by depth-first,
+  * breadth-first, priority-based, and heterogeneous root-to-node traversals.
+  * It delegates graph access, visited-node tracking, frontier management,
+  * priority updates, and tracing to typeclass instances supplied by the caller.
+  *
+  * The traversal methods accumulate results through a `Visitor`, allowing the
+  * same traversal engine to support simple journals, parent tracking, and other
+  * visitor-defined result structures. Nodes are recorded according to the
+  * semantics of the selected traversal method, and optional goal predicates may
+  * terminate traversal after the matching node has been recorded.
+  *
+  * Homogeneous graph traversal starts from a node of the same type as all other
+  * visited nodes. Tree traversal supports a heterogeneous root whose children
+  * are graph nodes, making it suitable for structures where the root is not
+  * itself a recordable value.
+  *
+  * The implementation is iterative and uses explicit frontier structures rather
+  * than recursive calls, allowing traversal order to be selected by the provided
+  * frontier or DFS order.
+  *
+  * The engine knows only about [[Frontier]], [[Neighbours]], [[VisitedSet]], [[Visitor]] and
+  * [[CostUpdate]] — no domain knowledge at all, and, since a `Visitor` carries whatever it
+  * needs to turn a node into a journal entry, no knowledge of [[Evaluable]] either.
+  *
+  * For [[traverse]], the frontier chooses the order, and nothing else about the call changes:
+  *   - `F = Queue` — breadth-first
+  *   - `F = Stack` — depth-first
+  *   - `F = PrioQueue` — best-first (requires an `Ordering[V]` in scope)
   *
   * Two visitor events are fired during traversal:
-  *   - `visit(v)`             — when a vertex is settled (dequeued/popped)
-  *   - `discover(v, cameFrom)` — when a vertex is first seen as a neighbour
+  *   - `visit(v)` — when a node is settled, that is dequeued or popped
+  *   - `discover(v, cameFrom)` — when a node is first seen as a neighbour
   *
-  * NOTE that there are four independent traversal engines which should be maintained
-  * in parallel as much as possible: `traverse`, `traverseTree`, `dfs`, and `inOrder`.
+  * NOTE that there are four independent traversal loops, which should be maintained in
+  * parallel as much as possible: [[traverse]], [[traverseTree]], [[dfsTracking]] and
+  * [[inOrderTracking]]. The remaining entry points delegate to one of those four.
   */
-/**
-  * The outcome of a traversal that hands back the visited set it built, as well as the visitor.
-  *
-  * @param visitor the visitor, carrying the journal
-  * @param visited the visited set as it stood when the traversal finished
-  * @tparam V the node type
-  * @tparam E the journal's element type
-  * @tparam J the journal type
-  */
-case class Traversed[V, E, J <: Appendable[E, J]](visitor: Visitor[V, E, J], visited: VisitedSet[V])
-
 object Traversal:
 
   /**
@@ -194,7 +206,8 @@ object Traversal:
               visited: VisitedSet[V]
             ): Visitor[V, E, J] =
       stack match
-        case Nil => vis
+        case Nil =>
+          vis
 
         case Right(node) :: rest =>
           tracer.trace(1, s"record: $node")
@@ -300,7 +313,8 @@ object Traversal:
               visited: VisitedSet[V]
             ): Traversed[V, E, J] =
       stack match
-        case Nil => Traversed(vis, visited)
+        case Nil =>
+          Traversed(vis, visited)
 
         case Right(node) :: rest =>
           tracer.trace(1, s"record: $node")
@@ -419,7 +433,8 @@ object Traversal:
               visited: VisitedSet[V]
             ): Traversed[V, E, J] =
       stack match
-        case Nil => Traversed(vis, visited)
+        case Nil =>
+          Traversed(vis, visited)
 
         case Right(node) :: rest =>
           tracer.trace(1, s"record: $node")
