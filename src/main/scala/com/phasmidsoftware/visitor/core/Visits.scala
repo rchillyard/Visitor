@@ -17,13 +17,13 @@ package com.phasmidsoftware.visitor.core
   *
   * {{{
   * given Neighbours[String, String] = v => graph.getOrElse(v, Nil).iterator
-  * Traverse.bfs("A")  // List(A, B, C, D)
+  * Visits.bfs("A")  // List(A, B, C, D)
   * }}}
   *
   * For came-from maps, evaluated results or early termination with a richer journal, use
   * [[Traversal]] with a [[JournaledVisitor]] directly.
   */
-object Traverse:
+object Visits:
 
   /**
     * Breadth-first traversal from `start`, returning the nodes in visit order.

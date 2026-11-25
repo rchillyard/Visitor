@@ -25,8 +25,15 @@ val previousRelease = "1.8.0"
 mimaPreviousArtifacts := Set(organization.value %% moduleName.value % previousRelease)
 
 // Deliberate breaks are listed in src/main/mima-filters/<previousRelease>.backwards.excludes,
-// which MiMa reads automatically. Keeping them there rather than here means they retire by
-// themselves: when previousRelease moves on, the old file stops being consulted.
+// which MiMa reads automatically, rather than in mimaBinaryIssueFilters here.
+//
+// They do NOT retire by themselves — an earlier version of this comment claimed they did.
+// sbt-mima applies EVERY *.backwards.excludes file in that directory, whatever it is named, so
+// a filter stays in force for every future release until the file is deleted by hand. The
+// version in the filename records which release the breaks belong to; it is not a condition on
+// when the file applies. So when previousRelease moves on, DELETE the older files, having first
+// checked that mimaReportBinaryIssues is still clean without them.
+// See https://github.com/rchillyard/Visitor/issues/50
 
 // ============================================================================
 // COMPILER OPTIONS

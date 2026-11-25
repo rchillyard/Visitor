@@ -75,14 +75,14 @@ class InOrderSpec extends AnyFlatSpec with Matchers:
   behavior of "in-order over a binary search tree"
 
   it should "yield the nodes in ascending order" in :
-    Traverse.inOrder(10) shouldBe everyNode
+    Visits.inOrder(10) shouldBe everyNode
 
   it should "agree with sorting, which is what in-order means here" in :
-    val order = Traverse.inOrder(10)
+    val order = Visits.inOrder(10)
     order shouldBe order.sorted
 
   it should "record a node between its two subtrees" in :
-    val position = Traverse.inOrder(10).zipWithIndex.toMap
+    val position = Visits.inOrder(10).zipWithIndex.toMap
     val subtrees = Map(
       10 -> (List(5, 2, 1, 3, 6), List(13, 11, 15)),
       5 -> (List(2, 1, 3), List(6)),
@@ -100,51 +100,51 @@ class InOrderSpec extends AnyFlatSpec with Matchers:
   behavior of "in-order alongside pre- and post-order"
 
   it should "visit every node exactly once" in :
-    Traverse.inOrder(10).sorted shouldBe everyNode
+    Visits.inOrder(10).sorted shouldBe everyNode
 
   it should "be a permutation of pre-order and of post-order" in :
-    val in = Traverse.inOrder(10)
-    in.sorted shouldBe Traverse.dfs(10).sorted
-    in.sorted shouldBe Traverse.dfs(10, DfsOrder.Post).sorted
+    val in = Visits.inOrder(10)
+    in.sorted shouldBe Visits.dfs(10).sorted
+    in.sorted shouldBe Visits.dfs(10, DfsOrder.Post).sorted
 
   it should "differ from both, this tree being neither a left nor a right spine" in :
-    val in = Traverse.inOrder(10)
-    in should not be Traverse.dfs(10)
-    in should not be Traverse.dfs(10, DfsOrder.Post)
+    val in = Visits.inOrder(10)
+    in should not be Visits.dfs(10)
+    in should not be Visits.dfs(10, DfsOrder.Post)
 
   it should "drive pre-order too, from the one instance" in :
     // BinaryNeighbours supplies `neighbours` from `left` and `right`, so the same given serves
     // the engines that know nothing of left and right.
-    Traverse.dfs(10) shouldBe List(10, 5, 2, 1, 3, 6, 13, 11, 15)
-    Traverse.bfs(10) shouldBe List(10, 5, 13, 2, 6, 11, 15, 1, 3)
+    Visits.dfs(10) shouldBe List(10, 5, 2, 1, 3, 6, 13, 11, 15)
+    Visits.bfs(10) shouldBe List(10, 5, 13, 2, 6, 11, 15, 1, 3)
 
   behavior of "the degenerate cases"
 
   it should "collapse pre-, in- and post-order for a childless node" in :
-    Traverse.inOrder(42)(using childless) shouldBe List(42)
-    Traverse.dfs(42)(using childless) shouldBe List(42)
-    Traverse.dfs(42, DfsOrder.Post)(using childless) shouldBe List(42)
+    Visits.inOrder(42)(using childless) shouldBe List(42)
+    Visits.dfs(42)(using childless) shouldBe List(42)
+    Visits.dfs(42, DfsOrder.Post)(using childless) shouldBe List(42)
 
   it should "distinguish a left-only child from a right-only one" in :
     // The case an arity check cannot reach: both trees have exactly one child, so counting
     // admits both, yet their in-orders differ. This is why BinaryNeighbours exists.
-    Traverse.inOrder(2)(using leftOnly) shouldBe List(1, 2)
-    Traverse.inOrder(2)(using rightOnly) shouldBe List(2, 1)
+    Visits.inOrder(2)(using leftOnly) shouldBe List(1, 2)
+    Visits.inOrder(2)(using rightOnly) shouldBe List(2, 1)
 
   it should "be blind to that difference through neighbours alone" in :
     // The other half of the same point: as adjacencies the two trees are indistinguishable,
     // so no amount of counting or inspecting `neighbours` could have told them apart.
     leftOnly.neighbours(2).toList shouldBe rightOnly.neighbours(2).toList
-    Traverse.dfs(2)(using leftOnly) shouldBe Traverse.dfs(2)(using rightOnly)
+    Visits.dfs(2)(using leftOnly) shouldBe Visits.dfs(2)(using rightOnly)
 
   behavior of "in-order with a goal and a visited set"
 
   it should "stop after recording the first node the goal accepts" in :
     // 5 is recorded once its left subtree (1, 2, 3) is done, and before its right child 6.
-    Traverse.inOrder(10, _ == 5) shouldBe List(1, 2, 3, 5)
+    Visits.inOrder(10, _ == 5) shouldBe List(1, 2, 3, 5)
 
   it should "stop at the very first node when the goal accepts it" in :
-    Traverse.inOrder(10, _ == 1) shouldBe List(1)
+    Visits.inOrder(10, _ == 1) shouldBe List(1)
 
   it should "hand back the visited set it built" in :
     val traversed = Traversal.inOrderTracking(10, SimpleVisitor.withQueueJournal[Int], VisitedSet.empty[Int])

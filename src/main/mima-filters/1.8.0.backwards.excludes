@@ -1,0 +1,25 @@
+# Deliberate binary break in 1.9.0, relative to 1.8.0. See the release note in README.md.
+#
+# `object Traverse` is renamed to `object Visits`. The division it belongs to is sound — the
+# engine takes a Visitor and returns a Visitor, while this facade builds a SimpleVisitor for the
+# caller and returns a List[V] — but the three names in that area, Traversal, Traverse and
+# Traversed, were distinguishable only by inflection, and the inflection did not map to the
+# roles. `Visits` says what the caller gets back: the visits, in order.
+#
+# Traverse was introduced in 1.8.0 and so carries one release of history, which made it the
+# cheapest of the three to rename. The engine keeps the name Traversal.
+#
+# Under PVP, 1.8.0 -> 1.9.0 is a major bump, so this break is permitted. See
+# https://github.com/rchillyard/Visitor/issues/48 for the release it travels with.
+#
+# NOTE: contrary to what the comment in build.sbt long claimed, this file does NOT retire itself
+# when previousRelease moves past 1.8.0. sbt-mima applies every *.backwards.excludes file in
+# this directory, whatever it is named, so these two lines stay in force until the file is
+# deleted by hand. Delete it once 1.9.0 is published and previousRelease has moved on, after
+# checking that mimaReportBinaryIssues is still clean without it. See
+# https://github.com/rchillyard/Visitor/issues/50
+#
+# The exact filter lines below are MiMa's own suggestions from the failing run, not hand-written.
+
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Traverse")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Traverse$")
