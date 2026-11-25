@@ -48,6 +48,24 @@ trait Tracer[V]:
     */
   def trace(depth: Int, brief: => String, detail: => String = ""): Unit
 
+/**
+  * Companion utilities and built-in implementations for [[Tracer]].
+  *
+  * Provides the standard tracing modes used by graph algorithms and other
+  * nested computations. The default given tracer is silent, allowing algorithms
+  * that require a tracer to compile and run without explicit configuration and
+  * without evaluating trace message arguments.
+  *
+  * Available modes:
+  *
+  *  - `silent`: suppresses all output and avoids evaluating messages
+  *  - `summary`: emits only top-level brief messages
+  *  - `verbose`: emits indented detailed messages up to a configurable depth
+  *
+  * Also includes a helper for producing brief and detailed messages from
+  * collections, using the collection size for the brief message and the
+  * collection elements for the detailed message.
+  */
 object Tracer:
 
   /**

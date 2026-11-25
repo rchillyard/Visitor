@@ -43,6 +43,13 @@ trait Evaluable[V, R]:
 trait EvaluableFrom[V, R]:
   def evaluate(from: Option[V], v: V): Option[R]
 
+/**
+  * Companion utilities for creating [[EvaluableFrom]] instances.
+  *
+  * Provides adapters for cases where evaluation either does not depend on the
+  * predecessor node or needs direct access to the predecessor recorded by a
+  * traversal visitor.
+  */
 object EvaluableFrom:
   /**
     * Adapts an ordinary [[Evaluable]], ignoring the predecessor.
@@ -139,6 +146,17 @@ trait VisitedSet[V]:
   def isVisited(v: V): Boolean
   def markVisited(v: V): VisitedSet[V]
 
+/**
+  * Companion utilities for creating [[VisitedSet]] instances.
+  *
+  * A `VisitedSet` records which graph nodes have already been encountered during
+  * traversal so algorithms can avoid revisiting nodes, including in cyclic graphs.
+  * The values returned by this companion are immutable; operations that add a node
+  * produce a new `VisitedSet` rather than modifying an existing one.
+  *
+  * Use [[empty]] to create a set with no visited nodes, or [[from]] to wrap an
+  * existing `Set` of already-visited nodes without rebuilding it element by element.
+  */
 object VisitedSet:
   /**
     * An empty `VisitedSet`.
@@ -167,6 +185,15 @@ object VisitedSet:
 /** Default given: immutable Set-backed VisitedSet for plain node types. */
 given [V]: VisitedSet[V] = SetVisitedSet(Set.empty)
 
+/**
+  * Immutable `VisitedSet` implementation backed by a Scala `Set`.
+  *
+  * Membership and insertion semantics are determined by the underlying set.
+  * Marking a value as visited returns a new visited-set instance and leaves the
+  * original instance unchanged.
+  *
+  * @tparam V the node type tracked by this visited set
+  */
 private case class SetVisitedSet[V](visited: Set[V]) extends VisitedSet[V]:
   def isVisited(v: V): Boolean = visited.contains(v)
   def markVisited(v: V): VisitedSet[V] = copy(visited + v)
@@ -187,6 +214,22 @@ private case class SetVisitedSet[V](visited: Set[V]) extends VisitedSet[V]:
   */
 given [E, V]: VisitedSet[(E, V)] = TupleVisitedSet(Set.empty)
 
+/**
+  * Visited-set implementation for values represented as `(E, V)` tuples.
+  *
+  * This implementation treats the second tuple component as the identity of the
+  * visited node and ignores the first component when testing or recording
+  * visitation. It is useful when traversal items carry auxiliary information,
+  * such as an edge, label, or predecessor, alongside the actual vertex to be
+  * tracked.
+  *
+  * The set is immutable: marking a tuple as visited returns a new visited-set
+  * instance containing the tuple's second component.
+  *
+  * @tparam E the type of the auxiliary tuple component
+  * @tparam V the type of the visited node component
+  * @param visited the set of node components already visited
+  */
 private case class TupleVisitedSet[E, V](visited: Set[V]) extends VisitedSet[(E, V)]:
   def isVisited(ev: (E, V)): Boolean = visited.contains(ev._2)
   def markVisited(ev: (E, V)): VisitedSet[(E, V)] = copy(visited + ev._2)
