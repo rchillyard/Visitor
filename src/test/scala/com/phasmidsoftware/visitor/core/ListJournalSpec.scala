@@ -1,6 +1,5 @@
-package com.phasmidsoftware.visitor.misc
+package com.phasmidsoftware.visitor.core
 
-import com.phasmidsoftware.visitor.misc.ListJournal
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
@@ -24,7 +23,7 @@ class ListJournalSpec extends AnyFlatSpec with should.Matchers {
     val emptyJournal = ListJournal.empty[String]
     emptyJournal.iterator.isEmpty shouldBe true
     val journal = emptyJournal.append("a").append("b")
-    val xs = journal.list
+    val xs = journal.xs
     xs shouldBe List("b", "a")
   }
 }

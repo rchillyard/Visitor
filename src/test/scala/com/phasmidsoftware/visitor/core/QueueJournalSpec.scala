@@ -1,6 +1,5 @@
-package com.phasmidsoftware.visitor.misc
+package com.phasmidsoftware.visitor.core
 
-import com.phasmidsoftware.visitor.misc.QueueJournal
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should
 
@@ -25,7 +24,7 @@ class QueueJournalSpec extends AnyFlatSpec with should.Matchers {
   it should "test queue" in {
     val emptyJournal = QueueJournal.empty[String]
     val journal = emptyJournal.append("a").append("b")
-    val queue = journal.queue
+    val queue = journal.q
     queue shouldBe Queue("a", "b")
   }
 }

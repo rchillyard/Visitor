@@ -1,4 +1,4 @@
-package com.phasmidsoftware.visitor.misc
+package com.phasmidsoftware.visitor.core
 
 /**
  * A case class implementation of the `Appendable` trait which executes a provided function
@@ -12,7 +12,7 @@ package com.phasmidsoftware.visitor.misc
  * @param f a function to be executed with each appended element
  * @tparam X the type of elements that can be appended to this `Appendable`
  */
-case class NonAppendable[X](f: X => Unit) extends com.phasmidsoftware.visitor.core.Appendable[X, NonAppendable[X]] {
+case class NonAppendable[X](f: X => Unit) extends Appendable[X, NonAppendable[X]] {
 
   /**
    * "Appends" the specified element to this `Appendable` object, returning a new instance
