@@ -30,8 +30,8 @@ enum DfsOrder:
   *   - `visit(v)`             — when a vertex is settled (dequeued/popped)
   *   - `discover(v, cameFrom)` — when a vertex is first seen as a neighbour
   *
-  * NOTE that there are three independent traversal engines which should be maintained
-  * in parallel as much as possible: `traverse`, `traverseTree`, and `dfs`.
+  * NOTE that there are four independent traversal engines which should be maintained
+  * in parallel as much as possible: `traverse`, `traverseTree`, `dfs`, and `inOrder`.
   */
 /**
   * The outcome of a traversal that hands back the visited set it built, as well as the visitor.
@@ -326,6 +326,124 @@ object Traversal:
     val startChildren = nbrs.neighbours(start).toList
     val discoveredVisitor = startChildren.foldLeft(visitor)((v, child) => v.discover(child, start))
     loop(List(Left(start)), discoveredVisitor, vs)
+
+  /**
+    * In-order depth-first traversal of a binary tree: left subtree, then the node, then right
+    * subtree. Over a binary search tree this is the traversal that yields the sorted sequence.
+    *
+    * This is a separate entry point rather than a third [[DfsOrder]] case because it asks for
+    * strictly more than `Pre` and `Post` do. Those are defined for any [[GraphNeighbours]];
+    * in-order is not, because it needs to know which side a child is on. A node with one child
+    * is the case that matters: left-only and right-only give different sequences, and an
+    * `Iterator[V]` of children cannot tell them apart — so counting the children would admit
+    * precisely the case that breaks. [[BinaryNeighbours]] asserts the property in the type
+    * instead, which is why no guard appears below and why this traversal is total: a node with
+    * no children degenerates to pre = in = post, and a node with one is resolved by the
+    * instance saying which side it is on.
+    *
+    * In-order has a meaning on a tree, not on a graph. The revisit guard keeps the traversal
+    * terminating and well defined on a structure with a shared subtree or a cycle, but a child
+    * reached twice is expanded only once, so the result is then no longer the sorted order of a
+    * search tree.
+    *
+    * See [[https://github.com/rchillyard/Visitor/issues/48 issue #48]].
+    *
+    * @param start   the node to start from.
+    * @param visitor the visitor that accumulates results during the traversal.
+    * @param goal    a predicate that, when true for a recorded node, halts the traversal after
+    *                recording it. Defaults to never stopping early.
+    * @param nbrs    the binary adjacency: which child is the left one, and which the right.
+    * @param vs      the set of visited nodes, preventing revisits.
+    * @param tracer  typeclass for tracing the node type.
+    * @tparam V the node type.
+    * @tparam E the journal's element type.
+    * @tparam J the journal type.
+    * @return the visitor, its journal holding the nodes in in-order.
+    */
+  def inOrder[V, E, J <: Appendable[E, J]](
+                                                      start: V,
+                                                      visitor: Visitor[V, E, J],
+                                                      goal: V => Boolean = (_: V) => false
+                                                    )(using
+                                                      nbrs: BinaryNeighbours[V],
+                                                      vs: VisitedSet[V],
+                                                      tracer: Tracer[V] = Tracer.silent
+  ): Visitor[V, E, J] =
+    inOrderTracking(start, visitor, vs, goal).visitor
+
+  /**
+    * In-order traversal that also returns the [[VisitedSet]] it built, as [[dfsTracking]] does
+    * for depth-first. See [[inOrder]] for what in-order means here and why it requires a
+    * [[BinaryNeighbours]], and [[dfsTracking]] for why the visited set is an ordinary parameter
+    * rather than a `using` one.
+    *
+    * The stack holds the same `Either`-tagged frames as [[dfsTracking]]:
+    *   - `Left(v)`  — expand `v`: push its left child, a record frame for `v`, then its right
+    *   - `Right(v)` — record `v` in the visitor now
+    *
+    * so that the record frame sits between the two subtrees rather than before or after both.
+    *
+    * `discover(child, node)` is called for each unvisited child at expand time, as in
+    * [[dfsTracking]], so a [[ParentedVisitor]] behaves the same way in all three orders.
+    *
+    * @param start   the node to start from.
+    * @param visitor the visitor that accumulates results during the traversal.
+    * @param vs      the set of visited nodes to begin from.
+    * @param goal    a predicate that, when true for a recorded node, halts the traversal after
+    *                recording it. Defaults to never stopping early.
+    * @param nbrs    the binary adjacency.
+    * @param tracer  typeclass for tracing the node type.
+    * @tparam V the node type.
+    * @tparam E the journal's element type.
+    * @tparam J the journal type.
+    * @return the visitor and the visited set, as a [[Traversed]].
+    */
+  def inOrderTracking[V, E, J <: Appendable[E, J]](
+                                                      start: V,
+                                                      visitor: Visitor[V, E, J],
+                                                      vs: VisitedSet[V],
+                                                      goal: V => Boolean = (_: V) => false
+                                                    )(using
+                                                      nbrs: BinaryNeighbours[V],
+                                                      tracer: Tracer[V] = Tracer.silent
+  ): Traversed[V, E, J] =
+
+    tracer.trace(0, s"inOrder: start=$start")
+
+    type Frame = Either[V, V]
+
+    @annotation.tailrec
+    def loop(
+              stack: List[Frame],
+              vis: Visitor[V, E, J],
+              visited: VisitedSet[V]
+            ): Traversed[V, E, J] =
+      stack match
+        case Nil => Traversed(vis, visited)
+
+        case Right(node) :: rest =>
+          tracer.trace(1, s"record: $node")
+          val newVisitor = vis.visit(node)
+          if goal(node) then Traversed(newVisitor, visited)
+          else loop(rest, newVisitor, visited)
+
+        case Left(node) :: rest =>
+          if visited.isVisited(node) then loop(rest, vis, visited)
+          else
+            val newVisited = visited.markVisited(node)
+            val l = nbrs.left(node).filterNot(newVisited.isVisited)
+            val r = nbrs.right(node).filterNot(newVisited.isVisited)
+            tracer.trace(1, s"expand: $node  left=$l right=$r")
+            // discover each child before pushing to stack
+            val discoveredVis = (l.iterator ++ r.iterator).foldLeft(vis)((v, child) => v.discover(child, node))
+            val leftFrames: List[Frame] = l.toList.map(Left(_))
+            val rightFrames: List[Frame] = r.toList.map(Left(_))
+            loop(leftFrames ::: (Right(node) :: rightFrames ::: rest), discoveredVis, newVisited)
+
+    // NOTE: unlike `dfsTracking`, start's children are not discovered here before the loop
+    // begins. The loop's own `Left(start)` branch discovers them, so seeding as well would
+    // announce each of them twice.
+    loop(List(Left(start)), visitor, vs)
 
   /**
     * Breadth-first search traversal.

@@ -200,6 +200,15 @@ object Traversal:
                            order: DfsOrder = DfsOrder.Pre, goal: V => Boolean = _ => false)
       (using Neighbours[V, V]): Traversed[V, E, J]
 
+  // in-order, for a binary tree: left subtree, node, right subtree
+  def inOrder[V, E, J](start: V, visitor: Visitor[V, E, J], goal: V => Boolean = _ => false)
+      (using BinaryNeighbours[V], VisitedSet[V]): Visitor[V, E, J]
+
+  // as inOrder, but also returns the VisitedSet it built
+  def inOrderTracking[V, E, J](start: V, visitor: Visitor[V, E, J], vs: VisitedSet[V],
+                               goal: V => Boolean = _ => false)
+      (using BinaryNeighbours[V]): Traversed[V, E, J]
+
   def bestFirst[V: Ordering, E, J](start: V, visitor: Visitor[V, E, J], goal: V => Boolean = _ => false)
       (using Neighbours[V, V], VisitedSet[V]): Visitor[V, E, J]
 
@@ -217,6 +226,26 @@ object Traversal:
 
 (`J` is bounded `J <: Appendable[E, J]` throughout; elided above for readability. Note that no
 entry point asks for an `Evaluable` — the visitor carries whatever it needs.)
+
+`inOrder` is the one entry point that does not take a `Neighbours`. In-order needs to know
+*which side* each child is on, and an `Iterator[V]` of children cannot say: a node with a single
+child is left-only or right-only, and the two give different sequences. Counting the children
+would admit exactly that case, so the property is asserted in the type instead —
+`BinaryNeighbours[V]` extends `GraphNeighbours[V]` with `left` and `right`, supplying
+`neighbours` from them, so one instance still drives `dfs`, `bfs` and the rest:
+
+```scala
+given BinaryNeighbours[Node] with
+  def left(n: Node): Option[Node] = n.l
+  def right(n: Node): Option[Node] = n.r
+
+Traverse.inOrder(root)   // over a binary search tree, the nodes in ascending order
+```
+
+A node with no children collapses pre-, in- and post-order to one; a node with one is resolved
+by the instance saying which side it is on; a third child cannot be presented at all, so
+`inOrder` needs no runtime guard. See
+[issue #48](https://github.com/rchillyard/Visitor/issues/48).
 
 `bestFirstWeighted` is the entry point for Dijkstra- and Prim-style traversals.
 The frontier element type `W` is typically `(E, V)` where `E` is the cost type.
@@ -393,6 +422,7 @@ given GraphNeighbours[String] = v => graph.getOrElse(v, Nil).iterator
 
 Traverse.bfs("A")                    // List(A, B, C, D)
 Traverse.dfs("A", DfsOrder.Post)     // post-order
+Traverse.inOrder(root)               // in-order; needs a BinaryNeighbours
 Traverse.tree(root)                  // a tree, root not visited
 ```
 
@@ -520,6 +550,7 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
 | 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Traverse.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`Appendable[X]` is now F-bounded as `Appendable[X, A <: Appendable[X, A]]`**, with `append(x: X): A`, removing four unchecked casts. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
+| 1.9.0   | Added **in-order traversal** for binary trees: `Traversal.inOrder`, `Traversal.inOrderTracking` and `Traverse.inOrder`, together with the **`BinaryNeighbours[V]`** typeclass they require ([#48](https://github.com/rchillyard/Visitor/issues/48)). `BinaryNeighbours` extends `GraphNeighbours` with `left` and `right` and supplies `neighbours` from them, so one instance drives every traversal. In-order is a separate entry point rather than a third `DfsOrder` case because it needs to know which side each child is on, which a `Neighbours` cannot say — see the note in the Traversal section. All additive: MiMa is clean against 1.8.0 |
 
 ## Migrating to 1.8.0
 
