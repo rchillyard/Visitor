@@ -552,7 +552,43 @@ The traversal loop threads all state explicitly — there are no `var`s anywhere
 | 1.6.0   | `Zero[A]` typeclass (identity only); `Monoid[A]` alongside it, bridged by a derived given rather than by inheritance; `given Zero[A]` instances for numeric types; derived `given [A: Monoid]: Zero[A]`; `CameFromJournal[V]` with first-discovery-wins semantics; `discover(v, cameFrom)` on `Visitor` (default no-op); `JournaledVisitor` records came-from when journal present; `withQueueJournalAndCameFrom` and `withListJournalAndCameFrom` factory methods; `discover` called in `traverse` and `dfs` at discovery time |
 | 1.7.0   | Built with Scala 3.9.0 (the current LTS), so needs Scala 3.9 or later; sbt 1.12.13; Scaladoc on GitHub Pages |
 | 1.8.0   | **`Visitor[V, E, J]` is now generic in its journal's element type `E`**, and `visit` no longer takes a `using Evaluable` — a `JournaledVisitor` binds one when it is built. **New `SimpleVisitor`** records bare nodes into an `Appendable[V]`, needing no `Evaluable` and allocating no pair per visit, and **`Visits.bfs`/`dfs`/`tree`** return a `List[V]` directly. New `Mapped[V, R]` alias for `(V, Option[R])`. **`Appendable[X]` is now F-bounded as `Appendable[X, A <: Appendable[X, A]]`**, with `append(x: X): A`, removing four unchecked casts. **`EvaluableFrom` and `ParentedVisitor`** give an evaluator the node a node was reached from ([#20](https://github.com/rchillyard/Visitor/issues/20)); **`Traversal.dfsTracking`** returns the `VisitedSet` it built, and **`VisitedSet.from`/`empty`** construct one directly ([#22](https://github.com/rchillyard/Visitor/issues/22)) — all additive. **Java API** (`com.phasmidsoftware.visitor.java`): `Traversals.bfs`/`dfs`/`traverseTree` with `NeighbourFunction`, `Evaluator`, `Order` and `TraversalResult`; Javadoc published beside the Scaladoc. **Removed `core.Zero` and `core.Monoid`** and their `given` instances — see the migration note below. `versionScheme` is now `pvp`; MiMa checks each release; `logback-classic` moved to `Test` scope, so it is no longer forced onto consumers |
-| 1.9.0   | Added **in-order traversal** for binary trees: `Traversal.inOrder`, `Traversal.inOrderTracking` and `Visits.inOrder`, together with the **`BinaryNeighbours[V]`** typeclass they require ([#48](https://github.com/rchillyard/Visitor/issues/48)). `BinaryNeighbours` extends `GraphNeighbours` with `left` and `right` and supplies `neighbours` from them, so one instance drives every traversal. In-order is a separate entry point rather than a third `DfsOrder` case because it needs to know which side each child is on, which a `Neighbours` cannot say — see the note in the Traversal section. **`Traverse` is renamed to `Visits`** — the one breaking change in this release, and the reason it is 1.9.0 rather than 1.8.1. The division between the engine and the facade is sound, but `Traversal`, `Traverse` and `Traversed` were distinguishable only by inflection, and the inflection did not map to the roles; `Visits` is named for what it returns. `Traverse` was introduced in 1.8.0, so it carried the least history of the three. **`Traversed` moves to its own file**, which is also how a long-orphaned scaladoc block on `object Traversal` came to light: it sat immediately before `Traversed`'s own comment and so had never been rendered. **`Behaviours.scala` is split into one file per typeclass family** — `Evaluable`, `Neighbours`, `VisitedSet`, `Frontier` and `CostUpdate` — which is source-compatible, nothing having left the package, but binary-breaking, because Scala 3 compiles a file's top-level definitions into a synthetic class named after the file. Everything else in this release is additive |
+| 1.9.0   | Added **in-order traversal** for binary trees: `Traversal.inOrder`, `Traversal.inOrderTracking` and `Visits.inOrder`, together with the **`BinaryNeighbours[V]`** typeclass they require ([#48](https://github.com/rchillyard/Visitor/issues/48)). `BinaryNeighbours` extends `GraphNeighbours` with `left` and `right` and supplies `neighbours` from them, so one instance drives every traversal. In-order is a separate entry point rather than a third `DfsOrder` case because it needs to know which side each child is on, which a `Neighbours` cannot say — see the note in the Traversal section. **`Traverse` is renamed to `Visits`** — the one breaking change in this release, and the reason it is 1.9.0 rather than 1.8.1. The division between the engine and the facade is sound, but `Traversal`, `Traverse` and `Traversed` were distinguishable only by inflection, and the inflection did not map to the roles; `Visits` is named for what it returns. `Traverse` was introduced in 1.8.0, so it carried the least history of the three. **`Traversed` moves to its own file**, which is also how a long-orphaned scaladoc block on `object Traversal` came to light: it sat immediately before `Traversed`'s own comment and so had never been rendered. **`Behaviours.scala` is split into one file per typeclass family** — `Evaluable`, `Neighbours`, `VisitedSet`, `Frontier` and `CostUpdate` — which is source-compatible, nothing having left the package, but binary-breaking, because Scala 3 compiles a file's top-level definitions into a synthetic class named after the file. **The `misc` package is eliminated** ([#31](https://github.com/rchillyard/Visitor/issues/31)): its duplicate `IterableJournal`, `ListJournal` and `QueueJournal` are dropped in favour of `core`'s, and `AppendableWriter`, `NonAppendable`, `FunctionMappedJournal`, `AbstractMapJournal`, `MapJournal` and `FunctionMapJournal` move into `core` — see *Migrating to 1.9.0* below. Everything else in this release is additive |
+
+## Migrating to 1.9.0
+
+Two renames and the removal of a package. Both are mechanical.
+
+**`Traverse` is now `Visits`.** The object with `bfs`, `dfs`, `inOrder` and `tree`, returning a
+`List[V]`. The engine, `Traversal`, is unchanged.
+
+```scala
+Traverse.bfs("A")   // 1.8.0
+Visits.bfs("A")     // 1.9.0
+```
+
+**The `misc` package is gone.** Everything worth keeping now lives in `core`, so in most cases
+the fix is the import:
+
+```scala
+import com.phasmidsoftware.visitor.misc.MapJournal   // 1.8.0
+import com.phasmidsoftware.visitor.core.MapJournal   // 1.9.0
+```
+
+That holds for `AppendableWriter`, `NonAppendable`, `FunctionMappedJournal`,
+`AbstractMapJournal`, `MapJournal` and `FunctionMapJournal`, which moved unchanged.
+
+`misc` also carried its own `IterableJournal`, `ListJournal` and `QueueJournal`, duplicating
+`core`'s by name and behaviour. Those are deleted, and `core`'s stand in their place. The import
+change is the same, but **the backing field is named differently**, so direct field access needs
+editing too:
+
+| 1.8.0 | 1.9.0 |
+|---|---|
+| `misc.ListJournal(...).list` | `core.ListJournal(...).xs` |
+| `misc.QueueJournal(...).queue` | `core.QueueJournal(...).q` |
+
+`append`, `iterator`, `empty` and `close` are identical in both, so only field access is
+affected. `core.ListJournal` prepends, exactly as `misc`'s did.
 
 ## Migrating to 1.8.0
 

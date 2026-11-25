@@ -50,3 +50,41 @@ ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Be
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_PrioQueue$")
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_Queue$")
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_Stack$")
+
+# ---------------------------------------------------------------------------
+# The misc package is eliminated (1.9.0). See
+# https://github.com/rchillyard/Visitor/issues/31
+#
+# misc carried a partial, parallel copy of core's journal hierarchy. Its IterableJournal,
+# ListJournal and QueueJournal duplicated core's by name and behaviour, which is a trap rather
+# than a convenience: two same-named types in one library, differing only in a field name. Those
+# three are DELETED; core's equivalents stand.
+#
+# Everything else MOVED into core unchanged: AppendableWriter, NonAppendable,
+# FunctionMappedJournal, AbstractMapJournal, MapJournal and FunctionMapJournal. A move is still
+# a binary break, the package being part of the name, which is why they appear below despite
+# still existing.
+#
+# For a caller the source fix is an import: com.phasmidsoftware.visitor.misc.X becomes
+# com.phasmidsoftware.visitor.core.X, for the deleted duplicates as well as the moved types,
+# since core has same-named equivalents. The one place that is not mechanical is field access on
+# the two duplicated journals, where core uses shorter names: ListJournal.list is now
+# ListJournal.xs, and QueueJournal.queue is now QueueJournal.q. The README records this.
+#
+# The exact filter lines below are MiMa's own suggestions from the failing run, not hand-written.
+
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.AbstractMapJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.AppendableWriter")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.AppendableWriter$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.FunctionMapJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.FunctionMapJournal$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.FunctionMappedJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.IterableJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.ListJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.ListJournal$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.MapJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.MapJournal$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.NonAppendable")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.NonAppendable$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.QueueJournal")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.misc.QueueJournal$")

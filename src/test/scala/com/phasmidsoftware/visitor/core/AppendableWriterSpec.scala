@@ -1,6 +1,5 @@
-package com.phasmidsoftware.visitor.misc
+package com.phasmidsoftware.visitor.core
 
-import com.phasmidsoftware.visitor.misc.AppendableWriter
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 

@@ -1,4 +1,4 @@
-package com.phasmidsoftware.visitor.misc
+package com.phasmidsoftware.visitor.core
 
 import java.io.*
 
@@ -16,7 +16,7 @@ import java.io.*
  * @param writer    the underlying `Writer` instance to which strings are appended
  * @param closeable an optional `AutoCloseable` resource that will be closed along with the writer
  */
-case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends com.phasmidsoftware.visitor.core.Appendable[String, AppendableWriter] {
+case class AppendableWriter(writer: Writer)(closeable: Option[AutoCloseable]) extends Appendable[String, AppendableWriter] {
 
   /**
    * Appends the specified string to this `AppendableWriter` instance.
