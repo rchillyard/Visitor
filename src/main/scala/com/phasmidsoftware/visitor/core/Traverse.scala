@@ -52,6 +52,22 @@ object Traverse:
     Traversal.dfs(start, SimpleVisitor.withQueueJournal[V], order, goal).result.toList
 
   /**
+    * In-order traversal of a binary tree from `start`: left subtree, node, right subtree.
+    *
+    * Over a binary search tree this returns the nodes in ascending order. It requires a
+    * [[BinaryNeighbours]] rather than a [[GraphNeighbours]], because in-order needs to know
+    * which side each child is on; see [[Traversal.inOrder]].
+    *
+    * @param start the node to start from
+    * @param goal  optional early-termination predicate. Defaults to never stopping early.
+    * @param nbrs  the binary adjacency
+    * @tparam V the node type
+    * @return the visited nodes, in in-order
+    */
+  def inOrder[V](start: V, goal: V => Boolean = (_: V) => false)(using nbrs: BinaryNeighbours[V]): List[V] =
+    Traversal.inOrder(start, SimpleVisitor.withQueueJournal[V], goal).result.toList
+
+  /**
     * Depth-first traversal of a tree whose root may have a different type from its descendants.
     *
     * The root itself is not visited; `rootNbrs` yields the nodes the traversal begins from.
