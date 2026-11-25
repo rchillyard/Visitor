@@ -96,6 +96,63 @@ private[core] object BinaryHeap:
 // ============================================================
 
 /**
+  * An immutable priority queue abstraction whose elements are retrieved according
+  * to the priority ordering defined by a concrete implementation.
+  *
+  * Adding or removing elements does not mutate the existing queue. Instead,
+  * operations return a new queue that reflects the requested change.
+  *
+  * Duplicate elements are permitted. Implementations determine how priorities
+  * are assigned and how elements with equal priority are ordered.
+  *
+  * @tparam T the type of elements stored in the priority queue
+  */
+trait AbstractPrioQueue[T] {
+
+  /**
+    * Adds an element to this priority queue, preserving the queue ordering.
+    * Duplicate elements are permitted.
+    *
+    * @param t the element to add
+    * @return a new priority queue containing all existing elements plus `t`
+    */
+  def offer(t: T): AbstractPrioQueue[T]
+
+  /**
+    * Removes the head element from this priority queue and returns it together
+    * with the remaining queue. The original queue is unchanged.
+    *
+    * Requires this queue to be non-empty.
+    *
+    * @return a tuple containing the removed element and a new priority queue without that element
+    */
+  def take: (T, AbstractPrioQueue[T])
+
+  /**
+    * Determines whether this priority queue contains no elements.
+    *
+    * @return `true` if this priority queue has no elements, otherwise `false`
+    */
+  def isEmpty: Boolean
+
+  /**
+    * Returns the number of elements currently contained in this priority queue.
+    *
+    * @return the number of elements in this priority queue
+    */
+  def size: Int
+
+  /**
+    * Returns the head element of this priority queue without removing it.
+    *
+    * Requires this queue to be non-empty.
+    *
+    * @return the element with the highest priority according to this queue's ordering
+    */
+  def head: T
+}
+
+/**
   * An immutable priority queue ADT backed by [[BinaryHeap]].
   *
   * Duplicates are permitted. The minimum element is dequeued first
@@ -111,10 +168,25 @@ private[core] object BinaryHeap:
   * @param heap the underlying binary heap
   * @tparam T the element type
   */
-case class PrioQueue[T] private(private val heap: BinaryHeap[T]):
+case class PrioQueue[T] private(private val heap: BinaryHeap[T]) extends AbstractPrioQueue[T]:
 
+  /**
+    * Adds an element to this priority queue, preserving the queue ordering.
+    * Duplicate elements are permitted.
+    *
+    * @param t the element to add
+    * @return a new priority queue containing all existing elements plus `t`
+    */
   def offer(t: T): PrioQueue[T] = copy(heap = heap.insert(t))
 
+  /**
+    * Removes the head element from this priority queue and returns it together
+    * with the remaining queue. The original queue is unchanged.
+    *
+    * Requires this queue to be non-empty.
+    *
+    * @return a tuple containing the removed element and a new priority queue without that element
+    */
   def take: (T, PrioQueue[T]) =
     val (min, h) = heap.removeMin
     (min, copy(heap = h))
@@ -164,12 +236,27 @@ object PrioQueue:
 case class IndexedPrioQueue[T] private(
                                         private[core] val heap: BinaryHeap[T],
                                         private val index: Map[T, Int]
-                                      ):
-
+                                      ) extends AbstractPrioQueue[T]:
+  /**
+    * Tests whether this priority queue contains no elements.
+    *
+    * @return true if this queue is empty, false otherwise
+    */
   def isEmpty: Boolean = heap.isEmpty
 
+  /**
+    * Returns the number of elements currently contained in this priority queue.
+    *
+    * @return the number of elements in this queue
+    */
   def size: Int = heap.size
 
+  /**
+    * Returns the minimum element currently at the head of this priority queue without removing it.
+    *
+    * @return the element with the highest priority according to the queue ordering
+    * @throws IllegalArgumentException if this queue is empty
+    */
   def head: T = heap.head
 
   /**
@@ -197,7 +284,8 @@ case class IndexedPrioQueue[T] private(
     */
   def decreaseKey(oldT: T, newT: T): IndexedPrioQueue[T] =
     index.get(oldT) match
-      case None => this
+      case None =>
+        this
       case Some(i) =>
         if heap.ord.lteq(heap.data(i), newT) then this
         else

@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the Java façade over Visitor's traversal engine.
@@ -69,7 +67,7 @@ class TraversalsTest {
     @Test
     void bfsLeavesTheStartNodeOutOfTheCameFromMap() {
         TraversalResult<String, String> r = Traversals.bfs("A", ADJACENCY);
-        assertTrue(r.cameFrom().get("A") == null, "start node was reached from nowhere");
+        assertNull(r.cameFrom().get("A"), "start node was reached from nowhere");
     }
 
     @Test
@@ -85,7 +83,7 @@ class TraversalsTest {
         // D was discovered when B was expanded, then never visited because the goal fired first.
         // So came-from legitimately holds a node absent from visited().
         assertEquals("B", r.cameFrom().get("D"));
-        assertTrue(!r.visited().contains("D"), "D should not have been visited");
+        assertFalse(r.visited().contains("D"), "D should not have been visited");
     }
 
     // ------------------------------------------------------------------------
