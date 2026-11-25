@@ -23,3 +23,30 @@
 
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Traverse")
 ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Traverse$")
+
+# ---------------------------------------------------------------------------
+# Behaviours.scala is split into one file per typeclass family (1.9.0).
+#
+# It had become a grab-bag of five unrelated typeclasses whose only common feature was that
+# nobody had found a home for them: Evaluable, Neighbours, VisitedSet, Frontier and CostUpdate.
+# Each now has its own file, named for the typeclass it holds.
+#
+# No logic changed, and nothing moved out of the package, so this is source-compatible: callers'
+# imports and implicit resolution are unaffected. It is nevertheless a binary break, because in
+# Scala 3 the top-level definitions of a file compile into a synthetic class named after that
+# file. Moving a top-level given from Behaviours.scala to Frontier.scala renames its enclosing
+# class, and Behaviours$package ceases to exist. The traits themselves are ordinary classes and
+# move for free; the seven entries below are the synthetic holder and the top-level givens.
+#
+# This is why the split was done in 1.9.0, which is a major bump under PVP and was already
+# breaking for the Traverse rename, rather than left for later.
+#
+# The exact filter lines below are MiMa's own suggestions from the failing run, not hand-written.
+
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_CostUpdate_W_F")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_IndexedPrioQueue$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_PrioQueue$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_Queue$")
+ProblemFilters.exclude[MissingClassProblem]("com.phasmidsoftware.visitor.core.Behaviours$package$given_Frontier_Stack$")
