@@ -1,0 +1,31 @@
+# Deliberate binary breaks in 1.10.0, relative to 1.9.0. See the release note in README.md.
+#
+# THESE FILTERS DO NOT RETIRE. sbt-mima reads every *.backwards.excludes in this directory
+# whatever it is named, so this file stays in force until somebody deletes it. Delete it at the
+# 1.10.0 post-release, when previousRelease moves to 1.10.0.
+#
+# ---------------------------------------------------------------------------------------
+# #55: CameFromJournal gains a `keepFirst` field.
+#
+# All three breaks are one change: adding a parameter to a case class changes its constructor,
+# its `copy` and its companion's `apply`. The field carries a default, so every source call site
+# compiles unchanged -- this is source-compatible and binary-incompatible, and a caller needs a
+# recompile rather than an edit.
+#
+# The field exists because a came-from map has to choose between the several vertices that can
+# reach a node before it is visited, and THE TWO TRAVERSALS WANT OPPOSITE ANSWERS. Breadth-first
+# wants the first, which is on a shortest path. Depth-first wants the last, which is the vertex it
+# actually expands from, because that is the frame nearest the top of the stack. Through 1.9.x the
+# journal always kept the first, so it was right for BFS and wrong for DFS.
+#
+# The behavioural change matters more than the binary one, and it is why this is 1.10.0 rather
+# than 1.9.1: `withListJournalAndCameFrom` now returns a different map for the same traversal of
+# the same graph. The old map was not the DFS tree. On a transitive tournament a DFS walking the
+# path 0,1,2,3,4,5 reported a star rooted at 0, because every vertex really was first seen from
+# the source -- the traversal had the right answer and the journal discarded it. BFS is unchanged.
+#
+# See #55, and rchillyard/Gryphon#144 where it surfaced.
+#
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.CameFromJournal.this")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.CameFromJournal.copy")
+ProblemFilters.exclude[DirectMissingMethodProblem]("com.phasmidsoftware.visitor.core.CameFromJournal.apply")

@@ -2,7 +2,7 @@
 
 organization := "com.phasmidsoftware"
 
-version := "1.9.1"
+version := "1.10.0"
 
 val scalaVersionNumber  = "3.9.0" // the current LTS
 val scalaTestVersion    = "3.2.20"

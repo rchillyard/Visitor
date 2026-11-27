@@ -141,24 +141,41 @@ object JournaledVisitor:
     JournaledVisitor(QueueJournal.empty, ev)
 
   /**
-    * Creates a journaled visitor with a queue-based journal and an empty came-from journal.
+    * Creates a journaled visitor with a queue-based journal and a came-from journal recording the
+    * '''discovery''' parent — which is what breadth-first search needs.
+    *
+    * The queue journal pairs with BFS, and BFS's tree is its discovery order: the first vertex to
+    * reach `v` is on a shortest path to it. So `cameFrom` here is the BFS tree, and following it
+    * backwards gives a path with the fewest edges.
     *
     * @tparam V the type of nodes being visited
     * @tparam R the result type associated with each node
-    * @return a `JournaledVisitor` configured with a `QueueJournal` and a came-from journal
+    * @return a `JournaledVisitor` configured with a `QueueJournal` and a discovery came-from journal
     */
   def withQueueJournalAndCameFrom[V, R](using ev: Evaluable[V, R]): JournaledVisitor[V, R, QueueJournal[Mapped[V, R]]] =
-    JournaledVisitor(QueueJournal.empty, ev, Some(CameFromJournal.empty))
+    JournaledVisitor(QueueJournal.empty, ev, Some(CameFromJournal.discovery))
 
   /**
-    * Creates a journaled visitor with a list-based journal and an empty came-from journal.
+    * Creates a journaled visitor with a list-based journal and a came-from journal recording the
+    * '''exploration''' parent — which is what depth-first search needs.
+    *
+    * ==This changed in 1.10.0==
+    *
+    * It used to record the discovery parent, like the queue variant above, and so returned a map
+    * that was not the DFS tree. On a transitive tournament, where the source is adjacent to every
+    * other vertex, a DFS walking the path `0,1,2,3,4,5` reported `{1->0, 2->0, 3->0, 4->0, 5->0}`
+    * — a star, because every vertex really was first seen from the source. The traversal had the
+    * right answer and the journal threw it away.
+    *
+    * Nothing was wrong with BFS, which is why one mechanism served both for so long: discovery
+    * and exploration coincide there. See #55, and rchillyard/Gryphon#144 where it surfaced.
     *
     * @tparam V the type of nodes being visited
     * @tparam R the result type associated with each node
-    * @return a `JournaledVisitor` configured with a `ListJournal` and a came-from journal
+    * @return a `JournaledVisitor` configured with a `ListJournal` and an exploration came-from journal
     */
   def withListJournalAndCameFrom[V, R](using ev: Evaluable[V, R]): JournaledVisitor[V, R, ListJournal[Mapped[V, R]]] =
-    JournaledVisitor(ListJournal.empty, ev, Some(CameFromJournal.empty))
+    JournaledVisitor(ListJournal.empty, ev, Some(CameFromJournal.exploration))
 
 /**
   * A [[Visitor]] that records the nodes themselves, with no evaluation.
