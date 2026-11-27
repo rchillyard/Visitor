@@ -115,25 +115,56 @@ object QueueJournal:
 /**
   * A journal that records the came-from relationship established during graph traversal.
   *
-  * For each discovered vertex `v`, `map(v)` is the vertex from which `v` was first
-  * discovered — i.e. the vertex that was being visited when `v` was added to the
-  * frontier. The start vertex is absent from the map (it has no predecessor).
+  * For each reached vertex `v`, `map(v)` is the vertex it was reached from. The start vertex is
+  * absent from the map, having no predecessor.
   *
   * This is sometimes called a "parent map" but "came-from" is more accurate: the
   * relationship is an artifact of traversal order, not a structural property of the
   * graph.
   *
-  * Used in conjunction with [[JournaledVisitor]] when came-from tracking is requested
-  * via the `withQueueJournalAndCameFrom` or `withListJournalAndCameFrom` factory methods.
+  * ==Reached from where, exactly: `keepFirst`==
   *
-  * @param map the underlying came-from map: vertex → the vertex that discovered it
+  * A vertex can be reached from several places before it is visited, so "the vertex it was
+  * reached from" has to pick one, and '''the two traversals need opposite answers'''.
+  *
+  *  - '''Breadth-first wants the FIRST''' (`keepFirst = true`). Discovery order is the tree: the
+  *    vertex that first reached `v` is the one on a shortest path to it, so following the map
+  *    backwards gives a path with the fewest edges.
+  *  - '''Depth-first wants the LAST''' (`keepFirst = false`). The DFS tree is defined by
+  *    ''exploration'', not discovery. A vertex may be seen early from the root and then seen
+  *    again, deeper, before its turn comes — and it is expanded from the most recent of those,
+  *    because that is the frame nearest the top of the stack. So the last writer before `v` is
+  *    visited is exactly the vertex `v` is explored from.
+  *
+  * Through 1.9.x this was always first-wins, and so was right for BFS and wrong for DFS. The
+  * symptom: on a transitive tournament — vertices 0..5, an edge `i -> j` for every `i < j` — DFS
+  * walks the path `0,1,2,3,4,5` and then reported `{1->0, 2->0, 3->0, 4->0, 5->0}`, a star. The
+  * traversal had the right answer and the journal discarded it, because every vertex really was
+  * first seen from the source. With `keepFirst = false` the same traversal reports
+  * `{1->0, 2->1, 3->2, 4->3, 5->4}`, which is the path it actually walked. See #55, and
+  * rchillyard/Gryphon#144 where it surfaced.
+  *
+  * Used in conjunction with [[JournaledVisitor]] when came-from tracking is requested via
+  * `withQueueJournalAndCameFrom` (BFS, first) or `withListJournalAndCameFrom` (DFS, last).
+  *
+  * @param map       the underlying came-from map: vertex → the vertex it was reached from
+  * @param keepFirst whether the first writer wins (discovery, for BFS) or the last
+  *                  (exploration, for DFS)
   * @tparam V the vertex type
   */
-case class CameFromJournal[V](map: Map[V, V]) extends IterableJournal[(V, V), CameFromJournal[V]]:
+case class CameFromJournal[V](map: Map[V, V], keepFirst: Boolean = true)
+        extends IterableJournal[(V, V), CameFromJournal[V]]:
 
+  /**
+    * Record that `x._1` was reached from `x._2`.
+    *
+    * A node can be reached from several places before it is visited, so this has to choose, and
+    * `keepFirst` is that choice. See the class scaladoc: the two traversals want opposite answers,
+    * and the engine offers each the one it needs.
+    */
   def append(x: (V, V)): CameFromJournal[V] =
-    if map.contains(x._1) then this // already discovered — keep first
-    else copy(map + x)
+    if keepFirst && map.contains(x._1) then this // already discovered — keep the first
+    else copy(map = map + x)
 
   def iterator: Iterator[(V, V)] = map.iterator
 
@@ -161,11 +192,33 @@ case class CameFromJournal[V](map: Map[V, V]) extends IterableJournal[(V, V), Ca
   */
 object CameFromJournal:
   /**
-    * Creates an empty `CameFromJournal` instance.
+    * An empty journal recording the '''discovery''' parent: the first vertex to reach each one.
     *
-    * This represents a journal with no recorded came-from relationships,
-    * intended to be used as the starting point for tracking during graph traversal.
+    * This is what breadth-first search wants, and what `empty` has always given. Following it
+    * backwards yields a path with the fewest edges.
+    *
+    * @return an empty `CameFromJournal` with `keepFirst = true`.
+    */
+  def discovery[V]: CameFromJournal[V] = CameFromJournal(Map.empty, keepFirst = true)
+
+  /**
+    * An empty journal recording the '''exploration''' parent: the last vertex to reach each one
+    * before it is visited.
+    *
+    * This is what depth-first search wants, and what it did not get before 1.10.0. See the class
+    * scaladoc for why the last writer is the vertex a DFS actually expands from.
+    *
+    * @return an empty `CameFromJournal` with `keepFirst = false`.
+    */
+  def exploration[V]: CameFromJournal[V] = CameFromJournal(Map.empty, keepFirst = false)
+
+  /**
+    * Creates an empty `CameFromJournal` instance, recording the discovery parent.
+    *
+    * Kept as the unqualified name, and as the discovery variant, because that is what it has
+    * always meant. Prefer `discovery` or `exploration`, which say which one you are asking for
+    * rather than leaving it to be inferred.
     *
     * @return an empty `CameFromJournal`, with an underlying empty map of type `Map[V, V]`.
     */
-  def empty[V]: CameFromJournal[V] = CameFromJournal(Map.empty)
+  def empty[V]: CameFromJournal[V] = discovery
