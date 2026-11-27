@@ -2,7 +2,7 @@
 
 organization := "com.phasmidsoftware"
 
-version := "1.10.0"
+version := "1.10.1"
 
 val scalaVersionNumber  = "3.9.0" // the current LTS
 val scalaTestVersion    = "3.2.20"
@@ -21,7 +21,7 @@ ThisBuild / scalaVersion := scalaVersionNumber
 // The version scheme is PVP (see publish.sbt): a patch release must pass; a minor release may break compatibility,
 // on purpose and with a release note, by listing the breaks in the filters file (or, after the release, by moving
 // previousRelease on). Note moduleName, not name — it is the published artifactId, not the display name.
-val previousRelease = "1.9.0"
+val previousRelease = "1.10.0"
 mimaPreviousArtifacts := Set(organization.value %% moduleName.value % previousRelease)
 
 // Deliberate breaks are listed in src/main/mima-filters/<previousRelease>.backwards.excludes,
